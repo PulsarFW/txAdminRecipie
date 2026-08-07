@@ -8,7 +8,7 @@ description: An advanced FiveM RP framework including jobs, gangs, housing & mor
 tasks:
   # Download Base Files
   - action: download_github
-    src: https://github.com/Artmines/TxAdminRecipie
+    src: https://github.com/PulsarFW/txAdminRecipie
     ref: main
     dest: ./tmp/pulsar
 
