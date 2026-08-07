@@ -52,7 +52,7 @@ Deploys `server.cfg`, `resources.cfg`, `pulsar.sql`, and every `pulsar_*` resour
 
 ## Maintaining This Recipe
 
-Deploy URL: `https://raw.githubusercontent.com/Artmines/TxAdminRecipie/main/pulsar.yaml`
+Deploy URL: `https://raw.githubusercontent.com/PulsarFW/txAdminRecipie/main/pulsar.yaml`
 
 **Adding/removing a resource:**
 1. Add or remove the `ensure` line in `resources.cfg`.
