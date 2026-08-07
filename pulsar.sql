@@ -1,31 +1,12 @@
-SET FOREIGN_KEY_CHECKS=0;
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET NAMES utf8 */;
+/*!50503 SET NAMES utf8mb4 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
-DROP TABLE IF EXISTS `billboards`;
-CREATE TABLE IF NOT EXISTS `billboards` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `billboardId` varchar(50) NOT NULL,
-  `billboardUrl` text,
-  `created_at` timestamp DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `billboardId` (`billboardId`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
-DROP TABLE IF EXISTS `logs`;
-CREATE TABLE IF NOT EXISTS `logs` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `date` int(11) NOT NULL,
-  `level` int(11) NOT NULL,
-  `component` varchar(255) NOT NULL,
-  `log` text NOT NULL,
-  `data` longtext,
-  PRIMARY KEY (`id`),
-  KEY `date` (`date`),
-  KEY `level` (`level`),
-  KEY `component` (`component`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
-DROP TABLE IF EXISTS `app_profile_history`;
 CREATE TABLE IF NOT EXISTS `app_profile_history` (
   `sid` bigint(20) unsigned NOT NULL,
   `date` datetime NOT NULL DEFAULT current_timestamp(),
@@ -36,7 +17,6 @@ CREATE TABLE IF NOT EXISTS `app_profile_history` (
   KEY `sid` (`sid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_520_ci;
 
-DROP TABLE IF EXISTS `bank_accounts`;
 CREATE TABLE IF NOT EXISTS `bank_accounts` (
   `account` int(10) NOT NULL,
   `type` varchar(255) NOT NULL,
@@ -48,7 +28,6 @@ CREATE TABLE IF NOT EXISTS `bank_accounts` (
   KEY `Type` (`type`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
-DROP TABLE IF EXISTS `bank_accounts_permissions`;
 CREATE TABLE IF NOT EXISTS `bank_accounts_permissions` (
   `id` int(10) NOT NULL AUTO_INCREMENT,
   `account` int(10) NOT NULL,
@@ -64,7 +43,6 @@ CREATE TABLE IF NOT EXISTS `bank_accounts_permissions` (
   KEY `account` (`account`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=149 DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
-DROP TABLE IF EXISTS `bank_accounts_transactions`;
 CREATE TABLE IF NOT EXISTS `bank_accounts_transactions` (
   `id` int(10) NOT NULL AUTO_INCREMENT,
   `type` varchar(255) NOT NULL,
@@ -76,37 +54,14 @@ CREATE TABLE IF NOT EXISTS `bank_accounts_transactions` (
   `data` varchar(1024) DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE,
   KEY `account` (`account`) USING BTREE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-DROP TABLE IF EXISTS `bans`;
-CREATE TABLE IF NOT EXISTS `bans` (
-    `id` INT(11) NOT NULL AUTO_INCREMENT,
-    `account` INT(11) DEFAULT NULL,
-    `identifier` VARCHAR(255) DEFAULT NULL,
-    `expires` INT(11) NOT NULL,
-    `reason` TEXT NOT NULL,
-    `issuer` VARCHAR(255) NOT NULL,
-    `active` TINYINT(1) NOT NULL DEFAULT 1,
-    `started` INT(11) NOT NULL,
-    `tokens` LONGTEXT DEFAULT NULL,
-    `unbanned` LONGTEXT DEFAULT NULL,
-    PRIMARY KEY (`id`),
-    KEY `account` (`account`),
-    KEY `identifier` (`identifier`),
-    KEY `active` (`active`),
-    KEY `expires` (`expires`),
-    CONSTRAINT `tokens` CHECK (json_valid(`tokens`)),
-    CONSTRAINT `unbanned` CHECK (json_valid(`unbanned`))
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
-DROP TABLE IF EXISTS `bench_schematics`;
 CREATE TABLE IF NOT EXISTS `bench_schematics` (
   `bench` char(64) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
   `schematic` char(255) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
   KEY `bench` (`bench`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
-DROP TABLE IF EXISTS `blueline_race_history`;
 CREATE TABLE IF NOT EXISTS `blueline_race_history` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `state` int(11) NOT NULL DEFAULT 0,
@@ -118,21 +73,10 @@ CREATE TABLE IF NOT EXISTS `blueline_race_history` (
   `date` datetime NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`id`) USING BTREE,
   KEY `pd_race_history_track` (`track`) USING BTREE,
-  KEY `host` (`host`)
+  KEY `host` (`host`),
+  CONSTRAINT `pd_race_history_track` FOREIGN KEY (`track`) REFERENCES `blueline_tracks` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_520_ci;
 
-DROP TABLE IF EXISTS `blueline_tracks`;
-CREATE TABLE IF NOT EXISTS `blueline_tracks` (
-  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-  `name` varchar(64) NOT NULL,
-  `distance` varchar(256) NOT NULL,
-  `type` varchar(16) NOT NULL,
-  `checkpoints` longtext NOT NULL,
-  `created_by` varchar(64) DEFAULT NULL,
-  PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_520_ci;
-
-DROP TABLE IF EXISTS `blueline_track_history`;
 CREATE TABLE IF NOT EXISTS `blueline_track_history` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `track` int(11) unsigned NOT NULL,
@@ -146,46 +90,21 @@ CREATE TABLE IF NOT EXISTS `blueline_track_history` (
   PRIMARY KEY (`id`) USING BTREE,
   KEY `pd_track_history_track` (`track`) USING BTREE,
   KEY `pd_track_history_race` (`race`) USING BTREE,
-  KEY `callsign` (`callsign`)
+  KEY `callsign` (`callsign`),
+  CONSTRAINT `pd_track_history_race` FOREIGN KEY (`race`) REFERENCES `blueline_race_history` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `pd_track_history_track` FOREIGN KEY (`track`) REFERENCES `blueline_tracks` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_520_ci;
 
-DROP TABLE IF EXISTS `business_configs`;
-CREATE TABLE IF NOT EXISTS `business_configs` (
-    `key` VARCHAR(255) NOT NULL,
-    `value` TEXT DEFAULT NULL,
-    PRIMARY KEY (`key`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+CREATE TABLE IF NOT EXISTS `blueline_tracks` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(64) NOT NULL,
+  `distance` varchar(256) NOT NULL,
+  `type` varchar(16) NOT NULL,
+  `checkpoints` longtext NOT NULL,
+  `created_by` varchar(64) DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_520_ci;
 
-DROP TABLE IF EXISTS `business_documents`;
-CREATE TABLE IF NOT EXISTS `business_documents` (
-    `id` INT(11) NOT NULL AUTO_INCREMENT,
-    `job` VARCHAR(255) NOT NULL,
-    `title` VARCHAR(255) NOT NULL,
-    `content` LONGTEXT DEFAULT NULL,
-    `author` LONGTEXT DEFAULT NULL,
-    `history` LONGTEXT DEFAULT NULL,
-    `lastUpdated` LONGTEXT DEFAULT NULL,
-    PRIMARY KEY (`id`),
-    KEY `job` (`job`),
-    KEY `title` (`title`),
-    CONSTRAINT `author` CHECK (json_valid(`author`)),
-    CONSTRAINT `history` CHECK (json_valid(`history`)),
-    CONSTRAINT `lastUpdated` CHECK (json_valid(`lastUpdated`))
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
-DROP TABLE IF EXISTS `business_notices`;
-CREATE TABLE IF NOT EXISTS `business_notices` (
-    `id` INT(11) NOT NULL AUTO_INCREMENT,
-    `job` VARCHAR(255) NOT NULL,
-    `title` VARCHAR(255) NOT NULL,
-    `content` LONGTEXT DEFAULT NULL,
-    `author` LONGTEXT DEFAULT NULL,
-    PRIMARY KEY (`id`),
-    KEY `job` (`job`),
-    CONSTRAINT `author` CHECK (json_valid(`author`))
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
-DROP TABLE IF EXISTS `business_phones`;
 CREATE TABLE IF NOT EXISTS `business_phones` (
   `id` char(50) NOT NULL DEFAULT 'AUTO_INCREMENT',
   `number` varchar(50) NOT NULL DEFAULT '0',
@@ -193,185 +112,37 @@ CREATE TABLE IF NOT EXISTS `business_phones` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
-DROP TABLE IF EXISTS `business_receipts`;
-CREATE TABLE IF NOT EXISTS `business_receipts` (
-    `id` INT(11) NOT NULL AUTO_INCREMENT,
-    `job` VARCHAR(255) NOT NULL,
-    `customerName` VARCHAR(255) DEFAULT NULL,
-    `amount` DECIMAL(15,2) DEFAULT 0,
-    `items` LONGTEXT DEFAULT NULL,
-    `author` LONGTEXT DEFAULT NULL,
-    `history` LONGTEXT DEFAULT NULL,
-    `lastUpdated` LONGTEXT DEFAULT NULL,
-    PRIMARY KEY (`id`),
-    KEY `job` (`job`),
-    KEY `customerName` (`customerName`),
-    CONSTRAINT `items` CHECK (json_valid(`items`)),
-    CONSTRAINT `author` CHECK (json_valid(`author`)),
-    CONSTRAINT `history` CHECK (json_valid(`history`)),
-    CONSTRAINT `lastUpdated` CHECK (json_valid(`lastUpdated`))
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+INSERT INTO `business_phones` (`id`, `number`, `muted`) VALUES
+	('autoexotics', '622-970-6947', NULL),
+	('bahama', '096-892-5597', NULL),
+	('bakery', '289-221-1843', NULL),
+	('beanmachine', '197-789-8287', NULL),
+	('bennys', '710-471-9435', NULL),
+	('bowling', '463-026-5329', NULL),
+	('burgershot', '174-303-6501', NULL),
+	('casino', '931-155-9964', NULL),
+	('dreamworks', '129-466-4878', NULL),
+	('garcon_pawn', '612-504-4785', NULL),
+	('harmony', '278-880-2215', NULL),
+	('hayes', '747-525-9582', NULL),
+	('lasttrain', '370-885-9015', NULL),
+	('noodle', '856-602-0847', NULL),
+	('ottos', '521-316-6145', NULL),
+	('paleto_tuners', '521-720-7694', NULL),
+	('pdm', '612-146-3360', NULL),
+	('pepega_pawn', '393-207-4426', NULL),
+	('pizza_this', '658-390-9596', NULL),
+	('prego', '471-171-7066', NULL),
+	('realestate', '922-959-4131', NULL),
+	('rustybrowns', '652-158-0014', NULL),
+	('triad', '426-344-9862', NULL),
+	('tuna', '063-060-3147', NULL),
+	('unicorn', '501-139-7594', NULL),
+	('uwu', '730-824-3068', NULL),
+	('vangelico', '989-757-8322', NULL),
+	('vangelico_grapeseed', '983-214-0741', NULL),
+	('woods_saloon', '236-188-7710', NULL);
 
-DROP TABLE IF EXISTS `business_tvs`;
-CREATE TABLE IF NOT EXISTS `business_tvs` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `tv` varchar(255) DEFAULT NULL,
-  `link` varchar(255) DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
-
-DROP TABLE IF EXISTS `casino_bigwins`;
-CREATE TABLE IF NOT EXISTS `casino_bigwins` (
-    `id` INT(11) NOT NULL AUTO_INCREMENT,
-    `player_name` VARCHAR(255) NOT NULL,
-    `game` VARCHAR(100) NOT NULL,
-    `amount` DECIMAL(15,2) NOT NULL,
-    PRIMARY KEY (`id`),
-    KEY `game` (`game`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
-DROP TABLE IF EXISTS `casino_config`;
-CREATE TABLE IF NOT EXISTS `casino_config` (
-    `key` VARCHAR(255) NOT NULL,
-    `data` LONGTEXT DEFAULT NULL,
-    PRIMARY KEY (`key`),
-    CONSTRAINT `data` CHECK (json_valid(`data`))
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
-DROP TABLE IF EXISTS `casino_statistics`;
-CREATE TABLE IF NOT EXISTS `casino_statistics` (
-    `SID` VARCHAR(255) NOT NULL,
-    `slots` LONGTEXT DEFAULT NULL,
-    `poker` LONGTEXT DEFAULT NULL,
-    `blackjack` LONGTEXT DEFAULT NULL,
-    `roulette` LONGTEXT DEFAULT NULL,
-    `AmountWon` LONGTEXT DEFAULT NULL,
-    `AmountLost` LONGTEXT DEFAULT NULL,
-    `TotalAmountWon` DECIMAL(15,2) DEFAULT 0,
-    `TotalAmountLost` DECIMAL(15,2) DEFAULT 0,
-    `wheel` LONGTEXT DEFAULT NULL,
-    PRIMARY KEY (`SID`),
-    CONSTRAINT `slots` CHECK (json_valid(`slots`)),
-    CONSTRAINT `poker` CHECK (json_valid(`poker`)),
-    CONSTRAINT `blackjack` CHECK (json_valid(`blackjack`)),
-    CONSTRAINT `roulette` CHECK (json_valid(`roulette`)),
-    CONSTRAINT `AmountWon` CHECK (json_valid(`AmountWon`)),
-    CONSTRAINT `AmountLost` CHECK (json_valid(`AmountLost`))
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
-DROP TABLE IF EXISTS `changelogs`;
-CREATE TABLE IF NOT EXISTS `changelogs` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `date` datetime NOT NULL DEFAULT current_timestamp(),
-  `title` varchar(255) NOT NULL,
-  `content` longtext NOT NULL,
-  `version` varchar(50) DEFAULT NULL,
-  `author` varchar(100) DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `date` (`date`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
-DROP TABLE IF EXISTS `characters`;
-CREATE TABLE IF NOT EXISTS `characters` (
-  `License` varchar(255) DEFAULT NULL,
-  `User` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
-  `SID` int(11) NOT NULL AUTO_INCREMENT,
-  `First` varchar(255) DEFAULT NULL,
-  `Last` varchar(255) DEFAULT NULL,
-  `Gender` int(11) NOT NULL DEFAULT 0,
-  `New` tinyint(1) NOT NULL DEFAULT 1,
-  `Jailed` tinyint(1) NOT NULL DEFAULT 0,
-  `Origin` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL,
-  `Apps` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL,
-  `Wardrobe` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL,
-  `DOB` longtext DEFAULT NULL,
-  `Cash` bigint(20) DEFAULT NULL,
-  `LastPlayed` longtext DEFAULT NULL,
-  `Jobs` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL,
-  `Apartment` int(11) DEFAULT NULL,
-  `PhoneSettings` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL,
-  `Phone` varchar(255) DEFAULT NULL,
-  `Crypto` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL,
-  `Licenses` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL,
-  `Alias` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL,
-  `PhonePermissions` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL,
-  `PhonePosition` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL,
-  `Addiction` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL,
-  `Animations` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL,
-  `Armor` int(11) NOT NULL DEFAULT 0,
-  `BankAccount` int(11) DEFAULT NULL,
-  `CryptoWallet` varchar(255) DEFAULT NULL,
-  `HP` int(11) DEFAULT 200,
-  `HPReductions` int(11) DEFAULT 0,
-  `States` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL,
-  `Callsign` varchar(255) DEFAULT NULL,
-  `MDTHistory` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL,
-  `Flags` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL,
-  `Qualifications` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL,
-  `LastClockOn` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL,
-  `Salary` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL,
-  `TimeClockedOn` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL,
-  `Reputations` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL,
-  `GangChain` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL,
-  `Bio` varchar(255) DEFAULT NULL,
-  `JailedData` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL,
-  `ICU` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL,
-  `Deleted` tinyint(1) DEFAULT 0,
-  `Status` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL,
-  `Parole` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL,
-  `MDTSystemAdmin` tinyint(1) NOT NULL DEFAULT 0,
-  `LaptopSettings` longtext DEFAULT NULL,
-  `LaptopPermissions` longtext DEFAULT NULL,
-  `LaptopApps` longtext DEFAULT NULL,
-  `HUDConfig` longtext DEFAULT NULL,
-  `Mugshot` varchar(255) DEFAULT NULL,
-  `Attorney` tinyint(1) DEFAULT 0,
-  `MDTSuspension` LONGTEXT NULL DEFAULT NULL COLLATE 'utf8mb4_bin',
-  `DrugStates` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL,
-  `CasinoChips` LONGTEXT DEFAULT NULL,
-  `LSUNDGInviter` JSON DEFAULT NULL,
-  `LSUNDGBan` JSON DEFAULT NULL,
-  PRIMARY KEY (`SID`) USING BTREE,
-  CONSTRAINT `Origin` CHECK (json_valid(`Origin`)),
-  CONSTRAINT `Apps` CHECK (json_valid(`Apps`)),
-  CONSTRAINT `Wardrobe` CHECK (json_valid(`Wardrobe`)),
-  CONSTRAINT `Jobs` CHECK (json_valid(`Jobs`)),
-  CONSTRAINT `PhoneSettings` CHECK (json_valid(`PhoneSettings`)),
-  CONSTRAINT `Crypto` CHECK (json_valid(`Crypto`)),
-  CONSTRAINT `Licenses` CHECK (json_valid(`Licenses`)),
-  CONSTRAINT `Alias` CHECK (json_valid(`Alias`)),
-  CONSTRAINT `PhonePermissions` CHECK (json_valid(`PhonePermissions`)),
-  CONSTRAINT `Addiction` CHECK (json_valid(`Addiction`)),
-  CONSTRAINT `Animations` CHECK (json_valid(`Animations`)),
-  CONSTRAINT `States` CHECK (json_valid(`States`)),
-  CONSTRAINT `MDTHistory` CHECK (json_valid(`MDTHistory`)),
-  CONSTRAINT `Flags` CHECK (json_valid(`Flags`)),
-  CONSTRAINT `Qualifications` CHECK (json_valid(`Qualifications`)),
-  CONSTRAINT `LastClockOn` CHECK (json_valid(`LastClockOn`)),
-  CONSTRAINT `Salary` CHECK (json_valid(`Salary`)),
-  CONSTRAINT `TimeClockedOn` CHECK (json_valid(`TimeClockedOn`)),
-  CONSTRAINT `Reputations` CHECK (json_valid(`Reputations`)),
-  CONSTRAINT `GangChain` CHECK (json_valid(`GangChain`)),
-  CONSTRAINT `JailedData` CHECK (json_valid(`JailedData`)),
-  CONSTRAINT `ICU` CHECK (json_valid(`ICU`)),
-  CONSTRAINT `Status` CHECK (json_valid(`Status`)),
-  CONSTRAINT `Parole` CHECK (json_valid(`Parole`)),
-  CONSTRAINT `DrugStates` CHECK (json_valid(`DrugStates`)),
-  CONSTRAINT `CasinoChips` CHECK (json_valid(`CasinoChips`)),
-  CONSTRAINT `LSUNDGInviter` CHECK (json_valid(`LSUNDGInviter`)),
-  CONSTRAINT `MDTSuspension` CHECK (json_valid(`MDTSuspension`))
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
-
-DROP TABLE IF EXISTS `ox_inventory`;
-CREATE TABLE IF NOT EXISTS `ox_inventory` (
-  `owner` varchar(60) DEFAULT NULL,
-  `name` varchar(100) NOT NULL,
-  `data` longtext DEFAULT NULL,
-  `lastupdated` timestamp NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
-  UNIQUE KEY `owner` (`owner`,`name`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
-DROP TABLE IF EXISTS `character_app_profiles`;
 CREATE TABLE IF NOT EXISTS `character_app_profiles` (
   `sid` bigint(20) unsigned NOT NULL,
   `app` varchar(32) NOT NULL,
@@ -382,7 +153,6 @@ CREATE TABLE IF NOT EXISTS `character_app_profiles` (
   UNIQUE KEY `app` (`app`,`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_520_ci;
 
-DROP TABLE IF EXISTS `character_calls`;
 CREATE TABLE IF NOT EXISTS `character_calls` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `owner` varchar(12) NOT NULL,
@@ -397,18 +167,17 @@ CREATE TABLE IF NOT EXISTS `character_calls` (
   PRIMARY KEY (`id`),
   KEY `number` (`number`),
   KEY `owner` (`owner`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_520_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_520_ci;
 
-DROP TABLE IF EXISTS `character_chatter_groups`;
 CREATE TABLE IF NOT EXISTS `character_chatter_groups` (
   `sid` bigint(20) unsigned NOT NULL,
   `chatty_group` bigint(20) unsigned NOT NULL,
   `joined_date` datetime NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`sid`,`chatty_group`) USING BTREE,
-  KEY `chatter_char_group` (`chatty_group`)
+  KEY `chatter_char_group` (`chatty_group`),
+  CONSTRAINT `chatter_char_group` FOREIGN KEY (`chatty_group`) REFERENCES `chatter_groups` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_520_ci;
 
-DROP TABLE IF EXISTS `character_contacts`;
 CREATE TABLE IF NOT EXISTS `character_contacts` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `sid` bigint(20) NOT NULL,
@@ -419,9 +188,8 @@ CREATE TABLE IF NOT EXISTS `character_contacts` (
   `favorite` bit(1) NOT NULL DEFAULT b'0',
   PRIMARY KEY (`id`),
   KEY `sid` (`sid`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_520_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_520_ci;
 
-DROP TABLE IF EXISTS `character_documents`;
 CREATE TABLE IF NOT EXISTS `character_documents` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `sid` int(11) unsigned NOT NULL,
@@ -432,7 +200,6 @@ CREATE TABLE IF NOT EXISTS `character_documents` (
   KEY `owner` (`sid`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_520_ci;
 
-DROP TABLE IF EXISTS `character_documents_shared`;
 CREATE TABLE IF NOT EXISTS `character_documents_shared` (
   `doc_id` int(10) unsigned NOT NULL,
   `sid` int(10) unsigned NOT NULL,
@@ -445,10 +212,10 @@ CREATE TABLE IF NOT EXISTS `character_documents_shared` (
   UNIQUE KEY `doc_id_sid` (`doc_id`,`sid`),
   KEY `sid` (`sid`),
   KEY `sharer` (`sharer`),
-  KEY `doc_sid` (`doc_id`) USING BTREE
+  KEY `doc_sid` (`doc_id`) USING BTREE,
+  CONSTRAINT `doc_shared` FOREIGN KEY (`doc_id`) REFERENCES `character_documents` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_520_ci;
 
-DROP TABLE IF EXISTS `character_emails`;
 CREATE TABLE IF NOT EXISTS `character_emails` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `sid` int(10) unsigned NOT NULL,
@@ -461,9 +228,8 @@ CREATE TABLE IF NOT EXISTS `character_emails` (
   `expires` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `sid` (`sid`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_520_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_520_ci;
 
-DROP TABLE IF EXISTS `character_messages`;
 CREATE TABLE IF NOT EXISTS `character_messages` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `owner` varchar(12) NOT NULL,
@@ -476,9 +242,8 @@ CREATE TABLE IF NOT EXISTS `character_messages` (
   KEY `owner` (`owner`),
   KEY `number` (`number`),
   KEY `ownu` (`owner`,`number`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_520_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=25 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_520_ci;
 
-DROP TABLE IF EXISTS `character_parole`;
 CREATE TABLE IF NOT EXISTS `character_parole` (
   `SID` int(11) NOT NULL,
   `end` datetime NOT NULL,
@@ -489,7 +254,6 @@ CREATE TABLE IF NOT EXISTS `character_parole` (
   PRIMARY KEY (`SID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_520_ci;
 
-DROP TABLE IF EXISTS `character_photos`;
 CREATE TABLE IF NOT EXISTS `character_photos` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `sid` varchar(50) NOT NULL,
@@ -499,7 +263,6 @@ CREATE TABLE IF NOT EXISTS `character_photos` (
   KEY `idx_sid` (`sid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
-DROP TABLE IF EXISTS `character_schematics`;
 CREATE TABLE IF NOT EXISTS `character_schematics` (
   `sid` int(11) DEFAULT NULL,
   `bench` char(64) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
@@ -509,7 +272,6 @@ CREATE TABLE IF NOT EXISTS `character_schematics` (
   KEY `sid_schem` (`sid`,`schematic`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
-DROP TABLE IF EXISTS `chatter_groups`;
 CREATE TABLE IF NOT EXISTS `chatter_groups` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `label` varchar(64) NOT NULL DEFAULT 'Chatter Group',
@@ -517,9 +279,8 @@ CREATE TABLE IF NOT EXISTS `chatter_groups` (
   `owner` bigint(20) NOT NULL,
   `create_date` datetime NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_520_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_520_ci;
 
-DROP TABLE IF EXISTS `chatter_messages`;
 CREATE TABLE IF NOT EXISTS `chatter_messages` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `group` bigint(20) unsigned NOT NULL,
@@ -528,136 +289,116 @@ CREATE TABLE IF NOT EXISTS `chatter_messages` (
   `timestamp` datetime NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`id`),
   KEY `chatter_msg_group` (`group`),
-  KEY `chatter_msg_author` (`author`)
+  KEY `chatter_msg_author` (`author`),
+  CONSTRAINT `chatter_msg_group` FOREIGN KEY (`group`) REFERENCES `chatter_groups` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_520_ci;
 
-DROP TABLE IF EXISTS `crafting_cooldowns`;
 CREATE TABLE IF NOT EXISTS `crafting_cooldowns` (
   `bench` varchar(64) NOT NULL,
   `id` varchar(64) NOT NULL,
   `expires` bigint(20) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
-DROP TABLE IF EXISTS `dealer_data`;
-CREATE TABLE IF NOT EXISTS `dealer_data` (
-  `dealership` varchar(255) NOT NULL,
-  `sales` int(11) DEFAULT 0,
-  `revenue` decimal(15,2) DEFAULT 0.00,
-  `inventory` longtext DEFAULT NULL,
-  `settings` longtext DEFAULT NULL,
-  `profitPercentage` decimal(5,2) DEFAULT 0.00,
-  `commission` decimal(5,2) DEFAULT 0.00,
-  PRIMARY KEY (`dealership`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_520_ci;
-
-DROP TABLE IF EXISTS `dealer_records`;
-CREATE TABLE IF NOT EXISTS `dealer_records` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `dealership` varchar(255) NOT NULL,
-  `time` int(11) NOT NULL,
-  `seller` longtext DEFAULT NULL,
-  `buyer` longtext DEFAULT NULL,
-  `vehicle` longtext DEFAULT NULL,
-  `price` decimal(15,2) DEFAULT 0.00,
-  `commission` decimal(15,2) DEFAULT 0.00,
+CREATE TABLE IF NOT EXISTS `doors` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `identifier` varchar(64) DEFAULT NULL,
+  `type` varchar(16) NOT NULL DEFAULT 'standard',
+  `category` varchar(32) NOT NULL DEFAULT 'misc',
+  `label` varchar(64) DEFAULT NULL,
+  `data` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL CHECK (json_valid(`data`)),
+  `created_at` int(10) unsigned NOT NULL,
+  `updated_at` int(10) unsigned NOT NULL,
   PRIMARY KEY (`id`),
-  KEY `dealership` (`dealership`),
-  KEY `time` (`time`),
-  CONSTRAINT `seller` CHECK (json_valid(`seller`)),
-  CONSTRAINT `buyer` CHECK (json_valid(`buyer`)),
-  CONSTRAINT `vehicle` CHECK (json_valid(`vehicle`))
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_520_ci;
+  UNIQUE KEY `identifier` (`identifier`)
+) ENGINE=InnoDB AUTO_INCREMENT=1055 DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
-DROP TABLE IF EXISTS `dealer_records_buybacks`;
-CREATE TABLE IF NOT EXISTS `dealer_records_buybacks` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `dealership` varchar(255) NOT NULL,
-  `time` int(11) NOT NULL,
-  `seller` longtext DEFAULT NULL,
-  `buyer` longtext DEFAULT NULL,
-  `vehicle` longtext DEFAULT NULL,
-  `price` decimal(15,2) DEFAULT 0.00,
-  `commission` decimal(15,2) DEFAULT 0.00,
-  PRIMARY KEY (`id`),
-  KEY `dealership` (`dealership`),
-  KEY `time` (`time`),
-  CONSTRAINT `seller` CHECK (json_valid(`seller`)),
-  CONSTRAINT `buyer` CHECK (json_valid(`buyer`)),
-  CONSTRAINT `vehicle` CHECK (json_valid(`vehicle`))
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_520_ci;
+INSERT INTO `doors` (`id`, `identifier`, `type`, `category`, `label`, `data`, `created_at`, `updated_at`) VALUES
+	(970, 'bank_fleeca_mall_office', 'standard', 'misc', 'bank fleeca mall office', '{"restricted":[],"doors":[{"coords":{"z":41.58000183105469,"y":-583.469970703125,"x":-567.2000122070313},"model":-551608542}],"autoRate":10.0,"locked":true}', 1785168909, 1785168909),
+	(971, 'bank_fleeca_vinewood_door_1', 'standard', 'misc', 'bank fleeca vinewood door 1', '{"restricted":[],"doors":[{"coords":{"z":106.37999725341797,"y":206.47999572753907,"x":272.7900085449219},"model":267980221}],"autoRate":10.0,"locked":true}', 1785168909, 1785168909),
+	(972, 'bank_fleeca_vinewood_door_2', 'standard', 'misc', 'bank fleeca vinewood door 2', '{"restricted":[],"doors":[{"coords":{"z":106.37000274658203,"y":215.7100067138672,"x":251.52000427246095},"model":-2121568016}],"autoRate":10.0,"locked":true}', 1785168909, 1785168909),
+	(973, 'bank_fleeca_vinewood_door_3', 'standard', 'misc', 'bank fleeca vinewood door 3', '{"restricted":[],"doors":[{"coords":{"z":106.37000274658203,"y":213.41000366210938,"x":267.3699951171875},"model":-2121568016}],"autoRate":10.0,"locked":true}', 1785168909, 1785168909),
+	(974, 'bank_fleeca_vinewood_door_4', 'standard', 'misc', 'bank fleeca vinewood door 4', '{"restricted":[],"doors":[{"coords":{"z":106.37000274658203,"y":221.27000427246095,"x":270.2300109863281},"model":-2121568016}],"autoRate":10.0,"locked":true}', 1785168909, 1785168909),
+	(975, 'bank_fleeca_vinewood_door_5', 'standard', 'misc', 'bank fleeca vinewood door 5', '{"restricted":[],"doors":[{"coords":{"z":106.37000274658203,"y":229.69000244140626,"x":256.6099853515625},"model":-2121568016}],"autoRate":10.0,"locked":true}', 1785168909, 1785168909),
+	(976, 'bank_fleeca_vinewood_door_6', 'standard', 'misc', 'bank fleeca vinewood door 6', '{"restricted":[],"doors":[{"coords":{"z":106.37000274658203,"y":229.69000244140626,"x":256.6099853515625},"model":-2121568016}],"autoRate":10.0,"locked":true}', 1785168909, 1785168909),
+	(977, 'bank_fleeca_vinewood_gate_1', 'standard', 'misc', 'bank fleeca vinewood gate 1', '{"restricted":[],"doors":[{"coords":{"z":97.31999969482422,"y":219.89999389648438,"x":272.6400146484375},"model":409280169}],"autoRate":10.0,"locked":true}', 1785168909, 1785168909),
+	(978, 'bank_fleeca_vinewood_gate_2', 'standard', 'misc', 'bank fleeca vinewood gate 2', '{"restricted":[],"doors":[{"coords":{"z":97.31999969482422,"y":212.9199981689453,"x":270.1000061035156},"model":409280169}],"autoRate":10.0,"locked":true}', 1785168909, 1785168909),
+	(979, 'bank_fleeca_vinewood_offices_1', 'standard', 'misc', 'bank fleeca vinewood offices 1', '{"restricted":[],"doors":[{"coords":{"z":106.37999725341797,"y":210.33999633789063,"x":262.17999267578127},"model":1721645826}],"autoRate":10.0,"locked":true}', 1785168909, 1785168909),
+	(980, 'bank_fleeca_vinewood_offices_2', 'standard', 'misc', 'bank fleeca vinewood offices 2', '{"restricted":[],"doors":[{"coords":{"z":106.37999725341797,"y":213.75999450683595,"x":252.7899932861328},"model":1721645826}],"autoRate":10.0,"locked":true}', 1785168909, 1785168909),
+	(981, 'bank_fleeca_vinewood_offices_3', 'standard', 'misc', 'bank fleeca vinewood offices 3', '{"restricted":[],"doors":[{"coords":{"z":106.37999725341797,"y":230.3800048828125,"x":258.82000732421877},"model":1721645826}],"autoRate":10.0,"locked":true}', 1785168909, 1785168909),
+	(982, 'bank_fleeca_vinewood_offices_4', 'standard', 'misc', 'bank fleeca vinewood offices 4', '{"restricted":[],"doors":[{"coords":{"z":106.37999725341797,"y":226.9600067138672,"x":268.2099914550781},"model":1721645826}],"autoRate":10.0,"locked":true}', 1785168909, 1785168909),
+	(983, 'bank_fleeca_vinewood_offices_5_1', 'standard', 'misc', 'bank fleeca vinewood offices 5 1', '{"restricted":[],"doors":[{"coords":{"z":110.27999877929688,"y":216.86000061035157,"x":273.17999267578127},"model":1109357065}],"autoRate":10.0,"locked":true}', 1785168909, 1785168909),
+	(984, 'bank_fleeca_vinewood_offices_5_2', 'standard', 'misc', 'bank fleeca vinewood offices 5 2', '{"restricted":[],"doors":[{"coords":{"z":110.27999877929688,"y":214.91000366210938,"x":272.4700012207031},"model":1109357065}],"autoRate":10.0,"locked":true}', 1785168909, 1785168909),
+	(985, 'bank_fleeca_vinewood_offices_6', 'standard', 'misc', 'bank fleeca vinewood offices 6', '{"restricted":[],"doors":[{"coords":{"z":110.27999877929688,"y":210.33999633789063,"x":262.17999267578127},"model":1721645826}],"autoRate":10.0,"locked":true}', 1785168909, 1785168909),
+	(986, 'bank_fleeca_vinewood_offices_7', 'standard', 'misc', 'bank fleeca vinewood offices 7', '{"restricted":[],"doors":[{"coords":{"z":110.27999877929688,"y":213.75999450683595,"x":252.7899932861328},"model":1721645826}],"autoRate":10.0,"locked":true}', 1785168909, 1785168909),
+	(987, 'bank_fleeca_vinewood_offices_8', 'standard', 'misc', 'bank fleeca vinewood offices 8', '{"restricted":[],"doors":[{"coords":{"z":110.27999877929688,"y":230.3800048828125,"x":258.82000732421877},"model":1721645826}],"autoRate":10.0,"locked":true}', 1785168909, 1785168909),
+	(988, 'bank_fleeca_vinewood_offices_9', 'standard', 'misc', 'bank fleeca vinewood offices 9', '{"restricted":[],"doors":[{"coords":{"z":110.27999877929688,"y":226.9600067138672,"x":268.2099914550781},"model":1721645826}],"autoRate":10.0,"locked":true}', 1785168909, 1785168909),
+	(989, 'bank_fleeca_vinewood_stairs_1', 'standard', 'misc', 'bank fleeca vinewood stairs 1', '{"restricted":[],"doors":[{"coords":{"z":106.37999725341797,"y":223.5399932861328,"x":277.6000061035156},"model":267980221}],"autoRate":10.0,"locked":true}', 1785168909, 1785168909),
+	(990, 'bank_fleeca_vinewood_stairs_2', 'standard', 'misc', 'bank fleeca vinewood stairs 2', '{"restricted":[],"doors":[{"coords":{"z":110.27999877929688,"y":223.5399932861328,"x":277.6000061035156},"model":267980221}],"autoRate":10.0,"locked":true}', 1785168909, 1785168909),
+	(991, 'bank_fleeca_vinewood_roof_1', 'standard', 'misc', 'bank fleeca vinewood roof 1', '{"restricted":[],"aliases":["bank_fleeca_vinewood_roof_2"],"doors":[{"coords":{"z":123.97000122070313,"y":235.47999572753907,"x":271.45001220703127},"model":726025323},{"coords":{"z":123.97000122070313,"y":234.58999633789063,"x":273.8999938964844},"model":1577691629}],"autoRate":10.0,"locked":true}', 1785168909, 1785168909),
+	(992, 'bank_savings_paleto_office_1', 'standard', 'misc', 'bank savings paleto office 1', '{"restricted":[],"doors":[{"coords":{"z":31.79000091552734,"y":6463.77001953125,"x":-104.83999633789063},"model":2110946875}],"autoRate":10.0,"locked":true}', 1785168909, 1785168909),
+	(993, 'bank_savings_paleto_office_2', 'standard', 'misc', 'bank savings paleto office 2', '{"restricted":[],"doors":[{"coords":{"z":31.79000091552734,"y":6467.990234375,"x":-100.62000274658203},"model":1754616769}],"autoRate":10.0,"locked":true}', 1785168909, 1785168909),
+	(994, 'bank_savings_paleto_office_3', 'standard', 'misc', 'bank savings paleto office 3', '{"restricted":[],"doors":[{"coords":{"z":31.79000091552734,"y":6473.919921875,"x":-104.70999908447266},"model":-368548260}],"autoRate":10.0,"locked":true}', 1785168909, 1785168909),
+	(995, 'bank_savings_paleto_corridor_1', 'standard', 'misc', 'bank savings paleto corridor 1', '{"restricted":[],"doors":[{"coords":{"z":31.79000091552734,"y":6475.330078125,"x":-111.04000091552735},"model":-56652918}],"autoRate":10.0,"locked":true}', 1785168909, 1785168909),
+	(996, 'bank_savings_paleto_corridor_2', 'standard', 'misc', 'bank savings paleto corridor 2', '{"restricted":[],"doors":[{"coords":{"z":31.79000091552734,"y":6474.39013671875,"x":-100.11000061035156},"model":-147325430}],"autoRate":10.0,"locked":true}', 1785168909, 1785168909),
+	(997, 'bank_savings_paleto_security', 'standard', 'misc', 'bank savings paleto security', '{"restricted":[],"doors":[{"coords":{"z":31.79000091552734,"y":6468.9599609375,"x":-92.2300033569336},"model":-147325430}],"autoRate":10.0,"locked":true}', 1785168909, 1785168909),
+	(998, 'bank_savings_paleto_back_1', 'standard', 'misc', 'bank savings paleto back 1', '{"restricted":[],"doors":[{"coords":{"z":31.79000091552734,"y":6474.06005859375,"x":-96.70999908447266},"model":1248599813}],"autoRate":10.0,"locked":true}', 1785168909, 1785168909),
+	(999, 'bank_savings_paleto_back_2', 'standard', 'misc', 'bank savings paleto back 2', '{"restricted":[],"doors":[{"coords":{"z":31.79000091552734,"y":6478.9599609375,"x":-116.51000213623047},"model":1248599813}],"autoRate":10.0,"locked":true}', 1785168909, 1785168909),
+	(1000, 'bank_savings_paleto_gate', 'standard', 'misc', 'bank savings paleto gate', '{"restricted":[],"doors":[{"coords":{"z":31.20999908447265,"y":6468.009765625,"x":-112.56999969482422},"model":1784650867}],"autoRate":10.0,"locked":true}', 1785168909, 1785168909),
+	(1001, 'bank_savings_paleto_vault', 'standard', 'misc', 'bank savings paleto vault', '{"restricted":[],"doors":[{"coords":{"z":31.8799991607666,"y":6464.5498046875,"x":-100.23999786376953},"model":-2050208642}],"autoRate":10.0,"locked":true}', 1785168909, 1785168909),
+	(1002, 'fleeca_hawick_east_gate', 'standard', 'misc', 'fleeca hawick east gate', '{"restricted":[],"doors":[{"coords":{"z":54.45999908447265,"y":-285.989990234375,"x":314.6199951171875},"model":-1591004109}],"autoRate":10.0,"locked":true}', 1785168909, 1785168909),
+	(1003, 'fleeca_hawick_west_gate', 'standard', 'misc', 'fleeca hawick west gate', '{"restricted":[],"doors":[{"coords":{"z":49.33000183105469,"y":-56.79999923706055,"x":-350.4100036621094},"model":-1591004109}],"autoRate":10.0,"locked":true}', 1785168909, 1785168909),
+	(1004, 'fleeca_delperro_gate', 'standard', 'misc', 'fleeca delperro gate', '{"restricted":[],"doors":[{"coords":{"z":38.08000183105469,"y":-335.1300048828125,"x":-1207.3299560546876},"model":-1591004109}],"autoRate":10.0,"locked":true}', 1785168909, 1785168909),
+	(1005, 'fleeca_great_ocean_gate', 'standard', 'misc', 'fleeca great ocean gate', '{"restricted":[],"doors":[{"coords":{"z":16.0,"y":485.4200134277344,"x":-2956.1201171875},"model":-1591004109}],"autoRate":10.0,"locked":true}', 1785168909, 1785168909),
+	(1006, 'fleeca_route68_gate', 'standard', 'misc', 'fleeca route68 gate', '{"restricted":[],"doors":[{"coords":{"z":38.38999938964844,"y":2713.14990234375,"x":1172.2900390625},"model":-1591004109}],"autoRate":10.0,"locked":true}', 1785168909, 1785168909),
+	(1007, 'fleeca_vespucci_gate', 'standard', 'misc', 'fleeca vespucci gate', '{"restricted":[],"doors":[{"coords":{"z":29.67000007629394,"y":-1047.6300048828126,"x":150.2899932861328},"model":-1591004109}],"autoRate":10.0,"locked":true}', 1785168909, 1785168909),
+	(1008, 'fleeca_hawick_east_tills', 'standard', 'misc', 'fleeca hawick east tills', '{"restricted":[],"doors":[{"coords":{"z":54.31999969482422,"y":-280.29998779296877,"x":309.70001220703127},"model":-147325430}],"autoRate":10.0,"locked":true}', 1785168909, 1785168909),
+	(1009, 'fleeca_hawick_west_tills', 'standard', 'misc', 'fleeca hawick west tills', '{"restricted":[],"doors":[{"coords":{"z":49.18999862670898,"y":-51.18999862670898,"x":-355.44000244140627},"model":-147325430}],"autoRate":10.0,"locked":true}', 1785168909, 1785168909),
+	(1010, 'fleeca_delperro_tills', 'standard', 'misc', 'fleeca delperro tills', '{"restricted":[],"doors":[{"coords":{"z":37.93999862670898,"y":-334.8500061035156,"x":-1214.8499755859376},"model":-147325430}],"autoRate":10.0,"locked":true}', 1785168909, 1785168909),
+	(1011, 'fleeca_great_ocean_tills', 'standard', 'misc', 'fleeca great ocean tills', '{"restricted":[],"doors":[{"coords":{"z":15.85000038146972,"y":479.0,"x":-2960.0400390625},"model":-147325430}],"autoRate":10.0,"locked":true}', 1785168909, 1785168909),
+	(1012, 'fleeca_route68_tills', 'standard', 'misc', 'fleeca route68 tills', '{"restricted":[],"doors":[{"coords":{"z":38.25,"y":2709.5,"x":1178.8699951171876},"model":-147325430}],"autoRate":10.0,"locked":true}', 1785168909, 1785168909),
+	(1013, 'fleeca_vespucci_tills', 'standard', 'misc', 'fleeca vespucci tills', '{"restricted":[],"doors":[{"coords":{"z":29.5300006866455,"y":-1041.93994140625,"x":145.3699951171875},"model":-147325430}],"autoRate":10.0,"locked":true}', 1785168909, 1785168909),
+	(1014, 'bobcat_extr', 'standard', 'misc', 'bobcat extr', '{"restricted":[],"aliases":["bobcat_extr_2"],"doors":[{"coords":{"z":30.55999946594238,"y":-2258.31005859375,"x":880.9000244140625},"model":-1563799200},{"coords":{"z":30.55999946594238,"y":-2258.530029296875,"x":883.47998046875},"model":-1259801187}],"autoRate":10.0,"locked":true}', 1785168909, 1785168909),
+	(1015, 'bobcat_front', 'standard', 'misc', 'bobcat front', '{"restricted":[],"doors":[{"coords":{"z":30.6200008392334,"y":-2264.669921875,"x":881.6199951171875},"model":-551608542}],"autoRate":10.0,"locked":true}', 1785168909, 1785168909),
+	(1016, 'bobcat_inner', 'standard', 'misc', 'bobcat inner', '{"restricted":[],"aliases":["bobcat_inner_2"],"doors":[{"coords":{"z":30.6200008392334,"y":-2268.179931640625,"x":880.030029296875},"model":933053701},{"coords":{"z":30.6200008392334,"y":-2268.409912109375,"x":882.6199951171875},"model":933053701}],"autoRate":10.0,"locked":true}', 1785168909, 1785168909),
+	(1017, 'bobcat_surveillance', 'standard', 'misc', 'bobcat surveillance', '{"restricted":[],"doors":[{"coords":{"z":30.6200008392334,"y":-2295.27001953125,"x":882.3400268554688},"model":-311575617}],"autoRate":10.0,"locked":true}', 1785168909, 1785168909),
+	(1018, 'bobcat_rear_left', 'standard', 'misc', 'bobcat rear left', '{"restricted":[],"aliases":["bobcat_rear_right"],"doors":[{"coords":{"z":31.01000022888183,"y":-2306.949951171875,"x":864.989990234375},"model":838685283},{"coords":{"z":31.01000022888183,"y":-2309.949951171875,"x":864.72998046875},"model":-1020431159}],"autoRate":10.0,"locked":true}', 1785168909, 1785168909),
+	(1019, 'coke_hidden_entrance', 'standard', 'misc', 'coke hidden entrance', '{"restricted":[],"doors":[{"coords":{"z":7.46000003814697,"y":-2444.47998046875,"x":-321.489990234375},"model":1013228087}],"autoRate":10.0,"locked":true}', 1785168909, 1785168909),
+	(1020, 'coke_seadoor', 'standard', 'misc', 'coke seadoor', '{"restricted":[],"aliases":["coke_seadoor_2"],"doors":[{"coords":{"z":-1.63999998569488,"y":-2468.719970703125,"x":-335.9100036621094},"model":1988553027},{"coords":{"z":-1.63999998569488,"y":-2473.679931640625,"x":-330.0299987792969},"model":1625505276}],"autoRate":10.0,"locked":true}', 1785168909, 1785168909),
+	(1021, 'coke_garage', 'standard', 'misc', 'coke garage', '{"restricted":[],"doors":[{"coords":{"z":9.39000034332275,"y":-2438.39990234375,"x":-318.0899963378906},"model":-1291669313}],"locked":true}', 1785168909, 1785168909),
+	(1022, 'robbery_gallery_vault', 'standard', 'misc', 'robbery gallery vault', '{"restricted":[],"doors":[{"coords":{"z":93.9800033569336,"y":138.72000122070313,"x":14.76000022888183},"model":-660779536}],"autoRate":10.0,"locked":true}', 1785168909, 1785168909),
+	(1023, 'robbery_gallery_cage1', 'standard', 'misc', 'robbery gallery cage1', '{"restricted":[],"doors":[{"coords":{"z":93.91999816894531,"y":144.9600067138672,"x":37.47000122070312},"model":-1508355822}],"autoRate":10.0,"locked":false}', 1785168909, 1785168909),
+	(1024, 'robbery_gallery_cage2', 'standard', 'misc', 'robbery gallery cage2', '{"restricted":[],"doors":[{"coords":{"z":93.94000244140625,"y":135.05999755859376,"x":33.83000183105469},"model":-1508355822}],"autoRate":10.0,"locked":false}', 1785168909, 1785168909),
+	(1025, 'robbery_gallery_office', 'standard', 'misc', 'robbery gallery office', '{"restricted":[],"aliases":["robbery_gallery_office2"],"doors":[{"coords":{"z":93.91999816894531,"y":154.0800018310547,"x":20.34000015258789},"model":110411286},{"coords":{"z":93.91000366210938,"y":156.52000427246095,"x":21.22999954223632},"model":110411286}],"autoRate":10.0,"locked":true}', 1785168909, 1785168909),
+	(1026, 'robbery_gallery_front', 'standard', 'misc', 'robbery gallery front', '{"restricted":[],"aliases":["robbery_gallery_front2"],"doors":[{"coords":{"z":93.91999816894531,"y":147.63999938964845,"x":11.19999980926513},"model":110411286},{"coords":{"z":93.91000366210938,"y":150.0800018310547,"x":12.09000015258789},"model":110411286}],"autoRate":10.0,"locked":false}', 1785168909, 1785168909),
+	(1027, 'lombank_front_gate', 'standard', 'misc', 'lombank front gate', '{"restricted":[],"doors":[{"coords":{"z":30.04999923706054,"y":-919.9500122070313,"x":17.98999977111816},"model":-222270721}],"autoRate":10.0,"locked":true}', 1785168909, 1785168909),
+	(1028, 'lombank_office', 'standard', 'misc', 'lombank office', '{"restricted":[],"aliases":["lombank_office_2"],"doors":[{"coords":{"z":33.84000015258789,"y":-933.8499755859375,"x":25.3799991607666},"model":964838196},{"coords":{"z":33.84000015258789,"y":-942.3900146484375,"x":22.29000091552734},"model":964838196}],"autoRate":10.0,"locked":true}', 1785168909, 1785168909),
+	(1029, 'lombank_cargo', 'standard', 'misc', 'lombank cargo', '{"restricted":[],"doors":[{"coords":{"z":31.80999946594238,"y":-917.5999755859375,"x":28.95999908447265},"model":1309269072}],"autoRate":10.0,"locked":true}', 1785168909, 1785168909),
+	(1030, 'lombank_cargo_2', 'standard', 'misc', 'lombank cargo 2', '{"restricted":[],"doors":[{"coords":{"z":31.80999946594238,"y":-920.6400146484375,"x":27.86000061035156},"model":1309269072}],"autoRate":10.0,"locked":true}', 1785168909, 1785168909),
+	(1031, 'lombank_hidden', 'standard', 'misc', 'lombank hidden', '{"restricted":[],"doors":[{"coords":{"z":29.90999984741211,"y":-922.1599731445313,"x":37.38999938964844},"model":30403864}],"autoRate":10.0,"locked":true}', 1785168909, 1785168909),
+	(1032, 'lombank_upper_gate', 'standard', 'misc', 'lombank upper gate', '{"restricted":[],"doors":[{"coords":{"z":30.21999931335449,"y":-931.5999755859375,"x":22.70000076293945},"model":1309269072}],"autoRate":10.0,"locked":true}', 1785168909, 1785168909),
+	(1033, 'lombank_upper_vault', 'standard', 'misc', 'lombank upper vault', '{"restricted":[],"doors":[{"coords":{"z":30.05999946594238,"y":-940.3800048828125,"x":19.06999969482422},"model":-1185205679}],"autoRate":10.0,"locked":true}', 1785168909, 1785168909),
+	(1034, 'lombank_upper_vault_gate', 'standard', 'misc', 'lombank upper vault gate', '{"restricted":[],"doors":[{"coords":{"z":30.21999931335449,"y":-943.8099975585938,"x":21.90999984741211},"model":1309269072}],"autoRate":10.0,"locked":true}', 1785168909, 1785168909),
+	(1035, 'lombank_lower_gate', 'standard', 'misc', 'lombank lower gate', '{"restricted":[],"doors":[{"coords":{"z":26.05999946594238,"y":-930.260009765625,"x":25.32999992370605},"model":1309269072}],"autoRate":10.0,"locked":true}', 1785168909, 1785168909),
+	(1036, 'lombank_lower_vault', 'standard', 'misc', 'lombank lower vault', '{"restricted":[],"holdOpen":true,"doors":[{"coords":{"z":26.45000076293945,"y":-918.3499755859375,"x":26.29999923706054},"model":961976194}],"autoRate":10.0,"locked":true}', 1785168909, 1785168909),
+	(1037, 'lombank_lower_room_1', 'standard', 'misc', 'lombank lower room 1', '{"restricted":[],"doors":[{"coords":{"z":26.05999946594238,"y":-915.280029296875,"x":23.93000030517578},"model":1309269072}],"autoRate":10.0,"locked":true}', 1785168909, 1785168909),
+	(1038, 'lombank_lower_room_2', 'standard', 'misc', 'lombank lower room 2', '{"restricted":[],"doors":[{"coords":{"z":26.05999946594238,"y":-918.5800170898438,"x":33.0},"model":1309269072}],"autoRate":10.0,"locked":true}', 1785168909, 1785168909),
+	(1039, 'lombank_lower_room_3', 'standard', 'misc', 'lombank lower room 3', '{"restricted":[],"doors":[{"coords":{"z":26.05999946594238,"y":-908.2000122070313,"x":26.5},"model":1309269072}],"autoRate":10.0,"locked":true}', 1785168909, 1785168909),
+	(1040, 'lombank_lower_room_4', 'standard', 'misc', 'lombank lower room 4', '{"restricted":[],"doors":[{"coords":{"z":26.05999946594238,"y":-911.5,"x":35.56999969482422},"model":1309269072}],"autoRate":10.0,"locked":true}', 1785168909, 1785168909),
+	(1041, 'lombank_hidden_entrance', 'standard', 'misc', 'lombank hidden entrance', '{"restricted":[],"doors":[{"coords":{"z":31.70999908447265,"y":-810.969970703125,"x":43.40999984741211},"model":-1997783829}],"autoRate":10.0,"locked":true}', 1785168909, 1785168909),
+	(1042, 'lombank_office_3', 'standard', 'misc', 'lombank office 3', '{"restricted":[],"doors":[{"coords":{"z":30.04999923706054,"y":-933.3300170898438,"x":35.7400016784668},"model":964838196}],"autoRate":10.0,"locked":true}', 1785168909, 1785168909),
+	(1043, 'lombank_supply_closet', 'standard', 'misc', 'lombank supply closet', '{"restricted":[],"doors":[{"coords":{"z":30.06999969482422,"y":-926.2100219726563,"x":38.31999969482422},"model":964838196}],"autoRate":10.0,"locked":true}', 1785168909, 1785168909),
+	(1044, 'lombank_lasers', 'standard', 'misc', 'lombank lasers', '{"restricted":[],"holdOpen":true,"doors":[{"coords":{"z":26.73406028747558,"y":-926.6845703125,"x":25.96659088134765},"model":-1596396219}],"autoRate":10.0,"locked":true}', 1785168909, 1785168909),
+	(1045, 'lombank_garage', 'standard', 'misc', 'lombank garage', '{"restricted":[],"holdOpen":true,"doors":[{"coords":{"z":33.40999984741211,"y":-908.97998046875,"x":36.54000091552734},"model":-1906310003}],"autoRate":10.0,"locked":true}', 1785168909, 1785168909),
+	(1046, 'mazebank_tills', 'standard', 'misc', 'mazebank tills', '{"restricted":[],"doors":[{"coords":{"z":16.93000030517578,"y":-816.6099853515625,"x":-1308.4599609375},"model":-774701539}],"autoRate":10.0,"locked":true}', 1785168909, 1785168909),
+	(1047, 'mazebank_gate', 'standard', 'misc', 'mazebank gate', '{"restricted":[],"doors":[{"coords":{"z":16.8700008392334,"y":-819.969970703125,"x":-1301.280029296875},"model":-1269579347}],"autoRate":10.0,"locked":true}', 1785168909, 1785168909),
+	(1048, 'mazebank_vault_gate', 'standard', 'misc', 'mazebank vault gate', '{"restricted":[],"doors":[{"coords":{"z":17.11000061035156,"y":-816.030029296875,"x":-1294.6400146484376},"model":-1591004109}],"autoRate":10.0,"locked":true}', 1785168909, 1785168909),
+	(1049, 'mazebank_offices', 'standard', 'misc', 'mazebank offices', '{"restricted":[{"job":"police","reqDuty":true,"workplace":false,"type":"job","gradeLevel":0,"jobPermission":false}],"doors":[{"coords":{"z":17.21999931335449,"y":-830.3800048828125,"x":-1302.47998046875},"model":-1960292781}],"autoRate":10.0,"locked":true}', 1785168909, 1785168909),
+	(1050, 'mazebank_office_1', 'standard', 'misc', 'mazebank office 1', '{"restricted":[{"job":"police","reqDuty":true,"workplace":false,"type":"job","gradeLevel":0,"jobPermission":false}],"doors":[{"coords":{"z":17.21999931335449,"y":-830.8599853515625,"x":-1300.5899658203126},"model":-1960292781}],"autoRate":10.0,"locked":true}', 1785168909, 1785168909),
+	(1051, 'mazebank_office_2', 'standard', 'misc', 'mazebank office 2', '{"restricted":[{"job":"police","reqDuty":true,"workplace":false,"type":"job","gradeLevel":0,"jobPermission":false}],"doors":[{"coords":{"z":17.21999931335449,"y":-834.1400146484375,"x":-1298.1300048828126},"model":-1960292781}],"autoRate":10.0,"locked":true}', 1785168909, 1785168909),
+	(1052, 'mazebank_office_3', 'standard', 'misc', 'mazebank office 3', '{"restricted":[{"job":"police","reqDuty":true,"workplace":false,"type":"job","gradeLevel":0,"jobPermission":false}],"doors":[{"coords":{"z":17.21999931335449,"y":-840.8900146484375,"x":-1293.06005859375},"model":-1960292781}],"autoRate":10.0,"locked":true}', 1785168909, 1785168909),
+	(1053, 'robbery_vangelico_office', 'standard', 'misc', 'robbery vangelico office', '{"restricted":[],"doors":[{"coords":{"z":38.20999908447265,"y":-230.14999389648438,"x":-629.1300048828125},"model":1335309163}],"autoRate":6.0,"locked":true}', 1785168909, 1785168909),
+	(1054, 'robbery_xgems_office', 'standard', 'misc', 'robbery xgems office', '{"restricted":[],"doors":[{"coords":{"z":106.30000305175781,"y":369.1300048828125,"x":225.9600067138672},"model":1335309163}],"autoRate":6.0,"locked":true}', 1785168909, 1785168909);
 
-DROP TABLE IF EXISTS `dealer_showrooms`;
-CREATE TABLE IF NOT EXISTS `dealer_showrooms` (
-  `dealership` varchar(255) NOT NULL,
-  `showroom` longtext DEFAULT NULL,
-  PRIMARY KEY (`dealership`),
-  CONSTRAINT `showroom` CHECK (json_valid(`showroom`))
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_520_ci;
-
-DROP TABLE IF EXISTS `dealer_stock`;
-CREATE TABLE IF NOT EXISTS `dealer_stock` (
-  `dealership` varchar(255) NOT NULL,
-  `vehicle` varchar(255) NOT NULL,
-  `modelType` varchar(255) DEFAULT NULL,
-  `data` longtext DEFAULT NULL,
-  `quantity` int(11) NOT NULL DEFAULT 0,
-  `lastStocked` int(11) DEFAULT NULL,
-  `lastPurchase` int(11) DEFAULT NULL,
-  `created_at` timestamp NULL DEFAULT current_timestamp(),
-  `updated_at` timestamp NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
-  UNIQUE KEY `dealership_vehicle` (`dealership`,`vehicle`),
-  KEY `dealership` (`dealership`),
-  KEY `vehicle` (`vehicle`),
-  CONSTRAINT `data` CHECK (json_valid(`data`))
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_520_ci;
-
-DROP TABLE IF EXISTS `donator_items`;
-CREATE TABLE IF NOT EXISTS `donator_items` (
-  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-  `player` char(128) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
-  `player_id` int(10) unsigned DEFAULT NULL,
-  `redeemed` tinyint(1) NOT NULL DEFAULT 0,
-  `data` longtext DEFAULT NULL,
-  PRIMARY KEY (`id`) USING BTREE,
-  KEY `player` (`player`) USING BTREE,
-  KEY `id_player` (`id`,`player`) USING BTREE,
-  KEY `player_redeemed` (`player`,`redeemed`) USING BTREE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_520_ci;
-
-DROP TABLE IF EXISTS `donator_plates`;
-CREATE TABLE IF NOT EXISTS `donator_plates` (
-  `player` varchar(255) NOT NULL,
-  `pending` int(11) NOT NULL DEFAULT 0,
-  `redeemed` int(11) NOT NULL DEFAULT 0,
-  `created_at` timestamp DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`player`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_520_ci;
-
-DROP TABLE IF EXISTS `donator_vehicles`;
-CREATE TABLE IF NOT EXISTS `donator_vehicles` (
-    `id` INT(11) NOT NULL AUTO_INCREMENT,
-    `player` VARCHAR(255) NOT NULL,
-    `class` VARCHAR(50) NOT NULL,
-    `redeemed` TINYINT(1) NOT NULL DEFAULT 0,
-    `data` LONGTEXT DEFAULT NULL,
-    `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY (`id`),
-    KEY `player` (`player`),
-    KEY `redeemed` (`redeemed`),
-    CONSTRAINT `data` CHECK (json_valid(`data`))
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
-DROP TABLE IF EXISTS `donor_created_item`;
-CREATE TABLE IF NOT EXISTS `donor_created_item` (
-  `sid` int(11) NOT NULL,
-  `item_id` char(50) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
-  KEY `sid` (`sid`) USING BTREE,
-  KEY `item_id` (`item_id`) USING BTREE,
-  KEY `siditem` (`sid`,`item_id`) USING BTREE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_520_ci;
-
-DROP TABLE IF EXISTS `firearms`;
 CREATE TABLE IF NOT EXISTS `firearms` (
   `police_id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `serial` char(128) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
@@ -672,9 +413,8 @@ CREATE TABLE IF NOT EXISTS `firearms` (
   KEY `owner_sid` (`owner_sid`) USING BTREE,
   KEY `police_filed` (`police_filed`) USING BTREE,
   KEY `serial` (`serial`)
-) ENGINE=InnoDB AUTO_INCREMENT=1956 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_520_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=2010 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_520_ci;
 
-DROP TABLE IF EXISTS `firearms_flags`;
 CREATE TABLE IF NOT EXISTS `firearms_flags` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `serial` char(128) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
@@ -690,77 +430,18 @@ CREATE TABLE IF NOT EXISTS `firearms_flags` (
   KEY `serial` (`serial`)
 ) ENGINE=InnoDB AUTO_INCREMENT=26 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_520_ci;
 
-DROP TABLE IF EXISTS `firearms_projectiles`;
-CREATE TABLE IF NOT EXISTS `firearms_projectiles` (
-    `Id` VARCHAR(255) NOT NULL,
-    `Weapon` LONGTEXT DEFAULT NULL,
-    `Coords` LONGTEXT DEFAULT NULL,
-    `AmmoType` VARCHAR(100) DEFAULT NULL,
-    PRIMARY KEY (`Id`),
-    CONSTRAINT `Weapon` CHECK (json_valid(`Weapon`)),
-    CONSTRAINT `Coords` CHECK (json_valid(`Coords`))
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+CREATE TABLE IF NOT EXISTS `inventory_shop_logs` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `date` datetime NOT NULL DEFAULT current_timestamp(),
+  `inventory` varchar(255) NOT NULL DEFAULT '0',
+  `item` varchar(255) NOT NULL DEFAULT '0',
+  `count` int(11) NOT NULL DEFAULT 0,
+  `itemId` bigint(20) DEFAULT NULL,
+  `buyer` int(11) NOT NULL DEFAULT 0,
+  `metadata` varchar(512) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=130 DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
-DROP TABLE IF EXISTS `jobs`;
-CREATE TABLE IF NOT EXISTS `jobs` (
-  `Id` varchar(255) NOT NULL,
-  `Name` varchar(255) NOT NULL,
-  `Type` varchar(255) NOT NULL,
-  `Workplaces` longtext DEFAULT NULL,
-  `Grades` longtext DEFAULT NULL,
-  `Salary` int(11) NOT NULL DEFAULT 0,
-  `SalaryTier` int(11) NOT NULL DEFAULT 0,
-  `LastUpdated` bigint(20) NOT NULL DEFAULT 0,
-  `Data` longtext DEFAULT NULL,
-  `Owner` int(11) DEFAULT NULL,
-  `Custom` tinyint(1) DEFAULT 0,
-  `Hidden` tinyint(1) DEFAULT 0,
-  PRIMARY KEY (`Id`),
-  KEY `Type` (`Type`),
-  KEY `Owner` (`Owner`),
-  CONSTRAINT `Workplaces` CHECK (json_valid(`Workplaces`)),
-  CONSTRAINT `Grades` CHECK (json_valid(`Grades`)),
-  CONSTRAINT `Data` CHECK (json_valid(`Data`))
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_520_ci;
-
-DROP TABLE IF EXISTS `loans`;
-CREATE TABLE IF NOT EXISTS `loans` (
-    `id` INT(11) NOT NULL AUTO_INCREMENT,
-    `Creation` INT(11) NOT NULL,
-    `SID` VARCHAR(255) NOT NULL,
-    `Type` VARCHAR(50) NOT NULL,
-    `AssetIdentifier` VARCHAR(255) NOT NULL,
-    `Defaulted` TINYINT(1) NOT NULL DEFAULT 0,
-    `InterestRate` DECIMAL(5,2) NOT NULL,
-    `Total` DECIMAL(15,2) NOT NULL,
-    `Remaining` DECIMAL(15,2) NOT NULL,
-    `Paid` DECIMAL(15,2) NOT NULL,
-    `DownPayment` DECIMAL(15,2) NOT NULL,
-    `TotalPayments` INT(11) NOT NULL,
-    `PaidPayments` INT(11) NOT NULL,
-    `MissablePayments` INT(11) NOT NULL,
-    `MissedPayments` INT(11) NOT NULL,
-    `TotalMissedPayments` INT(11) NOT NULL,
-    `NextPayment` INT(11) NOT NULL,
-    `LastPayment` INT(11) NOT NULL,
-    `paymentHistory` LONGTEXT DEFAULT NULL,
-    `terms` LONGTEXT DEFAULT NULL,
-    PRIMARY KEY (`id`),
-    KEY `SID` (`SID`),
-    KEY `Type` (`Type`),
-    KEY `AssetIdentifier` (`AssetIdentifier`),
-    CONSTRAINT `paymentHistory` CHECK (json_valid(`paymentHistory`)),
-    CONSTRAINT `terms` CHECK (json_valid(`terms`))
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
-DROP TABLE IF EXISTS `loans_credit_scores`;
-CREATE TABLE IF NOT EXISTS `loans_credit_scores` (
-    `SID` VARCHAR(255) NOT NULL,
-    `Score` INT(11) NOT NULL DEFAULT 0,
-    PRIMARY KEY (`SID`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
-DROP TABLE IF EXISTS `mdt_charges`;
 CREATE TABLE IF NOT EXISTS `mdt_charges` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `type` tinyint(4) NOT NULL DEFAULT 1,
@@ -918,7 +599,6 @@ INSERT INTO `mdt_charges` (`id`, `type`, `title`, `description`, `fine`, `jail`,
 	(143, 1, 'Driving Without Headlights During Darkness', 'Driving after dusk and before dawn or in other poor visiblity conditions without headlights.', 100, 0, 0),
 	(144, 2, 'Accessory to Assault & Battery', 'Assits in the threatens violence or injury upon an individual either orally or thru their actions and acts upon that threat.', 1000, 15, 0);
 
-DROP TABLE IF EXISTS `mdt_library`;
 CREATE TABLE IF NOT EXISTS `mdt_library` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `label` varchar(255) NOT NULL,
@@ -930,7 +610,6 @@ CREATE TABLE IF NOT EXISTS `mdt_library` (
   KEY `workplace` (`workplace`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_520_ci;
 
-DROP TABLE IF EXISTS `mdt_notices`;
 CREATE TABLE IF NOT EXISTS `mdt_notices` (
   `id` int(10) NOT NULL AUTO_INCREMENT,
   `title` varchar(1024) NOT NULL DEFAULT '',
@@ -942,7 +621,6 @@ CREATE TABLE IF NOT EXISTS `mdt_notices` (
   KEY `job` (`restricted`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_520_ci;
 
-DROP TABLE IF EXISTS `mdt_reports`;
 CREATE TABLE IF NOT EXISTS `mdt_reports` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `type` smallint(6) NOT NULL DEFAULT 0,
@@ -961,9 +639,8 @@ CREATE TABLE IF NOT EXISTS `mdt_reports` (
   KEY `creatorName` (`creatorName`),
   KEY `creatorCallsign` (`creatorCallsign`),
   KEY `allowAttorney` (`allowAttorney`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
-DROP TABLE IF EXISTS `mdt_reports_evidence`;
 CREATE TABLE IF NOT EXISTS `mdt_reports_evidence` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `report` int(11) NOT NULL,
@@ -971,10 +648,10 @@ CREATE TABLE IF NOT EXISTS `mdt_reports_evidence` (
   `label` varchar(1024) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `value` varchar(1024) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   PRIMARY KEY (`id`),
-  KEY `report` (`report`)
+  KEY `report` (`report`),
+  CONSTRAINT `FK1_mdt_reports_evidence` FOREIGN KEY (`report`) REFERENCES `mdt_reports` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
-DROP TABLE IF EXISTS `mdt_reports_people`;
 CREATE TABLE IF NOT EXISTS `mdt_reports_people` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `report` int(11) NOT NULL,
@@ -1004,10 +681,11 @@ CREATE TABLE IF NOT EXISTS `mdt_reports_people` (
   KEY `type` (`type`),
   KEY `sentenced` (`sentenced`),
   KEY `expunged` (`expunged`),
-  KEY `FK2_mdt_reports_people` (`warrant`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+  KEY `FK2_mdt_reports_people` (`warrant`),
+  CONSTRAINT `FK2_mdt_reports_people` FOREIGN KEY (`warrant`) REFERENCES `mdt_warrants` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `FK_mdt_reports_people` FOREIGN KEY (`report`) REFERENCES `mdt_reports` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
-DROP TABLE IF EXISTS `mdt_warrants`;
 CREATE TABLE IF NOT EXISTS `mdt_warrants` (
   `id` int(10) NOT NULL AUTO_INCREMENT,
   `state` varchar(50) NOT NULL DEFAULT 'active',
@@ -1023,10 +701,11 @@ CREATE TABLE IF NOT EXISTS `mdt_warrants` (
   PRIMARY KEY (`id`),
   KEY `suspect` (`suspect`),
   KEY `report` (`report`),
-  KEY `expires` (`expires`)
+  KEY `expires` (`expires`),
+  CONSTRAINT `FK1_mdt_warrants` FOREIGN KEY (`report`) REFERENCES `mdt_reports` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
+  CONSTRAINT `FK2_mdt_warrants` FOREIGN KEY (`suspect`) REFERENCES `mdt_reports_people` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_520_ci;
 
-DROP TABLE IF EXISTS `meth_tables`;
 CREATE TABLE IF NOT EXISTS `meth_tables` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `tier` int(11) NOT NULL DEFAULT 1,
@@ -1037,890 +716,6 @@ CREATE TABLE IF NOT EXISTS `meth_tables` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
-DROP TABLE IF EXISTS `moonshine_barrels`;
-CREATE TABLE IF NOT EXISTS `moonshine_barrels` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `quality` int(11) NOT NULL,
-  `drinks` int(11) NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
-
-DROP TABLE IF EXISTS `moonshine_stills`;
-CREATE TABLE IF NOT EXISTS `moonshine_stills` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `created` int(11) NOT NULL,
-  `tier` int(11) NOT NULL,
-  `cooldown` int(11) DEFAULT NULL,
-  `active_cook` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`active_cook`)),
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
-
-CREATE TABLE IF NOT EXISTS `ox_doorlock` (
-    `id` int (11) unsigned NOT NULL AUTO_INCREMENT,
-    `name` varchar(255) NOT NULL,
-    `data` longtext NOT NULL,
-    PRIMARY KEY (`id`)
-);
-
-INSERT INTO `ox_doorlock` (`id`, `name`, `data`) VALUES
-	(4367, 'pulsar_door_1', '{"coords":{"x":-1652.2900390625,"y":-1082.43994140625,"z":12.14999961853027},"maxDistance":2.5,"state":1,"model":-1879168074,"auto":true,"heading":0,"groups":{"avast_arcade":0},"lockSound":"button-remote","doorRate":6.0}'),
-	(4368, 'pulsar_door_2', '{"coords":{"x":-1656.06005859375,"y":-1077.1300048828126,"z":12.14999961853027},"maxDistance":2.5,"state":1,"model":-1977830166,"auto":true,"heading":0,"groups":{"avast_arcade":0},"lockSound":"button-remote","doorRate":6.0}'),
-	(4369, 'pulsar_door_3', '{"coords":{"x":-1647.0699462890626,"y":-1064.2900390625,"z":11.18000030517578},"maxDistance":2.5,"state":1,"model":855881614,"auto":true,"heading":0,"groups":{"avast_arcade":0},"lockSound":"button-remote","doorRate":6.0}'),
-	(4370, 'pulsar_door_4', '{"coords":{"x":-1645.469970703125,"y":-1070.4000244140626,"z":12.77999973297119},"maxDistance":2.5,"state":1,"model":855881614,"auto":true,"heading":0,"groups":{"avast_arcade":0},"lockSound":"button-remote","doorRate":6.0}'),
-	(4371, 'pulsar_door_5', '{"coords":{"x":483.69000244140627,"y":-1876.030029296875,"z":26.2800006866455},"maxDistance":2.5,"state":1,"model":63392702,"auto":true,"heading":0,"groups":{"atomic":0},"lockSound":"button-remote","doorRate":6.0}'),
-	(4372, 'pulsar_door_6', '{"coords":{"x":475.1700134277344,"y":-1893.239990234375,"z":26.2800006866455},"maxDistance":2.5,"state":1,"model":63392702,"auto":true,"heading":0,"groups":{"atomic":0},"lockSound":"button-remote","doorRate":6.0}'),
-	(4373, 'pulsar_door_7', '{"coords":{"x":473.6600036621094,"y":-1903.6099853515626,"z":26.2800006866455},"maxDistance":2.5,"state":1,"model":-1336826684,"auto":true,"heading":0,"groups":{"atomic":0},"lockSound":"button-remote","doorRate":6.0}'),
-	(4374, 'pulsar_door_8', '{"coords":{"x":469.739990234375,"y":-1891.8499755859376,"z":26.29000091552734},"maxDistance":2.5,"state":1,"model":109581382,"auto":true,"heading":0,"groups":{"atomic":0},"lockSound":"button-remote","doorRate":6.0}'),
-	(4375, 'pulsar_door_9', '{"coords":{"x":465.1400146484375,"y":-1890.9000244140626,"z":26.29000091552734},"maxDistance":2.5,"state":1,"model":-33970128,"auto":true,"heading":0,"groups":{"atomic":0},"lockSound":"button-remote","doorRate":6.0}'),
-	(4376, 'pulsar_atomic_garage_1', '{"coords":{"x":477.54498291015627,"y":-1885.2550048828126,"z":27.20499992370605},"maxDistance":2.5,"state":1,"doors":[{"model":212905524,"coords":{"x":479.8699951171875,"y":-1884.199951171875,"z":27.04999923706054},"heading":0},{"model":1162354622,"coords":{"x":475.2200012207031,"y":-1886.31005859375,"z":27.36000061035156},"heading":0}],"auto":true,"lockSound":"button-remote","groups":{"atomic":0},"doorRate":1.0,"_originalId":"atomic_garage_1"}'),
-	(4377, 'pulsar_autoexotics_bollards', '{"coords":{"x":546.6400146484375,"y":-252.6999969482422,"z":49.79000091552734},"maxDistance":2.5,"state":1,"model":-2122911303,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"autoexotics":0},"doorRate":1.0,"_originalId":"autoexotics_bollards"}'),
-	(4378, 'pulsar_autoexotics_garage_1', '{"coords":{"x":548.4600219726563,"y":-201.44000244140626,"z":56.4000015258789},"maxDistance":2.5,"state":1,"model":-836126368,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"autoexotics":0},"doorRate":1.0,"_originalId":"autoexotics_garage_1"}'),
-	(4379, 'pulsar_autoexotics_garage_2', '{"coords":{"x":541.3300170898438,"y":-189.3699951171875,"z":56.04000091552734},"maxDistance":2.5,"state":1,"model":988414009,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"autoexotics":0},"doorRate":1.0,"_originalId":"autoexotics_garage_2"}'),
-	(4380, 'pulsar_autoexotics_garage_3', '{"coords":{"x":542.219970703125,"y":-179.22999572753907,"z":57.59999847412109},"maxDistance":2.5,"state":1,"model":988414009,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"autoexotics":0},"doorRate":1.0,"_originalId":"autoexotics_garage_3"}'),
-	(4381, 'pulsar_autoexotics_garage_4', '{"coords":{"x":548.4600219726563,"y":-166.08999633789063,"z":56.36000061035156},"maxDistance":2.5,"state":1,"model":-836126368,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"autoexotics":0},"doorRate":1.0,"_originalId":"autoexotics_garage_4"}'),
-	(4382, 'pulsar_autoexotics_garage_5', '{"coords":{"x":562.9199829101563,"y":-209.13999938964845,"z":53.16999816894531},"maxDistance":2.5,"state":1,"model":-625016851,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"autoexotics":0},"doorRate":1.0,"_originalId":"autoexotics_garage_5"}'),
-	(4383, 'pulsar_autoexotics_garage_6', '{"coords":{"x":551.5499877929688,"y":-241.1999969482422,"z":49.0},"maxDistance":2.5,"state":1,"model":-1453542142,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"autoexotics":0},"doorRate":1.0,"_originalId":"autoexotics_garage_6"}'),
-	(4384, 'pulsar_door_19', '{"coords":{"x":540.9400024414063,"y":-195.97000122070313,"z":54.88000106811523},"maxDistance":2.5,"state":1,"model":-1924863600,"auto":true,"heading":0,"groups":{"autoexotics":0},"lockSound":"button-remote","doorRate":6.0}'),
-	(4385, 'pulsar_door_20', '{"coords":{"x":543.2899780273438,"y":-168.88999938964845,"z":54.63999938964844},"maxDistance":2.5,"state":1,"model":-35610440,"auto":true,"heading":0,"groups":{"autoexotics":0},"lockSound":"button-remote","doorRate":6.0}'),
-	(4386, 'pulsar_door_21', '{"coords":{"x":535.6699829101563,"y":-169.2100067138672,"z":54.63999938964844},"maxDistance":2.5,"state":1,"model":-35610440,"auto":true,"heading":0,"groups":{"autoexotics":0},"lockSound":"button-remote","doorRate":6.0}'),
-	(4387, 'pulsar_door_22', '{"coords":{"x":541.239990234375,"y":-168.5399932861328,"z":57.79000091552734},"maxDistance":2.5,"state":1,"model":-35610440,"auto":true,"heading":0,"groups":{"autoexotics":0},"lockSound":"button-remote","doorRate":6.0}'),
-	(4388, 'pulsar_door_23', '{"coords":{"x":553.1099853515625,"y":-201.0800018310547,"z":58.29000091552734},"maxDistance":2.5,"state":1,"model":1525532175,"auto":true,"heading":0,"groups":{"autoexotics":0},"lockSound":"button-remote","doorRate":6.0}'),
-	(4389, 'pulsar_door_24', '{"coords":{"x":558.9000244140625,"y":-194.7899932861328,"z":58.29000091552734},"maxDistance":2.5,"state":1,"model":1525532175,"auto":true,"heading":0,"groups":{"autoexotics":0},"lockSound":"button-remote","doorRate":6.0}'),
-	(4390, 'pulsar_door_25', '{"coords":{"x":546.4400024414063,"y":-253.50999450683595,"z":50.06000137329101},"maxDistance":2.5,"state":1,"model":675021279,"auto":true,"heading":0,"groups":{"autoexotics":0},"lockSound":"button-remote","doorRate":6.0}'),
-	(4391, 'pulsar_bh_front_left', '{"coords":{"x":-1388.08642578125,"y":-587.37548828125,"z":30.44564056396484},"maxDistance":2.5,"state":1,"doors":[{"model":-224738884,"coords":{"x":-1387.0360107421876,"y":-586.6932983398438,"z":30.44564056396484},"heading":0},{"model":666905606,"coords":{"x":-1389.136962890625,"y":-588.0576782226563,"z":30.44564056396484},"heading":0}],"permissions":"JOB_DOORS","auto":true,"lockSound":"button-remote","groups":{"bahama":0},"doorRate":6.0,"_originalId":"bh_front_left"}'),
-	(4392, 'pulsar_bh_reception_left', '{"coords":{"x":-1391.158935546875,"y":-593.7095947265625,"z":30.445650100708},"maxDistance":2.5,"state":1,"doors":[{"model":134859901,"coords":{"x":-1390.448974609375,"y":-594.80322265625,"z":30.445650100708},"heading":0},{"model":134859901,"coords":{"x":-1391.8690185546876,"y":-592.6160278320313,"z":30.445650100708},"heading":0}],"permissions":"JOB_DOORS","auto":true,"lockSound":"button-remote","groups":{"bahama":0},"doorRate":6.0,"_originalId":"bh_reception_left"}'),
-	(4393, 'pulsar_bh_office_door', '{"coords":{"x":-1378.5899658203126,"y":-621.3200073242188,"z":30.45000076293945},"maxDistance":2.5,"state":1,"model":-2102541881,"heading":0,"permissions":"JOB_DOORS","auto":true,"lockSound":"button-remote","groups":{"bahama":99},"doorRate":6.0,"_originalId":"bh_office_door"}'),
-	(4394, 'pulsar_bh_dressing_door', '{"coords":{"x":-1377.677978515625,"y":-624.8817138671875,"z":30.445650100708},"maxDistance":2.5,"state":1,"model":-2102541881,"heading":0,"permissions":"JOB_DOORS","auto":true,"lockSound":"button-remote","groups":{"bahama":0},"doorRate":6.0,"_originalId":"bh_dressing_door"}'),
-	(4395, 'pulsar_bh_dressing_office', '{"coords":{"x":-1373.760009765625,"y":-628.75,"z":30.45000076293945},"maxDistance":2.5,"state":1,"model":134859901,"heading":0,"permissions":"JOB_DOORS","auto":true,"lockSound":"button-remote","groups":{"bahama":99},"doorRate":6.0,"_originalId":"bh_dressing_office"}'),
-	(4396, 'pulsar_door_33', '{"coords":{"x":-1253.010009765625,"y":-295.32000732421877,"z":37.72000122070312},"maxDistance":2.5,"state":1,"model":855764503,"auto":true,"heading":0,"groups":{"bakery":0},"lockSound":"button-remote","doorRate":6.0}'),
-	(4397, 'pulsar_door_34', '{"coords":{"x":-1267.449951171875,"y":-289.0799865722656,"z":37.54000091552734},"maxDistance":2.5,"state":1,"model":-879439491,"auto":true,"heading":0,"groups":{"bakery":0},"lockSound":"button-remote","doorRate":6.0}'),
-	(4398, 'pulsar_bean_machine_1', '{"coords":{"x":114.97000122070313,"y":-1038.7750244140626,"z":29.35000038146972},"maxDistance":2.5,"state":1,"doors":[{"model":-1182160879,"coords":{"x":114.55999755859375,"y":-1039.8900146484376,"z":29.35000038146972},"heading":0},{"model":-747011272,"coords":{"x":115.37999725341797,"y":-1037.6600341796876,"z":29.35000038146972},"heading":0}],"auto":true,"lockSound":"button-remote","groups":{"beanmachine":0},"doorRate":6.0,"_originalId":"bean_machine_1"}'),
-	(4399, 'pulsar_door_37', '{"coords":{"x":128.2100067138672,"y":-1029.4599609375,"z":29.26000022888183},"maxDistance":2.5,"state":1,"model":494354570,"auto":true,"heading":0,"groups":{"beanmachine":0},"lockSound":"button-remote","doorRate":6.0}'),
-	(4400, 'pulsar_bennys_office_main', '{"coords":{"x":-197.4499969482422,"y":-1322.0699462890626,"z":31.45999908447265},"maxDistance":2.5,"state":1,"model":-147325430,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"bennys":0},"doorRate":6.0,"_originalId":"bennys_office_main"}'),
-	(4401, 'pulsar_bennys_clothing_door', '{"coords":{"x":-197.4499969482422,"y":-1339.1400146484376,"z":31.45999908447265},"maxDistance":2.5,"state":1,"model":-147325430,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"bennys":0},"doorRate":6.0,"_originalId":"bennys_clothing_door"}'),
-	(4402, 'pulsar_bennys_front_main_door', '{"coords":{"x":-230.6999969482422,"y":-1315.1500244140626,"z":31.45000076293945},"maxDistance":2.5,"state":1,"model":-147325430,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"bennys":0},"doorRate":6.0,"_originalId":"bennys_front_main_door"}'),
-	(4403, 'pulsar_bennys_front_inside_door', '{"coords":{"x":-226.05999755859376,"y":-1322.0699462890626,"z":31.45000076293945},"maxDistance":2.5,"state":1,"model":-147325430,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"bennys":0},"doorRate":6.0,"_originalId":"bennys_front_inside_door"}'),
-	(4404, 'pulsar_bennys_main_garage', '{"coords":{"x":-230.80999755859376,"y":-1327.0,"z":33.70000076293945},"maxDistance":2.5,"state":1,"model":-48831039,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"bennys":0},"doorRate":1.0,"_originalId":"bennys_main_garage"}'),
-	(4405, 'pulsar_bennys_side_garage_1', '{"coords":{"x":-207.77000427246095,"y":-1313.2900390625,"z":34.45000076293945},"maxDistance":2.5,"state":1,"model":-1453834687,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"bennys":0},"doorRate":1.0,"_originalId":"bennys_side_garage_1"}'),
-	(4406, 'pulsar_bennys_side_garage_2', '{"coords":{"x":-215.74000549316407,"y":-1313.2900390625,"z":34.45000076293945},"maxDistance":2.5,"state":1,"model":-1453834687,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"bennys":0},"doorRate":1.0,"_originalId":"bennys_side_garage_2"}'),
-	(4407, 'pulsar_door_45', '{"coords":{"x":758.52197265625,"y":-777.2520141601563,"z":26.64883041381836},"maxDistance":2.5,"state":1,"model":-626684119,"auto":true,"heading":0,"groups":{"bowling":0},"lockSound":"button-remote","doorRate":6.0}'),
-	(4408, 'pulsar_door_46', '{"coords":{"x":755.56298828125,"y":-777.2520141601563,"z":26.48348999023437},"maxDistance":2.5,"state":1,"model":-626684119,"auto":true,"heading":0,"groups":{"bowling":0},"lockSound":"button-remote","doorRate":6.0}'),
-	(4409, 'pulsar_door_47', '{"coords":{"x":755.5689697265625,"y":-780.9235229492188,"z":26.48348999023437},"maxDistance":2.5,"state":1,"model":-626684119,"auto":true,"heading":0,"groups":{"bowling":0},"lockSound":"button-remote","doorRate":6.0}'),
-	(4410, 'pulsar_door_48', '{"coords":{"x":755.5689697265625,"y":-770.7398071289063,"z":26.48348999023437},"maxDistance":2.5,"state":1,"model":-626684119,"auto":true,"heading":0,"groups":{"bowling":0},"lockSound":"button-remote","doorRate":6.0}'),
-	(4411, 'pulsar_bshot_back_exit', '{"coords":{"x":-1199.8900146484376,"y":-903.030029296875,"z":13.89999961853027},"maxDistance":2.5,"state":1,"model":1009568243,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"burgershot":0},"doorRate":6.0,"_originalId":"bshot_back_exit"}'),
-	(4412, 'pulsar_bshot_front_exit', '{"coords":{"x":-1176.6099853515626,"y":-895.5800170898438,"z":13.89999961853027},"maxDistance":2.5,"state":1,"model":1009568243,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"burgershot":0},"doorRate":6.0,"_originalId":"bshot_front_exit"}'),
-	(4413, 'pulsar_bshot_front_1', '{"coords":{"x":-1184.04443359375,"y":-884.5700073242188,"z":13.90345954895019},"maxDistance":2.5,"state":1,"doors":[{"model":1724308471,"coords":{"x":-1183.373046875,"y":-885.5643920898438,"z":13.90345954895019},"heading":0},{"model":-571782594,"coords":{"x":-1184.7159423828126,"y":-883.5756225585938,"z":13.90345954895019},"heading":0}],"auto":true,"lockSound":"button-remote","groups":{"burgershot":0},"doorRate":6.0,"_originalId":"bshot_front_1"}'),
-	(4414, 'pulsar_bshot_side_1', '{"coords":{"x":-1197.782470703125,"y":-884.3614501953125,"z":13.90345954895019},"maxDistance":2.5,"state":1,"doors":[{"model":-571782594,"coords":{"x":-1198.7769775390626,"y":-885.0333251953125,"z":13.90345954895019},"heading":0},{"model":1724308471,"coords":{"x":-1196.7879638671876,"y":-883.6895141601563,"z":13.90345954895019},"heading":0}],"auto":true,"lockSound":"button-remote","groups":{"burgershot":0},"doorRate":6.0,"_originalId":"bshot_side_1"}'),
-	(4415, 'pulsar_bshot_office', '{"coords":{"x":-1200.199951171875,"y":-901.22998046875,"z":13.89999961853027},"maxDistance":2.5,"state":1,"model":846116471,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"burgershot":0},"doorRate":6.0,"_originalId":"bshot_office"}'),
-	(4416, 'pulsar_bshot_freezer', '{"coords":{"x":-1193.739990234375,"y":-900.0800170898438,"z":13.94999980926513},"maxDistance":2.5,"state":1,"model":1309514423,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"burgershot":0},"doorRate":6.0,"_originalId":"bshot_freezer"}'),
-	(4417, 'pulsar_bshot_drivethru_freezer_back', '{"coords":{"x":-1191.7099609375,"y":-902.760009765625,"z":13.89999961853027},"maxDistance":2.5,"state":1,"model":547885802,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"burgershot":0},"doorRate":6.0,"_originalId":"bshot_drivethru_freezer_back"}'),
-	(4418, 'pulsar_bshot_door_kitchen', '{"coords":{"x":-1185.81005859375,"y":-895.47998046875,"z":13.89999961853027},"maxDistance":2.5,"state":1,"model":1618088565,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"burgershot":0},"doorRate":3.0,"_originalId":"bshot_door_kitchen"}'),
-	(4419, 'pulsar_bshot_door_counter', '{"coords":{"x":-1185.5,"y":-894.5900268554688,"z":13.89999961853027},"maxDistance":2.5,"state":1,"model":1618088565,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"burgershot":0},"doorRate":3.0,"_originalId":"bshot_door_counter"}'),
-	(4420, 'pulsar_bshot_door_change', '{"coords":{"x":-1182.5,"y":-899.5599975585938,"z":13.89999961853027},"maxDistance":2.5,"state":1,"model":547885802,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"burgershot":0},"doorRate":6.0,"_originalId":"bshot_door_change"}'),
-	(4421, 'pulsar_casino_enter_1', '{"coords":{"x":959.2050170898438,"y":33.31500244140625,"z":72.4000015258789},"maxDistance":2.5,"state":0,"doors":[{"model":21324050,"coords":{"x":960.27001953125,"y":32.6500015258789,"z":72.4000015258789},"heading":0},{"model":21324050,"coords":{"x":958.1400146484375,"y":33.97999954223633,"z":72.4000015258789},"heading":0}],"permissions":"CASINO_LOCK_DOORS","auto":true,"lockSound":"button-remote","groups":{"casino":0},"doorRate":6.0,"_originalId":"casino_enter_1"}'),
-	(4422, 'pulsar_casino_management_1', '{"coords":{"x":1018.1650390625,"y":66.33000183105469,"z":70.01000213623047},"maxDistance":2.5,"state":1,"doors":[{"model":680601509,"coords":{"x":1018.6900024414063,"y":67.18000030517578,"z":70.01000213623047},"heading":0},{"model":680601509,"coords":{"x":1017.6400146484375,"y":65.4800033569336,"z":70.01000213623047},"heading":0}],"permissions":"CASINO_LOCK_DOORS","auto":true,"lockSound":"button-remote","groups":{"casino":0},"doorRate":6.0,"_originalId":"casino_management_1"}'),
-	(4423, 'pulsar_casino_management_3', '{"coords":{"x":1001.4599609375,"y":60.84500122070312,"z":75.20999908447266},"maxDistance":2.5,"state":1,"doors":[{"model":-643593781,"coords":{"x":1000.6099853515625,"y":61.36999893188476,"z":75.20999908447266},"heading":0},{"model":-643593781,"coords":{"x":1002.3099975585938,"y":60.31999969482422,"z":75.20999908447266},"heading":0}],"permissions":"CASINO_LOCK_DOORS","auto":true,"lockSound":"button-remote","groups":{"casino":0},"doorRate":6.0,"_originalId":"casino_management_3"}'),
-	(4424, 'pulsar_door_67', '{"coords":{"x":980.6799926757813,"y":55.40999984741211,"z":116.29000091552735},"maxDistance":2.5,"state":1,"model":-1074495927,"auto":true,"heading":0,"lockSound":"button-remote","doorRate":6.0}'),
-	(4425, 'pulsar_door_68', '{"coords":{"x":981.739990234375,"y":57.11000061035156,"z":116.29000091552735},"maxDistance":2.5,"state":1,"model":-1074495927,"auto":true,"heading":0,"lockSound":"button-remote","doorRate":6.0}'),
-	(4426, 'pulsar_door_69', '{"coords":{"x":966.8300170898438,"y":54.18999862670898,"z":116.68000030517578},"maxDistance":2.5,"state":0,"model":1016572513,"auto":true,"heading":0,"lockSound":"button-remote","doorRate":6.0}'),
-	(4427, 'pulsar_door_70', '{"coords":{"x":968.8099975585938,"y":52.95000076293945,"z":116.68000030517578},"maxDistance":2.5,"state":0,"model":1016572513,"auto":true,"heading":0,"lockSound":"button-remote","doorRate":6.0}'),
-	(4428, 'pulsar_casino_penthouse_1', '{"coords":{"x":974.8699951171875,"y":53.72499847412109,"z":116.80999755859375},"maxDistance":2.5,"state":1,"doors":[{"model":196775740,"coords":{"x":975.9099731445313,"y":53.06999969482422,"z":116.80999755859375},"heading":0},{"model":196775740,"coords":{"x":973.8300170898438,"y":54.38000106811523,"z":116.80999755859375},"heading":0}],"permissions":"CASINO_LOCK_DOORS","auto":true,"lockSound":"button-remote","groups":{"casino":0},"doorRate":6.0,"_originalId":"casino_penthouse_1"}'),
-	(4429, 'pulsar_casino_penthouse_3', '{"coords":{"x":980.3349609375,"y":61.68000030517578,"z":116.29000091552735},"maxDistance":2.5,"state":1,"doors":[{"model":-1074495927,"coords":{"x":979.489990234375,"y":62.20999908447265,"z":116.29000091552735},"heading":0},{"model":-1074495927,"coords":{"x":981.1799926757813,"y":61.1500015258789,"z":116.29000091552735},"heading":0}],"permissions":"CASINO_LOCK_DOORS","auto":true,"lockSound":"button-remote","groups":{"casino":0},"doorRate":6.0,"_originalId":"casino_penthouse_3"}'),
-	(4430, 'pulsar_casino_lobby_1', '{"coords":{"x":926.853515625,"y":48.68249893188476,"z":81.10600280761719},"maxDistance":2.5,"state":0,"doors":[{"model":21324050,"coords":{"x":927.14599609375,"y":49.18999862670898,"z":81.10600280761719},"heading":0},{"model":21324050,"coords":{"x":926.5609741210938,"y":48.17499923706055,"z":81.10600280761719},"heading":0}],"permissions":"CASINO_LOCK_DOORS","auto":true,"lockSound":"button-remote","groups":{"casino":0},"doorRate":6.0,"_originalId":"casino_lobby_1"}'),
-	(4431, 'pulsar_casino_lobby_3', '{"coords":{"x":925.4859619140625,"y":46.23249816894531,"z":81.10350036621094},"maxDistance":2.5,"state":0,"doors":[{"model":21324050,"coords":{"x":925.7680053710938,"y":46.8390007019043,"z":81.10600280761719},"heading":0},{"model":21324050,"coords":{"x":925.2039794921875,"y":45.62599945068359,"z":81.10099792480469},"heading":0}],"permissions":"CASINO_LOCK_DOORS","auto":true,"lockSound":"button-remote","groups":{"casino":0},"doorRate":6.0,"_originalId":"casino_lobby_3"}'),
-	(4432, 'pulsar_casino_lobby_5', '{"coords":{"x":923.8575439453125,"y":43.90950012207031,"z":81.10600280761719},"maxDistance":2.5,"state":0,"doors":[{"model":21324050,"coords":{"x":924.0570068359375,"y":44.61000061035156,"z":81.10600280761719},"heading":0},{"model":21324050,"coords":{"x":923.6580200195313,"y":43.20899963378906,"z":81.10600280761719},"heading":0}],"permissions":"CASINO_LOCK_DOORS","auto":true,"lockSound":"button-remote","groups":{"casino":0},"doorRate":6.0,"_originalId":"casino_lobby_5"}'),
-	(4433, 'pulsar_casino_nc_1', '{"coords":{"x":962.6400146484375,"y":60.02999877929687,"z":-75.05999755859375},"maxDistance":2.5,"state":1,"model":-1555108147,"heading":0,"permissions":"CASINO_LOCK_DOORS","auto":true,"lockSound":"button-remote","groups":{"casino":0},"doorRate":6.0,"_originalId":"casino_nc_1"}'),
-	(4434, 'pulsar_casino_nc_2', '{"coords":{"x":963.72998046875,"y":42.4900016784668,"z":-75.04000091552735},"maxDistance":2.5,"state":1,"model":-1119680854,"heading":0,"permissions":"CASINO_LOCK_DOORS","auto":true,"lockSound":"button-remote","groups":{"casino":0},"doorRate":6.0,"_originalId":"casino_nc_2"}'),
-	(4435, 'pulsar_casino_nc_3', '{"coords":{"x":960.780029296875,"y":58.16999816894531,"z":-78.83999633789063},"maxDistance":2.5,"state":1,"model":1695461688,"heading":0,"permissions":"CASINO_LOCK_DOORS","auto":true,"lockSound":"button-remote","groups":{"casino":0},"doorRate":6.0,"_originalId":"casino_nc_3"}'),
-	(4436, 'pulsar_casino_nc_4', '{"coords":{"x":976.0700073242188,"y":80.0199966430664,"z":-75.83999633789063},"maxDistance":2.5,"state":1,"model":1695461688,"heading":0,"permissions":"CASINO_LOCK_DOORS","auto":true,"lockSound":"button-remote","groups":{"casino":0},"doorRate":6.0,"_originalId":"casino_nc_4"}'),
-	(4437, 'pulsar_casino_nc_5', '{"coords":{"x":966.6300048828125,"y":40.54000091552734,"z":-75.04000091552735},"maxDistance":2.5,"state":1,"model":1695461688,"heading":0,"permissions":"CASINO_LOCK_DOORS","auto":true,"lockSound":"button-remote","groups":{"casino":0},"doorRate":6.0,"_originalId":"casino_nc_5"}'),
-	(4438, 'pulsar_cloud9_main_office', '{"coords":{"x":-63.31000137329101,"y":-2519.1298828125,"z":7.55000019073486},"maxDistance":2.5,"state":1,"model":-684382235,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"cloud9":0},"doorRate":6.0,"_originalId":"cloud9_main_office"}'),
-	(4439, 'pulsar_cloud9_front_gate_enter', '{"coords":{"x":19.40999984741211,"y":-2529.699951171875,"z":5.05000019073486},"maxDistance":2.5,"state":1,"model":1286392437,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"cloud9":0},"doorRate":1.0,"_originalId":"cloud9_front_gate_enter"}'),
-	(4440, 'pulsar_cloud9_front_gate_exit_out', '{"coords":{"x":10.64000034332275,"y":-2542.2099609375,"z":5.05000019073486},"maxDistance":2.5,"state":1,"model":1286392437,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"cloud9":0},"doorRate":1.0,"_originalId":"cloud9_front_gate_exit_out"}'),
-	(4441, 'pulsar_cloud9_rear_gate_enter', '{"coords":{"x":-193.5500030517578,"y":-2515.570068359375,"z":5.28000020980835},"maxDistance":2.5,"state":1,"model":1286392437,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"cloud9":0},"doorRate":1.0,"_originalId":"cloud9_rear_gate_enter"}'),
-	(4442, 'pulsar_cloud9_rear_gate_exit_out', '{"coords":{"x":-202.6199951171875,"y":-2515.31005859375,"z":5.05000019073486},"maxDistance":2.5,"state":1,"model":1286392437,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"cloud9":0},"doorRate":1.0,"_originalId":"cloud9_rear_gate_exit_out"}'),
-	(4443, 'pulsar_comic_main_door_1', '{"coords":{"x":-143.72000122070313,"y":229.0800018310547,"z":93.91999816894531},"maxDistance":2.5,"state":0,"auto":true,"doors":[{"model":354266445,"coords":{"x":-145.0500030517578,"y":229.0800018310547,"z":93.91999816894531},"heading":0},{"model":-2062971609,"coords":{"x":-142.38999938964845,"y":229.0800018310547,"z":93.91999816894531},"heading":0}],"lockSound":"button-remote","doorRate":6.0,"_originalId":"comic_main_door_1"}'),
-	(4444, 'pulsar_comic_gate_door', '{"coords":{"x":-153.38999938964845,"y":225.8000030517578,"z":95.02999877929688},"maxDistance":2.5,"state":1,"model":-1360938964,"auto":true,"heading":0,"lockSound":"button-remote","doorRate":6.0,"_originalId":"comic_gate_door"}'),
-	(4445, 'pulsar_comic_backroom_door', '{"coords":{"x":-152.39999389648438,"y":219.4199981689453,"z":95.08999633789063},"maxDistance":2.5,"state":1,"model":217447762,"auto":true,"heading":0,"lockSound":"button-remote","doorRate":6.0,"_originalId":"comic_backroom_door"}'),
-	(4446, 'pulsar_comic_backroom_outside_door', '{"coords":{"x":-139.9499969482422,"y":216.0,"z":94.88999938964844},"maxDistance":2.5,"state":1,"model":1531355165,"auto":true,"heading":0,"lockSound":"button-remote","doorRate":6.0,"_originalId":"comic_backroom_outside_door"}'),
-	(4447, 'pulsar_comic_partyroom_outside_door', '{"coords":{"x":-155.44000244140626,"y":213.80999755859376,"z":94.88999938964844},"maxDistance":2.5,"state":1,"model":1531355165,"auto":true,"heading":0,"lockSound":"button-remote","doorRate":6.0,"_originalId":"comic_partyroom_outside_door"}'),
-	(4448, 'pulsar_dgang_garage', '{"coords":{"x":308.8900146484375,"y":-2732.8798828125,"z":9.71000003814697},"maxDistance":2.5,"state":1,"model":1187280133,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"dgang":0},"doorRate":6.0,"_originalId":"dgang_garage"}'),
-	(4449, 'pulsar_digital_den_secret_1', '{"coords":{"x":1135.945068359375,"y":-464.0400085449219,"z":66.51000213623047},"maxDistance":2.5,"state":1,"doors":[{"model":-1577379202,"coords":{"x":1135.489990234375,"y":-463.9100036621094,"z":66.51000213623047},"heading":0},{"model":-1577379202,"coords":{"x":1136.4000244140626,"y":-464.1700134277344,"z":66.51000213623047},"heading":0}],"auto":true,"lockSound":"button-remote","groups":{"digitalden":0},"doorRate":6.0,"_originalId":"digital_den_secret_1"}'),
-	(4450, 'pulsar_door_100', '{"coords":{"x":1137.3399658203126,"y":-470.0400085449219,"z":66.91000366210938},"maxDistance":2.5,"state":0,"model":1181020301,"auto":true,"heading":0,"groups":{"digitalden":0},"lockSound":"button-remote","doorRate":6.0}'),
-	(4451, 'pulsar_door_101', '{"coords":{"x":1137.300048828125,"y":-474.2099914550781,"z":72.12000274658203},"maxDistance":2.5,"state":0,"model":-1503577684,"auto":true,"heading":0,"groups":{"digitalden":0},"lockSound":"button-remote","doorRate":6.0}'),
-	(4452, 'pulsar_door_102', '{"coords":{"x":1129.2900390625,"y":-464.6600036621094,"z":66.63999938964844},"maxDistance":2.5,"state":1,"model":-1565285813,"auto":true,"heading":0,"groups":{"digitalden":0},"lockSound":"button-remote","doorRate":6.0}'),
-	(4453, 'pulsar_door_103', '{"coords":{"x":1136.68994140625,"y":-466.8999938964844,"z":66.62999725341797},"maxDistance":2.5,"state":1,"model":547719377,"auto":true,"heading":0,"groups":{"digitalden":0},"lockSound":"button-remote","doorRate":6.0}'),
-	(4454, 'pulsar_dreamworks_office_reception', '{"coords":{"x":-695.8800048828125,"y":-1386.9300537109376,"z":5.71000003814697},"maxDistance":2.5,"state":1,"model":-1858287035,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"dreamworks":0},"doorRate":6.0,"_originalId":"dreamworks_office_reception"}'),
-	(4455, 'pulsar_dreamworks_office_upper', '{"coords":{"x":-698.1500244140625,"y":-1389.800048828125,"z":7.55000019073486},"maxDistance":2.5,"state":1,"model":-194669501,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"dreamworks":0},"doorRate":6.0,"_originalId":"dreamworks_office_upper"}'),
-	(4456, 'pulsar_dreamworks_main_door3', '{"coords":{"x":-722.469970703125,"y":-1513.52001953125,"z":5.19999980926513},"maxDistance":2.5,"state":1,"model":1780065381,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"dreamworks":0},"doorRate":6.0,"_originalId":"dreamworks_main_door3"}'),
-	(4457, 'pulsar_dreamworks_main_door2', '{"coords":{"x":-759.780029296875,"y":-1515.8699951171876,"z":5.19999980926513},"maxDistance":2.5,"state":1,"model":1780065381,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"dreamworks":0},"doorRate":6.0,"_originalId":"dreamworks_main_door2"}'),
-	(4458, 'pulsar_dreamworks_main_door1', '{"coords":{"x":-752.4299926757813,"y":-1512.719970703125,"z":5.19999980926513},"maxDistance":2.5,"state":1,"model":461070437,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"dreamworks":0},"doorRate":6.0,"_originalId":"dreamworks_main_door1"}'),
-	(4459, 'pulsar_dreamworks_main_garage', '{"coords":{"x":-742.1300048828125,"y":-1508.6099853515626,"z":6.19999980926513},"maxDistance":2.5,"state":1,"model":112179610,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"dreamworks":0},"doorRate":1.0,"_originalId":"dreamworks_main_garage"}'),
-	(4460, 'pulsar_dyn8_front_1', '{"coords":{"x":-699.2049560546875,"y":270.93499755859377,"z":83.41000366210938},"maxDistance":2.5,"state":1,"doors":[{"model":-1922281023,"coords":{"x":-699.6599731445313,"y":271.8900146484375,"z":83.41000366210938},"heading":0},{"model":-1922281023,"coords":{"x":-698.75,"y":269.9800109863281,"z":83.41000366210938},"heading":0}],"auto":true,"lockSound":"button-remote","groups":{"realestate":0},"doorRate":6.0,"_originalId":"dyn8_front_1"}'),
-	(4461, 'pulsar_dyn8_office', '{"coords":{"x":-713.9199829101563,"y":264.4599914550781,"z":84.19000244140625},"maxDistance":2.5,"state":1,"model":1901183774,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"realestate":0},"doorRate":6.0,"_originalId":"dyn8_office"}'),
-	(4462, 'pulsar_dyn8_back', '{"coords":{"x":-716.3699951171875,"y":270.6000061035156,"z":84.81999969482422},"maxDistance":2.5,"state":1,"model":1901183774,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"realestate":0},"doorRate":6.0,"_originalId":"dyn8_back"}'),
-	(4463, 'pulsar_garcon_pawn_front_door', '{"coords":{"x":-230.80999755859376,"y":6233.39990234375,"z":31.92000007629394},"maxDistance":2.5,"state":1,"model":1534738093,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"garcon_pawn":0},"doorRate":6.0,"_originalId":"garcon_pawn_front_door"}'),
-	(4464, 'pulsar_garcon_pawn_office_door', '{"coords":{"x":-218.63999938964845,"y":6230.66015625,"z":31.94000053405761},"maxDistance":2.5,"state":1,"model":616583517,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"garcon_pawn":0},"doorRate":6.0,"_originalId":"garcon_pawn_office_door"}'),
-	(4465, 'pulsar_door_116', '{"coords":{"x":2476.090087890625,"y":4088.1298828125,"z":38.22999954223633},"maxDistance":2.5,"state":1,"model":-1563799200,"auto":true,"heading":0,"groups":{"greycat_shipping":0},"lockSound":"button-remote","doorRate":6.0}'),
-	(4466, 'pulsar_door_117', '{"coords":{"x":2470.320068359375,"y":4090.419921875,"z":38.15999984741211},"maxDistance":2.5,"state":1,"model":-1563799200,"auto":true,"heading":0,"groups":{"greycat_shipping":0},"lockSound":"button-remote","doorRate":6.0}'),
-	(4467, 'pulsar_door_118', '{"coords":{"x":2468.06005859375,"y":4094.3798828125,"z":38.15999984741211},"maxDistance":2.5,"state":1,"model":-1563799200,"auto":true,"heading":0,"groups":{"greycat_shipping":0},"lockSound":"button-remote","doorRate":6.0}'),
-	(4468, 'pulsar_greycat_garage', '{"coords":{"x":2468.280029296875,"y":4100.7001953125,"z":38.43999862670898},"maxDistance":2.5,"state":1,"model":2006822568,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"greycat_shipping":0},"doorRate":1.0,"_originalId":"greycat_garage"}'),
-	(4469, 'pulsar_door_120', '{"coords":{"x":2474.56005859375,"y":4101.509765625,"z":41.38000106811523},"maxDistance":2.5,"state":1,"model":-952356348,"auto":true,"heading":0,"groups":{"greycat_shipping":0},"lockSound":"button-remote","doorRate":6.0}'),
-	(4470, 'pulsar_door_121', '{"coords":{"x":2476.159912109375,"y":4105.3701171875,"z":41.38000106811523},"maxDistance":2.5,"state":1,"model":-952356348,"auto":true,"heading":0,"groups":{"greycat_shipping":0},"lockSound":"button-remote","doorRate":6.0}'),
-	(4471, 'pulsar_door_122', '{"coords":{"x":2463.530029296875,"y":4088.409912109375,"z":38.22000122070312},"maxDistance":2.5,"state":1,"model":-1923229054,"auto":true,"heading":0,"groups":{"greycat_shipping":0},"lockSound":"button-remote","doorRate":6.0}'),
-	(4472, 'pulsar_door_123', '{"coords":{"x":2470.360107421875,"y":4083.780029296875,"z":34.88000106811523},"maxDistance":2.5,"state":1,"model":-1563799200,"auto":true,"heading":0,"groups":{"greycat_shipping":0},"lockSound":"button-remote","doorRate":6.0}'),
-	(4473, 'pulsar_door_124', '{"coords":{"x":2478.7900390625,"y":4105.68994140625,"z":41.38000106811523},"maxDistance":2.5,"state":1,"model":-952356348,"auto":true,"heading":0,"groups":{"greycat_shipping":0},"lockSound":"button-remote","doorRate":6.0}'),
-	(4474, 'pulsar_door_125', '{"coords":{"x":2475.260009765625,"y":4097.1298828125,"z":41.31999969482422},"maxDistance":2.5,"state":1,"model":-1563799200,"auto":true,"heading":0,"groups":{"greycat_shipping":0},"lockSound":"button-remote","doorRate":6.0}'),
-	(4475, 'pulsar_meet_garage', '{"coords":{"x":950.7745971679688,"y":-1698.22705078125,"z":31.44470977783203},"maxDistance":2.5,"state":1,"model":-982531572,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"blackline":0},"doorRate":1.0,"_originalId":"meet_garage"}'),
-	(4476, 'pulsar_door_127', '{"coords":{"x":1187.199951171875,"y":2644.949951171875,"z":38.54999923706055},"maxDistance":2.5,"state":1,"model":1335311341,"auto":true,"heading":0,"groups":{"harmony":0},"lockSound":"button-remote","doorRate":6.0}'),
-	(4477, 'pulsar_harmony_garage_1', '{"coords":{"x":1182.31005859375,"y":2644.169921875,"z":40.5099983215332},"maxDistance":2.5,"state":1,"model":-822900180,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"harmony":0},"doorRate":1.0,"_originalId":"harmony_garage_1"}'),
-	(4478, 'pulsar_harmony_garage_2', '{"coords":{"x":1174.6600341796876,"y":2644.14990234375,"z":40.5099983215332},"maxDistance":2.5,"state":1,"model":-822900180,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"harmony":0},"doorRate":1.0,"_originalId":"harmony_garage_2"}'),
-	(4479, 'pulsar_door_130', '{"coords":{"x":-1434.1600341796876,"y":-448.5899963378906,"z":36.06000137329101},"maxDistance":2.5,"state":1,"model":-634936098,"auto":true,"heading":0,"groups":{"hayes":0},"lockSound":"button-remote","doorRate":6.0}'),
-	(4480, 'pulsar_door_131', '{"coords":{"x":-1427.530029296875,"y":-455.67999267578127,"z":36.06000137329101},"maxDistance":2.5,"state":1,"model":1289778077,"auto":true,"heading":0,"groups":{"hayes":0},"lockSound":"button-remote","doorRate":6.0}'),
-	(4481, 'pulsar_hayes_garage_1', '{"coords":{"x":-1427.3299560546876,"y":-444.1499938964844,"z":34.90999984741211},"maxDistance":2.5,"state":1,"model":1715394473,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"hayes":0},"doorRate":1.0,"_originalId":"hayes_garage_1"}'),
-	(4482, 'pulsar_hayes_garage_2', '{"coords":{"x":-1421.1199951171876,"y":-440.2699890136719,"z":34.93000030517578},"maxDistance":2.5,"state":1,"model":1715394473,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"hayes":0},"doorRate":1.0,"_originalId":"hayes_garage_2"}'),
-	(4483, 'pulsar_hayes_garage_3', '{"coords":{"x":-1414.8699951171876,"y":-436.3699951171875,"z":34.90999984741211},"maxDistance":2.5,"state":1,"model":1715394473,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"hayes":0},"doorRate":1.0,"_originalId":"hayes_garage_3"}'),
-	(4484, 'pulsar_hmech_garage_1', '{"coords":{"x":978.489990234375,"y":-1500.199951171875,"z":32.06999969482422},"maxDistance":2.5,"state":1,"model":-709652764,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"blackline":0},"doorRate":1.0,"_originalId":"hmech_garage_1"}'),
-	(4485, 'pulsar_hmech_garage_2', '{"coords":{"x":999.739990234375,"y":-1492.510009765625,"z":33.47000122070312},"maxDistance":2.5,"state":1,"model":-709652764,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"blackline":0},"doorRate":1.0,"_originalId":"hmech_garage_2"}'),
-	(4486, 'pulsar_hmech_door_1', '{"coords":{"x":996.0900268554688,"y":-1486.0899658203126,"z":31.65999984741211},"maxDistance":2.5,"state":1,"model":-664582244,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"blackline":0},"doorRate":6.0,"_originalId":"hmech_door_1"}'),
-	(4487, 'pulsar_hmech_door_2', '{"coords":{"x":983.969970703125,"y":-1503.300048828125,"z":31.65999984741211},"maxDistance":2.5,"state":1,"model":-664582244,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"blackline":0},"doorRate":6.0,"_originalId":"hmech_door_2"}'),
-	(4488, 'pulsar_hmech_office', '{"coords":{"x":994.1400146484375,"y":-1491.7099609375,"z":31.65999984741211},"maxDistance":2.5,"state":1,"model":842946633,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"blackline":0},"doorRate":6.0,"_originalId":"hmech_office"}'),
-	(4489, 'pulsar_jewel_main_1', '{"coords":{"x":-708.9099731445313,"y":-887.2999877929688,"z":24.11000061035156},"maxDistance":2.5,"state":1,"doors":[{"model":-266682831,"coords":{"x":-707.719970703125,"y":-887.2999877929688,"z":24.11000061035156},"heading":0},{"model":1674388876,"coords":{"x":-710.0999755859375,"y":-887.2999877929688,"z":24.11000061035156},"heading":0}],"auto":true,"lockSound":"button-remote","groups":{"jewel":0},"doorRate":6.0,"_originalId":"jewel_main_1"}'),
-	(4490, 'pulsar_jewel_breakroom_door', '{"coords":{"x":-702.6599731445313,"y":-901.530029296875,"z":23.95999908447265},"maxDistance":2.5,"state":1,"model":-717018680,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"jewel":0},"doorRate":6.0,"_originalId":"jewel_breakroom_door"}'),
-	(4491, 'pulsar_jewel_upstairs_door', '{"coords":{"x":-698.1199951171875,"y":-897.02001953125,"z":23.95999908447265},"maxDistance":2.5,"state":1,"model":-717018680,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"jewel":0},"doorRate":6.0,"_originalId":"jewel_upstairs_door"}'),
-	(4492, 'pulsar_jewel_downstairs_door', '{"coords":{"x":-700.1599731445313,"y":-897.02001953125,"z":19.68000030517578},"maxDistance":2.5,"state":1,"model":-717018680,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"jewel":0},"doorRate":6.0,"_originalId":"jewel_downstairs_door"}'),
-	(4493, 'pulsar_jewel_downstairs_storage_door', '{"coords":{"x":-702.6900024414063,"y":-897.02001953125,"z":19.68000030517578},"maxDistance":2.5,"state":1,"model":-717018680,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"jewel":0},"doorRate":6.0,"_originalId":"jewel_downstairs_storage_door"}'),
-	(4494, 'pulsar_jewel_downstairs_gem_door', '{"coords":{"x":-698.219970703125,"y":-900.3200073242188,"z":19.68000030517578},"maxDistance":2.5,"state":1,"model":-717018680,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"jewel":0},"doorRate":6.0,"_originalId":"jewel_downstairs_gem_door"}'),
-	(4495, 'pulsar_jewel_downstairs_office_door', '{"coords":{"x":-706.6500244140625,"y":-897.02001953125,"z":19.68000030517578},"maxDistance":2.5,"state":1,"model":-717018680,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"jewel":0},"doorRate":6.0,"_originalId":"jewel_downstairs_office_door"}'),
-	(4496, 'pulsar_jewel_downstairs_office_vault_door', '{"coords":{"x":-711.239990234375,"y":-897.02001953125,"z":19.68000030517578},"onduty":true,"state":1,"model":819960528,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"jewel":0},"_originalId":"jewel_downstairs_office_vault_door","maxDistance":2.5}'),
-	(4497, 'pulsar_jewel_back_door', '{"coords":{"x":-697.4600219726563,"y":-902.1400146484375,"z":23.96999931335449},"maxDistance":2.5,"state":1,"model":-670027930,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"jewel":0},"doorRate":6.0,"_originalId":"jewel_back_door"}'),
-	(4498, 'pulsar_door_151', '{"coords":{"x":-363.3599853515625,"y":279.0400085449219,"z":86.76000213623047},"maxDistance":2.5,"state":1,"model":1681388327,"auto":true,"heading":0,"groups":{"lasttrain":0},"lockSound":"button-remote","doorRate":6.0}'),
-	(4499, 'pulsar_door_152', '{"coords":{"x":-385.3800048828125,"y":269.5799865722656,"z":86.7699966430664},"maxDistance":2.5,"state":1,"model":-1202480291,"auto":true,"heading":0,"groups":{"lasttrain":0},"lockSound":"button-remote","doorRate":6.0}'),
-	(4500, 'pulsar_door_153', '{"coords":{"x":-361.4100036621094,"y":276.2699890136719,"z":86.76000213623047},"maxDistance":2.5,"state":1,"model":-1202480291,"auto":true,"heading":0,"groups":{"lasttrain":0},"lockSound":"button-remote","doorRate":6.0}'),
-	(4501, 'pulsar_lasttrain_gate_1', '{"coords":{"x":-380.18499755859377,"y":265.010009765625,"z":85.73999786376953},"maxDistance":2.5,"state":1,"doors":[{"model":-1114085264,"coords":{"x":-380.5,"y":265.4599914550781,"z":85.73999786376953},"heading":0},{"model":961634272,"coords":{"x":-379.8699951171875,"y":264.55999755859377,"z":85.73999786376953},"heading":0}],"auto":true,"lockSound":"button-remote","groups":{"lasttrain":0},"doorRate":6.0,"_originalId":"lasttrain_gate_1"}'),
-	(4502, 'pulsar_door_156', '{"coords":{"x":1162.550048828125,"y":-401.4700012207031,"z":67.61000061035156},"maxDistance":2.5,"state":1,"model":-710818483,"auto":true,"heading":0,"lockSound":"button-remote","doorRate":6.0}'),
-	(4503, 'pulsar_liquid_lib_distill_1', '{"coords":{"x":1161.02001953125,"y":-407.58502197265627,"z":67.63999938964844},"maxDistance":2.5,"state":1,"doors":[{"model":-2041666783,"coords":{"x":1161.9200439453126,"y":-407.1700134277344,"z":67.63999938964844},"heading":0},{"model":-137984497,"coords":{"x":1160.1199951171876,"y":-408.0,"z":67.63999938964844},"heading":0}],"auto":true,"lockSound":"button-remote","groups":{"liquidlibrary":0},"doorRate":6.0,"_originalId":"liquid_lib_distill_1"}'),
-	(4504, 'pulsar_door_159', '{"coords":{"x":1647.0400390625,"y":4843.47998046875,"z":42.1500015258789},"maxDistance":2.5,"state":1,"model":1219405180,"auto":true,"heading":0,"groups":{"lsfc":0},"lockSound":"button-remote","doorRate":6.0}'),
-	(4505, 'pulsar_door_160', '{"coords":{"x":1643.0799560546876,"y":4846.2900390625,"z":27.14999961853027},"maxDistance":2.5,"state":1,"model":757543979,"auto":true,"heading":0,"groups":{"lsfc":0},"lockSound":"button-remote","doorRate":6.0}'),
-	(4506, 'pulsar_door_161', '{"coords":{"x":1633.5,"y":4848.330078125,"z":27.14999961853027},"maxDistance":2.5,"state":1,"model":464151082,"auto":true,"heading":0,"groups":{"lsfc":0},"lockSound":"button-remote","doorRate":6.0}'),
-	(4507, 'pulsar_door_162', '{"coords":{"x":1617.1099853515626,"y":4856.06982421875,"z":27.14999961853027},"maxDistance":2.5,"state":1,"model":-1023447729,"auto":true,"heading":0,"groups":{"lsfc":0},"lockSound":"button-remote","doorRate":6.0}'),
-	(4508, 'pulsar_door_163', '{"coords":{"x":1617.56005859375,"y":4861.5400390625,"z":27.14999961853027},"maxDistance":2.5,"state":1,"model":-1023447729,"auto":true,"heading":0,"groups":{"lsfc":0},"lockSound":"button-remote","doorRate":6.0}'),
-	(4509, 'pulsar_door_164', '{"coords":{"x":1625.4100341796876,"y":4840.0,"z":24.38999938964843},"maxDistance":2.5,"state":1,"model":-1156020871,"permissions":"JOB_DOORS","auto":true,"heading":0,"groups":{"lsfc":99},"lockSound":"button-remote","doorRate":6.0}'),
-	(4510, 'pulsar_door_165', '{"coords":{"x":1624.699951171875,"y":4834.2001953125,"z":33.29000091552734},"maxDistance":2.5,"state":1,"model":-1116041313,"permissions":"JOB_DOORS","auto":true,"heading":0,"groups":{"lsfc":99},"lockSound":"button-remote","doorRate":6.0}'),
-	(4511, 'pulsar_mba_main_one_right2', '{"coords":{"x":-287.489990234375,"y":-1920.669921875,"z":30.25},"maxDistance":2.5,"state":1,"doors":[{"model":160224187,"coords":{"x":-288.4100036621094,"y":-1919.9000244140626,"z":30.25},"heading":0},{"model":-1911661372,"coords":{"x":-286.57000732421877,"y":-1921.43994140625,"z":30.25},"heading":0}],"auto":true,"lockSound":"button-remote","groups":{"mba":0},"doorRate":6.0,"_originalId":"mba_main_one_right2"}'),
-	(4512, 'pulsar_mba_main_one_right1', '{"coords":{"x":-283.510009765625,"y":-1924.010009765625,"z":30.25},"maxDistance":2.5,"state":1,"doors":[{"model":160224187,"coords":{"x":-284.42999267578127,"y":-1923.239990234375,"z":30.25},"heading":0},{"model":-1911661372,"coords":{"x":-282.5899963378906,"y":-1924.780029296875,"z":30.25},"heading":0}],"auto":true,"lockSound":"button-remote","groups":{"mba":0},"doorRate":6.0,"_originalId":"mba_main_one_right1"}'),
-	(4513, 'pulsar_mba_main_one_right', '{"coords":{"x":-255.0,"y":-2026.7550048828126,"z":30.25},"maxDistance":2.5,"state":1,"doors":[{"model":160224187,"coords":{"x":-254.22999572753907,"y":-2025.8399658203126,"z":30.25},"heading":0},{"model":-1911661372,"coords":{"x":-255.77000427246095,"y":-2027.6700439453126,"z":30.25},"heading":0}],"auto":true,"lockSound":"button-remote","groups":{"mba":0},"doorRate":6.0,"_originalId":"mba_main_one_right"}'),
-	(4514, 'pulsar_door_172', '{"coords":{"x":-1198.8699951171876,"y":-1162.989990234375,"z":7.8600001335144},"maxDistance":2.5,"state":1,"model":-641991387,"auto":true,"heading":0,"groups":{"noodle":0},"lockSound":"button-remote","doorRate":6.0}'),
-	(4515, 'pulsar_door_173', '{"coords":{"x":-1186.5400390625,"y":-1152.8399658203126,"z":7.82000017166137},"maxDistance":2.5,"state":1,"model":-1382408715,"auto":true,"heading":0,"groups":{"noodle":0},"lockSound":"button-remote","doorRate":6.0}'),
-	(4516, 'pulsar_ottos_garage1_temp', '{"coords":{"x":945.9400024414063,"y":-985.5900268554688,"z":41.22999954223633},"maxDistance":2.5,"state":1,"model":-983965772,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"ottos":0},"doorRate":1.0,"_originalId":"ottos_garage1_temp"}'),
-	(4517, 'pulsar_door_175', '{"coords":{"x":948.530029296875,"y":-965.3499755859375,"z":39.63999938964844},"maxDistance":2.5,"state":1,"model":1289778077,"auto":true,"heading":0,"groups":{"ottos":0},"lockSound":"button-remote","doorRate":6.0}'),
-	(4518, 'pulsar_door_176', '{"coords":{"x":955.3599853515625,"y":-972.4500122070313,"z":39.6500015258789},"maxDistance":2.5,"state":1,"model":-626684119,"auto":true,"heading":0,"groups":{"ottos":0},"lockSound":"button-remote","doorRate":6.0}'),
-	(4519, 'pulsar_paleto_tuners_garage_1', '{"coords":{"x":151.64999389648438,"y":6390.27001953125,"z":32.88999938964844},"maxDistance":2.5,"state":1,"model":-634850919,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"paleto_tuners":0},"doorRate":1.0,"_originalId":"paleto_tuners_garage_1"}'),
-	(4520, 'pulsar_paleto_tuners_garage_2', '{"coords":{"x":160.16000366210938,"y":6394.75,"z":32.88999938964844},"maxDistance":2.5,"state":1,"model":-1351902177,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"paleto_tuners":0},"doorRate":1.0,"_originalId":"paleto_tuners_garage_2"}'),
-	(4521, 'pulsar_door_179', '{"coords":{"x":165.7899932861328,"y":6397.7099609375,"z":31.42000007629394},"maxDistance":2.5,"state":1,"model":1662948258,"auto":true,"heading":0,"groups":{"paleto_tuners":0},"lockSound":"button-remote","doorRate":6.0}'),
-	(4522, 'pulsar_door_180', '{"coords":{"x":171.32000732421876,"y":6391.10009765625,"z":31.42000007629394},"maxDistance":2.5,"state":1,"model":1662948258,"auto":true,"heading":0,"groups":{"paleto_tuners":0},"lockSound":"button-remote","doorRate":6.0}'),
-	(4523, 'pulsar_door_181', '{"coords":{"x":178.83999633789063,"y":6388.27001953125,"z":31.42000007629394},"maxDistance":2.5,"state":1,"model":1662948258,"auto":true,"heading":0,"groups":{"paleto_tuners":0},"lockSound":"button-remote","doorRate":6.0}'),
-	(4524, 'pulsar_door_182', '{"coords":{"x":-30.43000030517578,"y":-1102.469970703125,"z":27.42000007629394},"maxDistance":2.5,"state":1,"model":2089009131,"auto":true,"heading":0,"groups":{"pdm":0},"lockSound":"button-remote","doorRate":6.0}'),
-	(4525, 'pulsar_door_183', '{"coords":{"x":-32.63999938964844,"y":-1108.56005859375,"z":27.42000007629394},"maxDistance":2.5,"state":1,"model":2089009131,"auto":true,"heading":0,"groups":{"pdm":0},"lockSound":"button-remote","doorRate":6.0}'),
-	(4526, 'pulsar_door_184', '{"coords":{"x":-27.6200008392334,"y":-1094.760009765625,"z":27.42000007629394},"maxDistance":2.5,"state":1,"model":2089009131,"auto":true,"heading":0,"groups":{"pdm":0},"lockSound":"button-remote","doorRate":6.0}'),
-	(4527, 'pulsar_door_185', '{"coords":{"x":-48.13000106811523,"y":-1103.5,"z":27.61000061035156},"maxDistance":2.5,"state":0,"model":1973010099,"auto":true,"heading":0,"groups":{"pdm":0},"lockSound":"button-remote","doorRate":6.0}'),
-	(4528, 'pulsar_door_186', '{"coords":{"x":-55.95000076293945,"y":-1088.0699462890626,"z":27.61000061035156},"maxDistance":2.5,"state":0,"model":1973010099,"auto":true,"heading":0,"groups":{"pdm":0},"lockSound":"button-remote","doorRate":6.0}'),
-	(4529, 'pulsar_pdm_garage', '{"coords":{"x":-21.51000022888183,"y":-1089.3900146484376,"z":28.14999961853027},"maxDistance":2.5,"state":1,"model":1010499530,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"pdm":0},"doorRate":1.0,"_originalId":"pdm_garage"}'),
-	(4530, 'pulsar_pepega_pawn_main_1', '{"coords":{"x":-298.1199951171875,"y":-105.69999694824219,"z":47.4000015258789},"maxDistance":2.5,"state":1,"doors":[{"model":2146843530,"coords":{"x":-297.67999267578127,"y":-104.4800033569336,"z":47.4000015258789},"heading":0},{"model":-1666470363,"coords":{"x":-298.55999755859377,"y":-106.91999816894531,"z":47.4000015258789},"heading":0}],"auto":true,"lockSound":"button-remote","groups":{"pepega_pawn":0},"doorRate":6.0,"_originalId":"pepega_pawn_main_1"}'),
-	(4531, 'pulsar_pepega_pawn_office_door', '{"coords":{"x":-331.010009765625,"y":-100.33000183105469,"z":47.4000015258789},"maxDistance":2.5,"state":1,"model":-1666470363,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"pepega_pawn":0},"doorRate":6.0,"_originalId":"pepega_pawn_office_door"}'),
-	(4532, 'pulsar_pepega_pawn_office_back_door', '{"coords":{"x":-333.1700134277344,"y":-90.37000274658203,"z":47.29000091552734},"maxDistance":2.5,"state":1,"model":964838196,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"pepega_pawn":0},"doorRate":6.0,"_originalId":"pepega_pawn_office_back_door"}'),
-	(4533, 'pulsar_pzt_front_1', '{"coords":{"x":794.25,"y":-758.25,"z":27.0300006866455},"maxDistance":2.5,"state":1,"doors":[{"model":-49173194,"coords":{"x":794.25,"y":-759.4400024414063,"z":27.0300006866455},"heading":0},{"model":95403626,"coords":{"x":794.25,"y":-757.0599975585938,"z":27.0300006866455},"heading":0}],"auto":true,"lockSound":"button-remote","groups":{"pizza_this":0},"doorRate":6.0,"_originalId":"pzt_front_1"}'),
-	(4534, 'pulsar_pzt_side_1', '{"coords":{"x":804.469970703125,"y":-747.9299926757813,"z":27.0300006866455},"maxDistance":2.5,"state":1,"doors":[{"model":-49173194,"coords":{"x":803.280029296875,"y":-747.9299926757813,"z":27.0300006866455},"heading":0},{"model":95403626,"coords":{"x":805.6599731445313,"y":-747.9299926757813,"z":27.0300006866455},"heading":0}],"auto":true,"lockSound":"button-remote","groups":{"pizza_this":0},"doorRate":6.0,"_originalId":"pzt_side_1"}'),
-	(4535, 'pulsar_pzt_rear', '{"coords":{"x":814.5700073242188,"y":-762.8200073242188,"z":27.04999923706054},"maxDistance":2.5,"state":1,"model":-420112688,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"pizza_this":0},"doorRate":6.0,"_originalId":"pzt_rear"}'),
-	(4536, 'pulsar_pzt_wine', '{"coords":{"x":806.280029296875,"y":-765.8099975585938,"z":26.93000030517578},"maxDistance":2.5,"state":1,"model":1984391163,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"pizza_this":0},"doorRate":6.0,"_originalId":"pzt_wine"}'),
-	(4537, 'pulsar_pzt_ceo', '{"coords":{"x":797.4000244140625,"y":-758.25,"z":31.42000007629394},"maxDistance":2.5,"state":1,"model":1984391163,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"pizza_this":99},"doorRate":6.0,"_originalId":"pzt_ceo"}'),
-	(4538, 'pulsar_pzt_office', '{"coords":{"x":797.4000244140625,"y":-758.25,"z":31.42000007629394},"maxDistance":2.5,"state":1,"model":1984391163,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"pizza_this":0},"doorRate":6.0,"_originalId":"pzt_office"}'),
-	(4539, 'pulsar_pzt_upstairs', '{"coords":{"x":804.489990234375,"y":-767.7000122070313,"z":31.42000007629394},"maxDistance":2.5,"state":1,"model":1984391163,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"pizza_this":0},"doorRate":6.0,"_originalId":"pzt_upstairs"}'),
-	(4540, 'pulsar_prego_front_1', '{"coords":{"x":-1111.31005859375,"y":-1454.705078125,"z":5.73999977111816},"maxDistance":2.5,"state":1,"doors":[{"model":1241878177,"coords":{"x":-1110.760009765625,"y":-1455.489990234375,"z":5.73999977111816},"heading":0},{"model":1719322507,"coords":{"x":-1111.8599853515626,"y":-1453.9200439453126,"z":5.73999977111816},"heading":0}],"auto":true,"lockSound":"button-remote","groups":{"prego":0},"doorRate":6.0,"_originalId":"prego_front_1"}'),
-	(4541, 'pulsar_prego_side', '{"coords":{"x":-1120.3900146484376,"y":-1449.969970703125,"z":5.17000007629394},"maxDistance":2.5,"state":1,"model":1558551263,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"prego":0},"doorRate":6.0,"_originalId":"prego_side"}'),
-	(4542, 'pulsar_prego_bar', '{"coords":{"x":-1119.760009765625,"y":-1456.6600341796876,"z":5.21000003814697},"maxDistance":2.5,"state":1,"model":1306229702,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"prego":0},"doorRate":6.0,"_originalId":"prego_bar"}'),
-	(4543, 'pulsar_prego_freezer', '{"coords":{"x":-1122.6099853515626,"y":-1457.8199462890626,"z":5.26000022888183},"maxDistance":2.5,"state":1,"model":-1401461724,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"prego":0},"doorRate":6.0,"_originalId":"prego_freezer"}'),
-	(4544, 'pulsar_prego_back_1', '{"coords":{"x":-1117.9100341796876,"y":-1459.875,"z":5.26999998092651},"maxDistance":2.5,"state":1,"doors":[{"model":19433826,"coords":{"x":-1118.4200439453126,"y":-1459.1500244140626,"z":5.26999998092651},"heading":0},{"model":1988621347,"coords":{"x":-1117.4000244140626,"y":-1460.5999755859376,"z":5.26999998092651},"heading":0}],"auto":true,"lockSound":"button-remote","groups":{"prego":0},"doorRate":6.0,"_originalId":"prego_back_1"}'),
-	(4545, 'pulsar_prego_freezer_1', '{"coords":{"x":-1125.7349853515626,"y":-1459.304931640625,"z":5.30000019073486},"maxDistance":2.5,"state":1,"doors":[{"model":1187399482,"coords":{"x":-1126.1400146484376,"y":-1458.72998046875,"z":5.30000019073486},"heading":0},{"model":-1198085411,"coords":{"x":-1125.3299560546876,"y":-1459.8800048828126,"z":5.30000019073486},"heading":0}],"permissions":"PREGO_BASEMENT","auto":true,"lockSound":"button-remote","groups":{"prego":0},"doorRate":6.0,"_originalId":"prego_freezer_1"}'),
-	(4546, 'pulsar_prego_stairs', '{"coords":{"x":-1122.6800537109376,"y":-1464.27001953125,"z":2.14000010490417},"maxDistance":2.5,"state":1,"model":1306229702,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"prego":0},"doorRate":6.0,"_originalId":"prego_stairs"}'),
-	(4547, 'pulsar_prego_office', '{"coords":{"x":-1119.93994140625,"y":-1461.6199951171876,"z":5.21000003814697},"maxDistance":2.5,"state":1,"model":1306229702,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"prego":0},"doorRate":6.0,"_originalId":"prego_office"}'),
-	(4548, 'pulsar_rockford_records_lobby_1', '{"coords":{"x":-1015.7550048828125,"y":-266.04498291015627,"z":39.27000045776367},"maxDistance":2.5,"state":1,"doors":[{"model":-10590885,"coords":{"x":-1015.0,"y":-264.9800109863281,"z":39.27000045776367},"heading":0},{"model":662746527,"coords":{"x":-1016.510009765625,"y":-267.1099853515625,"z":39.27000045776367},"heading":0}],"auto":true,"lockSound":"button-remote","groups":{"rockford_records":0},"doorRate":6.0,"_originalId":"rockford_records_lobby_1"}'),
-	(4549, 'pulsar_rockford_records_concert_1', '{"coords":{"x":-1005.2449951171875,"y":-262.5150146484375,"z":39.20000076293945},"maxDistance":2.5,"state":1,"doors":[{"model":1650276170,"coords":{"x":-1006.2899780273438,"y":-261.75,"z":39.20000076293945},"heading":0},{"model":1650276170,"coords":{"x":-1004.2000122070313,"y":-263.2799987792969,"z":39.20000076293945},"heading":0}],"auto":true,"lockSound":"button-remote","groups":{"rockford_records":0},"doorRate":6.0,"_originalId":"rockford_records_concert_1"}'),
-	(4550, 'pulsar_rockford_records_concert_3', '{"coords":{"x":-996.4249877929688,"y":-262.4049987792969,"z":39.18999862670898},"maxDistance":2.5,"state":1,"doors":[{"model":1650276170,"coords":{"x":-997.1799926757813,"y":-263.4599914550781,"z":39.18999862670898},"heading":0},{"model":1650276170,"coords":{"x":-995.6699829101563,"y":-261.3500061035156,"z":39.18999862670898},"heading":0}],"auto":true,"lockSound":"button-remote","groups":{"rockford_records":0},"doorRate":6.0,"_originalId":"rockford_records_concert_3"}'),
-	(4551, 'pulsar_rockford_records_stairs_1', '{"coords":{"x":-994.2050170898438,"y":-270.7550048828125,"z":39.18000030517578},"maxDistance":2.5,"state":1,"doors":[{"model":1650276170,"coords":{"x":-993.1500244140625,"y":-271.510009765625,"z":39.18000030517578},"heading":0},{"model":1650276170,"coords":{"x":-995.260009765625,"y":-270.0,"z":39.18000030517578},"heading":0}],"auto":true,"lockSound":"button-remote","groups":{"rockford_records":0},"doorRate":6.0,"_originalId":"rockford_records_stairs_1"}'),
-	(4552, 'pulsar_rockford_records_stairs_3', '{"coords":{"x":-999.1649780273438,"y":-269.33502197265627,"z":39.18999862670898},"maxDistance":2.5,"state":1,"doors":[{"model":-1693304723,"coords":{"x":-998.4099731445313,"y":-268.2799987792969,"z":39.18999862670898},"heading":0},{"model":1930160225,"coords":{"x":-999.9199829101563,"y":-270.3900146484375,"z":39.18999862670898},"heading":0}],"auto":true,"lockSound":"button-remote","groups":{"rockford_records":0},"doorRate":6.0,"_originalId":"rockford_records_stairs_3"}'),
-	(4553, 'pulsar_door_223', '{"coords":{"x":-993.4500122070313,"y":-281.3800048828125,"z":38.36999893188476},"maxDistance":2.5,"state":1,"model":-1719935594,"auto":true,"heading":0,"groups":{"rockford_records":0},"lockSound":"button-remote","doorRate":6.0}'),
-	(4554, 'pulsar_door_224', '{"coords":{"x":-981.4500122070313,"y":-251.22000122070313,"z":38.59999847412109},"maxDistance":2.5,"state":1,"model":-484931818,"auto":true,"heading":0,"groups":{"rockford_records":0},"lockSound":"button-remote","doorRate":6.0}'),
-	(4555, 'pulsar_door_225', '{"coords":{"x":-986.0700073242188,"y":-256.8800048828125,"z":38.63000106811523},"maxDistance":2.5,"state":1,"model":-245685349,"auto":true,"heading":0,"groups":{"rockford_records":0},"lockSound":"button-remote","doorRate":6.0}'),
-	(4556, 'pulsar_door_226', '{"coords":{"x":-1007.1300048828125,"y":-270.3399963378906,"z":45.02000045776367},"maxDistance":2.5,"state":1,"model":-10590885,"auto":true,"heading":0,"groups":{"rockford_records":0},"lockSound":"button-remote","doorRate":6.0}'),
-	(4557, 'pulsar_door_227', '{"coords":{"x":-1013.6099853515625,"y":-279.3699951171875,"z":45.02000045776367},"maxDistance":2.5,"state":1,"model":-10590885,"auto":true,"heading":0,"groups":{"rockford_records":0},"lockSound":"button-remote","doorRate":6.0}'),
-	(4558, 'pulsar_door_228', '{"coords":{"x":-1008.0599975585938,"y":-281.260009765625,"z":44.95000076293945},"maxDistance":2.5,"state":1,"model":-2122500721,"auto":true,"heading":0,"groups":{"rockford_records":0},"lockSound":"button-remote","doorRate":6.0}'),
-	(4559, 'pulsar_door_229', '{"coords":{"x":-1006.5800170898438,"y":-286.3399963378906,"z":44.91999816894531},"maxDistance":2.5,"state":1,"model":-2122500721,"auto":true,"heading":0,"groups":{"rockford_records":0},"lockSound":"button-remote","doorRate":6.0}'),
-	(4560, 'pulsar_door_230', '{"coords":{"x":-1002.5999755859375,"y":-293.55999755859377,"z":44.95999908447265},"maxDistance":2.5,"state":1,"model":-2122500721,"auto":true,"heading":0,"groups":{"rockford_records":0},"lockSound":"button-remote","doorRate":6.0}'),
-	(4561, 'pulsar_door_231', '{"coords":{"x":-1001.0,"y":-296.6400146484375,"z":45.0099983215332},"maxDistance":2.5,"state":1,"model":-10590885,"auto":true,"heading":0,"groups":{"rockford_records":0},"lockSound":"button-remote","doorRate":6.0}'),
-	(4562, 'pulsar_door_232', '{"coords":{"x":-997.4299926757813,"y":-303.5400085449219,"z":44.93999862670898},"maxDistance":2.5,"state":1,"model":-2122500721,"auto":true,"heading":0,"groups":{"rockford_records":0},"lockSound":"button-remote","doorRate":6.0}'),
-	(4563, 'pulsar_door_233', '{"coords":{"x":-1008.1799926757813,"y":-275.70001220703127,"z":39.18999862670898},"maxDistance":2.5,"state":1,"model":-2122500721,"auto":true,"heading":0,"groups":{"rockford_records":0},"lockSound":"button-remote","doorRate":6.0}'),
-	(4564, 'pulsar_rockford_records_garage', '{"coords":{"x":-977.8200073242188,"y":-264.30999755859377,"z":37.70000076293945},"maxDistance":2.5,"state":1,"model":363383944,"heading":0,"groups":{"rockford_records":0},"_originalId":"rockford_records_garage"}'),
-	(4565, 'pulsar_rustybrowns_front_main', '{"coords":{"x":148.1699981689453,"y":240.41000366210938,"z":106.05999755859375},"maxDistance":2.5,"state":1,"model":-245952660,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"rustybrowns":0},"doorRate":3.0,"_originalId":"rustybrowns_front_main"}'),
-	(4566, 'pulsar_rustybrowns_office_main', '{"coords":{"x":162.69000244140626,"y":249.63999938964845,"z":106.05999755859375},"maxDistance":2.5,"state":1,"model":530115567,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"rustybrowns":0},"doorRate":6.0,"_originalId":"rustybrowns_office_main"}'),
-	(4567, 'pulsar_sagma_main_1', '{"coords":{"x":-424.8399963378906,"y":23.63999938964843,"z":46.52000045776367},"maxDistance":2.5,"state":1,"doors":[{"model":-1854854241,"coords":{"x":-423.6000061035156,"y":23.5300006866455,"z":46.52000045776367},"heading":0},{"model":-1663450520,"coords":{"x":-426.0799865722656,"y":23.75,"z":46.52000045776367},"heading":0}],"auto":true,"lockSound":"button-remote","groups":{"sagma":0},"doorRate":6.0,"_originalId":"sagma_main_1"}'),
-	(4568, 'pulsar_sagma_carauction_1', '{"coords":{"x":-490.15997314453127,"y":28.84500122070312,"z":46.58000183105469},"maxDistance":2.5,"state":1,"doors":[{"model":-752680088,"coords":{"x":-488.9599914550781,"y":28.73999977111816,"z":46.58000183105469},"heading":0},{"model":1709680887,"coords":{"x":-491.3599853515625,"y":28.95000076293945,"z":46.58000183105469},"heading":0}],"auto":true,"lockSound":"button-remote","groups":{"sagma":0},"doorRate":6.0,"_originalId":"sagma_carauction_1"}'),
-	(4569, 'pulsar_sagma_garage', '{"coords":{"x":-491.2099914550781,"y":51.20999908447265,"z":51.70999908447265},"maxDistance":2.5,"state":1,"model":-429115342,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"sagma":0},"doorRate":1.0,"_originalId":"sagma_garage"}'),
-	(4570, 'pulsar_door_242', '{"coords":{"x":-478.3299865722656,"y":54.54999923706055,"z":52.54999923706055},"maxDistance":2.5,"state":1,"model":-1204133321,"auto":true,"heading":0,"groups":{"sagma":0},"lockSound":"button-remote","doorRate":6.0}'),
-	(4571, 'pulsar_door_243', '{"coords":{"x":-482.5,"y":57.88999938964844,"z":52.56000137329101},"maxDistance":2.5,"state":1,"model":-1436367224,"auto":true,"heading":0,"groups":{"sagma":0},"lockSound":"button-remote","doorRate":6.0}'),
-	(4572, 'pulsar_sagma_carauction2_1', '{"coords":{"x":-464.07501220703127,"y":43.94999694824219,"z":53.09000015258789},"maxDistance":2.5,"state":1,"doors":[{"model":-1663450520,"coords":{"x":-463.9700012207031,"y":45.18999862670898,"z":53.09000015258789},"heading":0},{"model":-1854854241,"coords":{"x":-464.17999267578127,"y":42.70999908447265,"z":53.09000015258789},"heading":0}],"auto":true,"lockSound":"button-remote","groups":{"sagma":0},"doorRate":6.0,"_originalId":"sagma_carauction2_1"}'),
-	(4573, 'pulsar_sagma_balcony_1', '{"coords":{"x":-440.22998046875,"y":40.11499786376953,"z":53.06000137329101},"maxDistance":2.5,"state":1,"doors":[{"model":-1663450520,"coords":{"x":-438.989990234375,"y":40.0099983215332,"z":53.06000137329101},"heading":0},{"model":-1854854241,"coords":{"x":-441.4700012207031,"y":40.22000122070312,"z":53.06000137329101},"heading":0}],"auto":true,"lockSound":"button-remote","groups":{"sagma":0},"doorRate":6.0,"_originalId":"sagma_balcony_1"}'),
-	(4574, 'pulsar_sagma_auction_1', '{"coords":{"x":-440.58001708984377,"y":51.67499923706055,"z":53.06999969482422},"maxDistance":2.5,"state":1,"doors":[{"model":1967988229,"coords":{"x":-440.69000244140627,"y":50.43999862670898,"z":53.06999969482422},"heading":0},{"model":1566764593,"coords":{"x":-440.4700012207031,"y":52.90999984741211,"z":53.06999969482422},"heading":0}],"auto":true,"lockSound":"button-remote","groups":{"sagma":0},"doorRate":6.0,"_originalId":"sagma_auction_1"}'),
-	(4575, 'pulsar_door_250', '{"coords":{"x":-439.5199890136719,"y":45.27999877929687,"z":46.38999938964844},"maxDistance":2.5,"state":1,"model":-2066395222,"auto":true,"heading":0,"groups":{"sagma":0},"lockSound":"button-remote","doorRate":6.0}'),
-	(4576, 'pulsar_door_251', '{"coords":{"x":-456.1600036621094,"y":43.41999816894531,"z":46.38999938964844},"maxDistance":2.5,"state":1,"model":-2066395222,"auto":true,"heading":0,"groups":{"sagma":0},"lockSound":"button-remote","doorRate":6.0}'),
-	(4577, 'pulsar_door_252', '{"coords":{"x":-462.70001220703127,"y":44.0099983215332,"z":46.38000106811523},"maxDistance":2.5,"state":1,"model":-1834751161,"auto":true,"heading":0,"groups":{"sagma":0},"lockSound":"button-remote","doorRate":6.0}'),
-	(4578, 'pulsar_door_253', '{"coords":{"x":-465.1499938964844,"y":39.75,"z":46.38000106811523},"maxDistance":2.5,"state":1,"model":-1834751161,"auto":true,"heading":0,"groups":{"sagma":0},"lockSound":"button-remote","doorRate":6.0}'),
-	(4579, 'pulsar_door_254', '{"coords":{"x":-465.5299987792969,"y":35.4000015258789,"z":46.38000106811523},"maxDistance":2.5,"state":1,"model":-1834751161,"auto":true,"heading":0,"groups":{"sagma":0},"lockSound":"button-remote","doorRate":6.0}'),
-	(4580, 'pulsar_door_255', '{"coords":{"x":-465.5299987792969,"y":35.4000015258789,"z":46.38000106811523},"maxDistance":2.5,"state":1,"model":-1834751161,"auto":true,"heading":0,"groups":{"sagma":0},"lockSound":"button-remote","doorRate":6.0}'),
-	(4581, 'pulsar_door_256', '{"coords":{"x":-470.6300048828125,"y":51.04999923706055,"z":52.56000137329101},"maxDistance":2.5,"state":1,"model":-1193319547,"auto":true,"heading":0,"groups":{"sagma":0},"lockSound":"button-remote","doorRate":6.0}'),
-	(4582, 'pulsar_door_257', '{"coords":{"x":14.69999980926513,"y":-120.27999877929688,"z":56.61000061035156},"maxDistance":2.5,"state":1,"model":-1499404327,"auto":true,"heading":0,"groups":{"securoserv":0},"lockSound":"button-remote","doorRate":6.0}'),
-	(4583, 'pulsar_door_258', '{"coords":{"x":23.6299991607666,"y":-116.12000274658203,"z":56.16999816894531},"maxDistance":2.5,"state":1,"model":1042741067,"auto":true,"heading":0,"groups":{"securoserv":0},"lockSound":"button-remote","doorRate":6.0}'),
-	(4584, 'pulsar_door_259', '{"coords":{"x":28.34000015258789,"y":-117.83999633789063,"z":56.16999816894531},"maxDistance":2.5,"state":1,"model":1042741067,"auto":true,"heading":0,"groups":{"securoserv":0},"lockSound":"button-remote","doorRate":6.0}'),
-	(4585, 'pulsar_door_260', '{"coords":{"x":16.42000007629394,"y":-114.05999755859375,"z":56.16999816894531},"maxDistance":2.5,"state":1,"model":34120519,"auto":true,"heading":0,"groups":{"securoserv":0},"lockSound":"button-remote","doorRate":6.0}'),
-	(4586, 'pulsar_door_261', '{"coords":{"x":20.69000053405761,"y":-106.25,"z":56.18000030517578},"maxDistance":2.5,"state":1,"model":34120519,"auto":true,"heading":0,"groups":{"securoserv":0},"lockSound":"button-remote","doorRate":6.0}'),
-	(4587, 'pulsar_securoserv_garage', '{"coords":{"x":28.48999977111816,"y":-101.37000274658203,"z":56.77999877929687},"maxDistance":2.5,"state":1,"model":918072461,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"securoserv":0},"doorRate":1.0,"_originalId":"securoserv_garage"}'),
-	(4588, 'pulsar_taxi_1_1', '{"coords":{"x":907.375,"y":-160.3699951171875,"z":74.55000305175781},"maxDistance":2.5,"state":1,"doors":[{"model":1519319655,"coords":{"x":908.1099853515625,"y":-159.17999267578126,"z":74.55000305175781},"heading":0},{"model":1519319655,"coords":{"x":906.6400146484375,"y":-161.55999755859376,"z":74.55000305175781},"heading":0}],"auto":true,"lockSound":"button-remote","groups":{"taxicab":0},"doorRate":6.0,"_originalId":"taxi_1_1"}'),
-	(4589, 'pulsar_taxi_2_1', '{"coords":{"x":894.4400024414063,"y":-179.31500244140626,"z":74.86000061035156},"maxDistance":2.5,"state":1,"doors":[{"model":-2023754432,"coords":{"x":895.1199951171875,"y":-178.2100067138672,"z":74.86000061035156},"heading":0},{"model":-2023754432,"coords":{"x":893.760009765625,"y":-180.4199981689453,"z":74.86000061035156},"heading":0}],"auto":true,"lockSound":"button-remote","groups":{"taxicab":0},"doorRate":6.0,"_originalId":"taxi_2_1"}'),
-	(4590, 'pulsar_taxi_garage', '{"coords":{"x":899.5900268554688,"y":-148.6300048828125,"z":78.97000122070313},"maxDistance":2.5,"state":1,"model":2064385778,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"taxicab":0},"doorRate":1.0,"_originalId":"taxi_garage"}'),
-	(4591, 'pulsar_taxi_garage_door', '{"coords":{"x":895.239990234375,"y":-144.8699951171875,"z":77.05000305175781},"maxDistance":2.5,"state":1,"model":-2023754432,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"taxicab":0},"doorRate":6.0,"_originalId":"taxi_garage_door"}'),
-	(4592, 'pulsar_taxi_garage_door_2', '{"coords":{"x":895.8800048828125,"y":-161.0500030517578,"z":77.05999755859375},"maxDistance":2.5,"state":1,"model":-2023754432,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"taxicab":0},"doorRate":6.0,"_originalId":"taxi_garage_door_2"}'),
-	(4593, 'pulsar_taxi_owner', '{"coords":{"x":903.5700073242188,"y":-152.16000366210938,"z":74.33999633789063},"maxDistance":2.5,"state":1,"model":-2023754432,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"taxicab":99},"doorRate":6.0,"_originalId":"taxi_owner"}'),
-	(4594, 'pulsar_taxi_3_1', '{"coords":{"x":899.6300048828125,"y":-164.0,"z":74.33999633789063},"maxDistance":2.5,"state":1,"doors":[{"model":-2023754432,"coords":{"x":900.72998046875,"y":-164.69000244140626,"z":74.33999633789063},"heading":0},{"model":-2023754432,"coords":{"x":898.530029296875,"y":-163.30999755859376,"z":74.33999633789063},"heading":0}],"auto":true,"lockSound":"button-remote","groups":{"taxicab":0},"doorRate":6.0,"_originalId":"taxi_3_1"}'),
-	(4595, 'pulsar_tequila_1', '{"coords":{"x":-560.449951171875,"y":278.5,"z":83.12999725341797},"maxDistance":2.5,"state":1,"doors":[{"model":202981272,"coords":{"x":-561.3499755859375,"y":278.5799865722656,"z":83.12999725341797},"heading":0},{"model":1117236368,"coords":{"x":-559.5499877929688,"y":278.4200134277344,"z":83.12999725341797},"heading":0}],"auto":true,"lockSound":"button-remote","groups":{"tequila":0},"doorRate":6.0,"_originalId":"tequila_1"}'),
-	(4596, 'pulsar_door_275', '{"coords":{"x":-565.1699829101563,"y":276.6300048828125,"z":83.29000091552735},"maxDistance":2.5,"state":1,"model":993120320,"auto":true,"heading":0,"groups":{"tequila":0},"lockSound":"button-remote","doorRate":6.0}'),
-	(4597, 'pulsar_door_276', '{"coords":{"x":-561.2899780273438,"y":293.5,"z":87.77999877929688},"maxDistance":2.5,"state":1,"model":993120320,"auto":true,"heading":0,"groups":{"tequila":0},"lockSound":"button-remote","doorRate":6.0}'),
-	(4598, 'pulsar_door_277', '{"coords":{"x":-560.239990234375,"y":293.010009765625,"z":82.33000183105469},"maxDistance":2.5,"state":1,"model":-626684119,"auto":true,"heading":0,"groups":{"tequila":0},"lockSound":"button-remote","doorRate":6.0}'),
-	(4599, 'pulsar_door_278', '{"coords":{"x":-568.8800048828125,"y":281.1099853515625,"z":83.12999725341797},"maxDistance":2.5,"state":1,"model":1289778077,"auto":true,"heading":0,"groups":{"tequila":0},"lockSound":"button-remote","doorRate":6.0}'),
-	(4600, 'pulsar_door_279', '{"coords":{"x":-569.7999877929688,"y":293.7699890136719,"z":79.33000183105469},"maxDistance":2.5,"state":1,"model":-626684119,"auto":true,"heading":0,"groups":{"tequila":50},"lockSound":"button-remote","doorRate":6.0}'),
-	(4601, 'pulsar_door_280', '{"coords":{"x":-71.7699966430664,"y":-1331.22998046875,"z":29.45999908447265},"maxDistance":2.5,"state":1,"model":1373774648,"auto":true,"heading":0,"groups":{"tirenutz":0},"lockSound":"button-remote","doorRate":6.0}'),
-	(4602, 'pulsar_door_281', '{"coords":{"x":-80.5,"y":-1325.47998046875,"z":29.45999908447265},"maxDistance":2.5,"state":1,"model":1500121166,"auto":true,"heading":0,"groups":{"tirenutz":0},"lockSound":"button-remote","doorRate":6.0}'),
-	(4603, 'pulsar_door_282', '{"coords":{"x":-65.41000366210938,"y":-1325.47998046875,"z":29.45999908447265},"maxDistance":2.5,"state":1,"model":-571069749,"auto":true,"heading":0,"groups":{"tirenutz":0},"lockSound":"button-remote","doorRate":6.0}'),
-	(4604, 'pulsar_door_283', '{"coords":{"x":-71.0999984741211,"y":-1325.510009765625,"z":29.45999908447265},"maxDistance":2.5,"state":1,"model":-769888189,"auto":true,"heading":0,"groups":{"tirenutz":0},"lockSound":"button-remote","doorRate":6.0}'),
-	(4605, 'pulsar_tnutz_garage_1', '{"coords":{"x":-65.43000030517578,"y":-1334.199951171875,"z":30.69000053405761},"maxDistance":2.5,"state":1,"model":-826148325,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"tirenutz":0},"doorRate":1.0,"_originalId":"tnutz_garage_1"}'),
-	(4606, 'pulsar_tnutz_garage_2', '{"coords":{"x":-65.11000061035156,"y":-1341.64501953125,"z":30.57500076293945},"maxDistance":2.5,"state":1,"doors":[{"model":-1249458267,"coords":{"x":-64.66999816894531,"y":-1339.31005859375,"z":31.31999969482422},"heading":0},{"model":-1421593824,"coords":{"x":-65.55000305175781,"y":-1343.97998046875,"z":29.82999992370605},"heading":0}],"auto":true,"lockSound":"button-remote","groups":{"tirenutz":0},"doorRate":1.0,"_originalId":"tnutz_garage_2"}'),
-	(4607, 'pulsar_door_287', '{"coords":{"x":1062.0899658203126,"y":-2406.89990234375,"z":30.14999961853027},"maxDistance":2.5,"state":1,"model":238628931,"auto":true,"heading":0,"groups":{"triad_boxing":0},"lockSound":"button-remote","doorRate":6.0}'),
-	(4608, 'pulsar_door_288', '{"coords":{"x":1071.7099609375,"y":-2398.25,"z":26.05999946594238},"maxDistance":2.5,"state":1,"model":-794915429,"auto":true,"heading":0,"groups":{"triad_boxing":0},"lockSound":"button-remote","doorRate":6.0}'),
-	(4609, 'pulsar_triad_boxing_arena', '{"coords":{"x":1070.52001953125,"y":-2398.050048828125,"z":26.05999946594238},"maxDistance":2.5,"state":1,"model":856189823,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"triad_boxing":0},"doorRate":6.0,"_originalId":"triad_boxing_arena"}'),
-	(4610, 'pulsar_traid_entry_left_1', '{"coords":{"x":-826.4025268554688,"y":-699.8389892578125,"z":28.49082946777343},"maxDistance":2.5,"state":0,"doors":[{"model":2001816392,"coords":{"x":-826.4025268554688,"y":-700.9301147460938,"z":28.49082946777343},"heading":0},{"model":2001816392,"coords":{"x":-826.4025268554688,"y":-698.747802734375,"z":28.49082946777343},"heading":0}],"auto":true,"lockSound":"button-remote","groups":{"triad":0},"doorRate":6.0,"_originalId":"traid_entry_left_1"}'),
-	(4611, 'pulsar_traid_entry_right_1', '{"coords":{"x":-826.4025268554688,"y":-696.9046020507813,"z":28.49082946777343},"maxDistance":2.5,"state":0,"doors":[{"model":2001816392,"coords":{"x":-826.4025268554688,"y":-697.994384765625,"z":28.49082946777343},"heading":0},{"model":2001816392,"coords":{"x":-826.4025268554688,"y":-695.8148193359375,"z":28.49082946777343},"heading":0}],"auto":true,"lockSound":"button-remote","groups":{"triad":0},"doorRate":6.0,"_originalId":"traid_entry_right_1"}'),
-	(4612, 'pulsar_traid_hallway_entry_1', '{"coords":{"x":-821.3134765625,"y":-703.1262817382813,"z":28.20560073852539},"maxDistance":2.5,"state":1,"doors":[{"model":75593271,"coords":{"x":-822.3142700195313,"y":-703.1262817382813,"z":28.20560073852539},"heading":0},{"model":1403720845,"coords":{"x":-820.3126220703125,"y":-703.1262817382813,"z":28.20560073852539},"heading":0}],"auto":true,"lockSound":"button-remote","groups":{"triad":0},"doorRate":6.0,"_originalId":"traid_hallway_entry_1"}'),
-	(4613, 'pulsar_traid_reception_staff_right', '{"coords":{"x":-816.6038208007813,"y":-702.3438110351563,"z":28.20560073852539},"maxDistance":2.5,"state":1,"model":693644064,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"triad":0},"doorRate":6.0,"_originalId":"traid_reception_staff_right"}'),
-	(4614, 'pulsar_traid_reception_staff_left', '{"coords":{"x":-816.6038208007813,"y":-694.3997802734375,"z":28.20560073852539},"maxDistance":2.5,"state":1,"model":693644064,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"triad":0},"doorRate":6.0,"_originalId":"traid_reception_staff_left"}'),
-	(4615, 'pulsar_traid_hallway_bar_1', '{"coords":{"x":-821.3134765625,"y":-715.6939697265625,"z":28.20560073852539},"maxDistance":2.5,"state":1,"doors":[{"model":75593271,"coords":{"x":-822.3142700195313,"y":-715.6939697265625,"z":28.20560073852539},"heading":0},{"model":1403720845,"coords":{"x":-820.3126220703125,"y":-715.6939697265625,"z":28.20560073852539},"heading":0}],"auto":true,"lockSound":"button-remote","groups":{"triad":0},"doorRate":6.0,"_originalId":"traid_hallway_bar_1"}'),
-	(4616, 'pulsar_traid_stairs_1', '{"coords":{"x":-819.4990844726563,"y":-711.9124145507813,"z":28.20560073852539},"maxDistance":2.5,"state":0,"model":693644064,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"triad":0},"doorRate":6.0,"_originalId":"traid_stairs_1"}'),
-	(4617, 'pulsar_traid_stairs_2', '{"coords":{"x":-819.4990844726563,"y":-711.9124145507813,"z":32.48664855957031},"maxDistance":2.5,"state":0,"model":693644064,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"triad":0},"doorRate":6.0,"_originalId":"traid_stairs_2"}'),
-	(4618, 'pulsar_traid_stairs_3', '{"coords":{"x":-819.4990844726563,"y":-711.9124145507813,"z":23.92465019226074},"maxDistance":2.5,"state":1,"model":693644064,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"triad":0},"doorRate":6.0,"_originalId":"traid_stairs_3"}'),
-	(4619, 'pulsar_traid_ceo', '{"coords":{"x":-822.0344848632813,"y":-703.1276245117188,"z":32.48664855957031},"maxDistance":2.5,"state":1,"model":693644064,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"triad":99},"doorRate":6.0,"_originalId":"traid_ceo"}'),
-	(4620, 'pulsar_traid_meeting_1', '{"coords":{"x":-823.14501953125,"y":-709.446533203125,"z":32.48659896850586},"maxDistance":2.5,"state":1,"doors":[{"model":1403720845,"coords":{"x":-823.14501953125,"y":-708.4456787109375,"z":32.48659896850586},"heading":0},{"model":75593271,"coords":{"x":-823.14501953125,"y":-710.4473266601563,"z":32.48659896850586},"heading":0}],"auto":true,"lockSound":"button-remote","groups":{"triad":0},"doorRate":6.0,"_originalId":"traid_meeting_1"}'),
-	(4621, 'pulsar_traid_studio', '{"coords":{"x":-822.0344848632813,"y":-715.6934204101563,"z":32.48664855957031},"maxDistance":2.5,"state":1,"model":693644064,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"triad":0},"doorRate":6.0,"_originalId":"traid_studio"}'),
-	(4622, 'pulsar_traid_downstairs_storage', '{"coords":{"x":-823.1431274414063,"y":-711.9124145507813,"z":23.92465019226074},"maxDistance":2.5,"state":1,"model":-2023754432,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"triad":0},"doorRate":6.0,"_originalId":"traid_downstairs_storage"}'),
-	(4623, 'pulsar_traid_downstairs_garage', '{"coords":{"x":-820.6585083007813,"y":-715.6948852539063,"z":23.93993949890136},"maxDistance":2.5,"state":1,"model":-2023754432,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"triad":0},"doorRate":6.0,"_originalId":"traid_downstairs_garage"}'),
-	(4624, 'pulsar_traid_garage', '{"coords":{"x":-816.2235717773438,"y":-740.1627197265625,"z":24.16523933410644},"maxDistance":2.5,"state":1,"model":-700626879,"heading":0,"groups":{"triad":0},"_originalId":"traid_garage"}'),
-	(4625, 'pulsar_tuna_garage_1', '{"coords":{"x":154.82000732421876,"y":-3034.050048828125,"z":8.5600004196167},"maxDistance":2.5,"state":1,"model":-456733639,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"tuna":0},"doorRate":1.0,"_originalId":"tuna_garage_1"}'),
-	(4626, 'pulsar_tuna_garage_2', '{"coords":{"x":154.82000732421876,"y":-3023.889892578125,"z":8.5600004196167},"maxDistance":2.5,"state":1,"model":-456733639,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"tuna":0},"doorRate":1.0,"_originalId":"tuna_garage_2"}'),
-	(4627, 'pulsar_tuna_door', '{"coords":{"x":154.92999267578126,"y":-3017.320068359375,"z":7.19000005722045},"maxDistance":2.5,"state":0,"model":-2023754432,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"tuna":0},"doorRate":6.0,"_originalId":"tuna_door"}'),
-	(4628, 'pulsar_uwu_garage', '{"coords":{"x":-600.9099731445313,"y":-1059.219970703125,"z":21.71999931335449},"maxDistance":2.5,"state":1,"model":522844070,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"uwu":0},"doorRate":1.0,"_originalId":"uwu_garage"}'),
-	(4629, 'pulsar_uwu_front_1', '{"coords":{"x":-581.0150146484375,"y":-1069.6300048828126,"z":22.48999977111816},"maxDistance":2.5,"state":1,"doors":[{"model":-69331849,"coords":{"x":-580.3599853515625,"y":-1069.6300048828126,"z":22.48999977111816},"heading":0},{"model":526179188,"coords":{"x":-581.6699829101563,"y":-1069.6300048828126,"z":22.48999977111816},"heading":0}],"auto":true,"lockSound":"button-remote","groups":{"uwu":0},"doorRate":6.0,"_originalId":"uwu_front_1"}'),
-	(4630, 'pulsar_uwu_back_1', '{"coords":{"x":-587.3400268554688,"y":-1051.9000244140626,"z":22.40999984741211},"maxDistance":2.5,"state":1,"model":-1283712428,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"uwu":0},"doorRate":6.0,"_originalId":"uwu_back_1"}'),
-	(4631, 'pulsar_uwu_kitchen', '{"coords":{"x":-590.1799926757813,"y":-1054.1500244140626,"z":22.40999984741211},"maxDistance":2.5,"state":1,"model":-60871655,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"uwu":0},"doorRate":6.0,"_originalId":"uwu_kitchen"}'),
-	(4632, 'pulsar_uwu_garage_to', '{"coords":{"x":-592.469970703125,"y":-1056.0899658203126,"z":22.40999984741211},"maxDistance":2.5,"state":1,"model":-60871655,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"uwu":0},"doorRate":6.0,"_originalId":"uwu_garage_to"}'),
-	(4633, 'pulsar_uwu_freezer', '{"coords":{"x":-591.77001953125,"y":-1066.97998046875,"z":22.5300006866455},"maxDistance":2.5,"state":1,"model":-562476388,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"uwu":0},"doorRate":6.0,"_originalId":"uwu_freezer"}'),
-	(4634, 'pulsar_uwu_garage_out', '{"coords":{"x":-600.8900146484375,"y":-1055.1300048828126,"z":22.70999908447265},"maxDistance":2.5,"state":1,"model":1099436502,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"uwu":0},"doorRate":6.0,"_originalId":"uwu_garage_out"}'),
-	(4635, 'pulsar_uwu_office_1', '{"coords":{"x":-594.4099731445313,"y":-1049.77001953125,"z":22.5},"maxDistance":2.5,"state":1,"model":2089009131,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"uwu":0},"doorRate":6.0,"_originalId":"uwu_office_1"}'),
-	(4636, 'pulsar_uwu_office_2', '{"coords":{"x":-575.010009765625,"y":-1063.780029296875,"z":26.77000045776367},"maxDistance":2.5,"state":1,"model":2089009131,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"uwu":0},"doorRate":6.0,"_originalId":"uwu_office_2"}'),
-	(4637, 'pulsar_uwu_office_3', '{"coords":{"x":-575.010009765625,"y":-1062.3800048828126,"z":26.77000045776367},"maxDistance":2.5,"state":1,"model":2089009131,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"uwu":0},"doorRate":6.0,"_originalId":"uwu_office_3"}'),
-	(4638, 'pulsar_vangelico_main_1', '{"coords":{"x":-382.91998291015627,"y":6043.14013671875,"z":31.65999984741211},"maxDistance":2.5,"state":1,"doors":[{"model":1425919976,"coords":{"x":-383.8399963378906,"y":6044.06005859375,"z":31.65999984741211},"heading":0},{"model":9467943,"coords":{"x":-382.0,"y":6042.22021484375,"z":31.65999984741211},"heading":0}],"auto":true,"lockSound":"button-remote","groups":{"vangelico":0},"doorRate":6.0,"_originalId":"vangelico_main_1"}'),
-	(4639, 'pulsar_vangelico_office_door', '{"coords":{"x":-382.010009765625,"y":6050.60009765625,"z":31.65999984741211},"onduty":true,"state":1,"model":1335309163,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"vangelico":0},"_originalId":"vangelico_office_door","maxDistance":2.5}'),
-	(4640, 'pulsar_vangelico_grapeseed_main_1', '{"coords":{"x":1653.47509765625,"y":4882.85986328125,"z":42.31000137329101},"maxDistance":2.5,"state":1,"doors":[{"model":1425919976,"coords":{"x":1653.6600341796876,"y":4881.56982421875,"z":42.31000137329101},"heading":0},{"model":9467943,"coords":{"x":1653.2900390625,"y":4884.14990234375,"z":42.31000137329101},"heading":0}],"auto":true,"lockSound":"button-remote","groups":{"vangelico_grapeseed":0},"doorRate":6.0,"_originalId":"vangelico_grapeseed_main_1"}'),
-	(4641, 'pulsar_vangelico_grapeseed_office_door', '{"coords":{"x":1648.27001953125,"y":4877.419921875,"z":42.31000137329101},"onduty":true,"state":1,"model":1335309163,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"vangelico_grapeseed":0},"_originalId":"vangelico_grapeseed_office_door","maxDistance":2.5}'),
-	(4642, 'pulsar_door_332', '{"coords":{"x":127.94999694824219,"y":-1298.510009765625,"z":29.42000007629394},"maxDistance":2.5,"state":1,"model":-1116041313,"permissions":"JOB_DOORS","auto":true,"heading":0,"groups":{"unicorn":0},"lockSound":"button-remote","doorRate":6.0}'),
-	(4643, 'pulsar_door_333', '{"coords":{"x":128.07000732421876,"y":-1279.3499755859376,"z":29.44000053405761},"maxDistance":2.5,"state":1,"model":1695461688,"permissions":"JOB_DOORS","auto":true,"heading":0,"groups":{"unicorn":0},"lockSound":"button-remote","doorRate":6.0}'),
-	(4644, 'pulsar_door_334', '{"coords":{"x":116.2300033569336,"y":-1294.5899658203126,"z":29.44000053405761},"maxDistance":2.5,"state":1,"model":390840000,"permissions":"JOB_DOORS","auto":true,"heading":0,"groups":{"unicorn":0},"lockSound":"button-remote","doorRate":6.0}'),
-	(4645, 'pulsar_door_335', '{"coords":{"x":113.41000366210938,"y":-1296.260009765625,"z":29.44000053405761},"maxDistance":2.5,"state":1,"model":390840000,"permissions":"JOB_DOORS","auto":true,"heading":0,"groups":{"unicorn":0},"lockSound":"button-remote","doorRate":6.0}'),
-	(4646, 'pulsar_door_336', '{"coords":{"x":99.08000183105469,"y":-1293.68994140625,"z":29.44000053405761},"maxDistance":2.5,"state":1,"model":390840000,"permissions":"JOB_DOORS","auto":true,"heading":0,"groups":{"unicorn":95},"lockSound":"button-remote","doorRate":6.0}'),
-	(4647, 'pulsar_door_337', '{"coords":{"x":96.08999633789063,"y":-1284.8499755859376,"z":29.44000053405761},"maxDistance":2.5,"state":1,"model":1695461688,"permissions":"JOB_DOORS","auto":true,"heading":0,"groups":{"unicorn":95},"lockSound":"button-remote","doorRate":6.0}'),
-	(4648, 'pulsar_door_338', '{"coords":{"x":-1168.6199951171876,"y":-1569.8399658203126,"z":4.82000017166137},"maxDistance":2.5,"state":1,"model":-2023754432,"auto":true,"heading":0,"groups":{"weed":0},"lockSound":"button-remote","doorRate":6.0}'),
-	(4649, 'pulsar_door_339', '{"coords":{"x":-1165.25,"y":-1570.800048828125,"z":4.82000017166137},"maxDistance":2.5,"state":1,"model":-2023754432,"auto":true,"heading":0,"groups":{"weed":0},"lockSound":"button-remote","doorRate":6.0}'),
-	(4650, 'pulsar_woods_front_1', '{"coords":{"x":-301.07000732421877,"y":6256.9150390625,"z":31.68000030517578},"maxDistance":2.5,"state":1,"doors":[{"model":1504256620,"coords":{"x":-301.8699951171875,"y":6256.16015625,"z":31.68000030517578},"heading":0},{"model":262671971,"coords":{"x":-300.2699890136719,"y":6257.669921875,"z":31.68000030517578},"heading":0}],"auto":true,"lockSound":"button-remote","groups":{"woods_saloon":0},"doorRate":6.0,"_originalId":"woods_front_1"}'),
-	(4651, 'pulsar_door_342', '{"coords":{"x":-310.3800048828125,"y":6267.33984375,"z":31.68000030517578},"maxDistance":2.5,"state":1,"model":-2023754432,"auto":true,"heading":0,"groups":{"woods_saloon":0},"lockSound":"button-remote","doorRate":6.0}'),
-	(4652, 'pulsar_door_343', '{"coords":{"x":-309.8800048828125,"y":6271.330078125,"z":31.68000030517578},"maxDistance":2.5,"state":1,"model":-1627599682,"auto":true,"heading":0,"groups":{"woods_saloon":0},"lockSound":"button-remote","doorRate":6.0}'),
-	(4653, 'pulsar_door_344', '{"coords":{"x":-298.2900085449219,"y":6272.89013671875,"z":31.68000030517578},"maxDistance":2.5,"state":1,"model":1099436502,"auto":true,"heading":0,"groups":{"woods_saloon":0},"lockSound":"button-remote","doorRate":6.0}'),
-	(4654, 'pulsar_door_345', '{"coords":{"x":-298.5799865722656,"y":6272.240234375,"z":31.68000030517578},"maxDistance":2.5,"state":1,"model":-2023754432,"auto":true,"heading":0,"groups":{"woods_saloon":0},"lockSound":"button-remote","doorRate":6.0}'),
-	(4655, 'pulsar_courthouse_front_1', '{"coords":{"x":-545.5400390625,"y":-203.34500122070313,"z":38.41999816894531},"maxDistance":2.5,"state":0,"doors":[{"model":660342567,"coords":{"x":-544.5599975585938,"y":-202.77999877929688,"z":38.41999816894531},"heading":0},{"model":-1094765077,"coords":{"x":-546.52001953125,"y":-203.91000366210938,"z":38.41999816894531},"heading":0}],"auto":true,"lockSound":"button-remote","groups":{"government":0},"doorRate":6.0,"_originalId":"courthouse_front_1"}'),
-	(4656, 'pulsar_courthouse_courtside_1', '{"coords":{"x":-562.4550170898438,"y":-202.0050048828125,"z":38.43999862670898},"maxDistance":2.5,"state":1,"doors":[{"model":-1940023190,"coords":{"x":-562.780029296875,"y":-201.44000244140626,"z":38.43999862670898},"heading":0},{"model":-1940023190,"coords":{"x":-562.1300048828125,"y":-202.57000732421876,"z":38.43999862670898},"heading":0}],"auto":true,"lockSound":"button-remote","groups":{"police":0,"government":0},"doorRate":6.0,"_originalId":"courthouse_courtside_1"}'),
-	(4657, 'pulsar_courthouse_rearcourt_1', '{"coords":{"x":-562.4550170898438,"y":-202.0,"z":43.58000183105469},"maxDistance":2.5,"state":1,"doors":[{"model":-1940023190,"coords":{"x":-562.780029296875,"y":-201.44000244140626,"z":43.58000183105469},"heading":0},{"model":-1940023190,"coords":{"x":-562.1300048828125,"y":-202.55999755859376,"z":43.58000183105469},"heading":0}],"auto":true,"lockSound":"button-remote","groups":{"police":0,"government":0},"doorRate":6.0,"_originalId":"courthouse_rearcourt_1"}'),
-	(4658, 'pulsar_door_352', '{"coords":{"x":-532.4199829101563,"y":-182.1300048828125,"z":38.33000183105469},"maxDistance":2.5,"state":0,"model":1762042010,"auto":true,"heading":0,"groups":{"government":0},"lockSound":"button-remote","doorRate":6.0}'),
-	(4659, 'pulsar_door_353', '{"coords":{"x":-538.4099731445313,"y":-185.58999633789063,"z":38.33000183105469},"maxDistance":2.5,"state":0,"model":1762042010,"auto":true,"heading":0,"groups":{"government":0},"lockSound":"button-remote","doorRate":6.0}'),
-	(4660, 'pulsar_door_354', '{"coords":{"x":-531.3400268554688,"y":-186.61000061035157,"z":38.33000183105469},"maxDistance":2.5,"state":1,"model":1762042010,"auto":true,"heading":0,"groups":{"police":0,"government":0},"lockSound":"button-remote","doorRate":6.0}'),
-	(4661, 'pulsar_door_355', '{"coords":{"x":-536.2000122070313,"y":-189.4199981689453,"z":38.33000183105469},"maxDistance":2.5,"state":1,"model":1762042010,"auto":true,"heading":0,"groups":{"government":0},"lockSound":"button-remote","doorRate":6.0}'),
-	(4662, 'pulsar_door_356', '{"coords":{"x":-541.02001953125,"y":-192.1999969482422,"z":38.33000183105469},"maxDistance":2.5,"state":1,"model":1762042010,"auto":true,"heading":0,"groups":{"government":0},"lockSound":"button-remote","doorRate":6.0}'),
-	(4663, 'pulsar_door_357', '{"coords":{"x":-541.010009765625,"y":-192.1999969482422,"z":43.47000122070312},"maxDistance":2.5,"state":1,"model":1762042010,"auto":true,"heading":0,"groups":{"government":0},"lockSound":"button-remote","doorRate":6.0}'),
-	(4664, 'pulsar_door_358', '{"coords":{"x":-536.1900024414063,"y":-189.41000366210938,"z":43.47000122070312},"maxDistance":2.5,"state":1,"model":1762042010,"auto":true,"heading":0,"groups":{"government":0},"lockSound":"button-remote","doorRate":6.0}'),
-	(4665, 'pulsar_door_359', '{"coords":{"x":-538.4000244140625,"y":-185.5800018310547,"z":43.47000122070312},"maxDistance":2.5,"state":1,"model":1762042010,"auto":true,"heading":0,"groups":{"police":0,"government":0},"lockSound":"button-remote","doorRate":6.0}'),
-	(4666, 'pulsar_door_360', '{"coords":{"x":-582.5,"y":-207.5,"z":38.31999969482422},"maxDistance":2.5,"state":1,"model":1762042010,"auto":true,"heading":0,"groups":{"government":0},"lockSound":"button-remote","doorRate":6.0}'),
-	(4667, 'pulsar_door_361', '{"coords":{"x":-577.25,"y":-216.61000061035157,"z":38.31999969482422},"maxDistance":2.5,"state":1,"model":1762042010,"auto":true,"heading":0,"groups":{"government":0},"lockSound":"button-remote","doorRate":6.0}'),
-	(4668, 'pulsar_door_362', '{"coords":{"x":-574.5900268554688,"y":-216.92999267578126,"z":38.31999969482422},"maxDistance":2.5,"state":1,"model":1762042010,"auto":true,"heading":0,"groups":{"police":0,"government":0},"lockSound":"button-remote","doorRate":6.0}'),
-	(4669, 'pulsar_door_363', '{"coords":{"x":-574.5900268554688,"y":-216.92999267578126,"z":38.31999969482422},"maxDistance":2.5,"state":1,"model":1762042010,"auto":true,"heading":0,"groups":{"police":0,"government":0},"lockSound":"button-remote","doorRate":6.0}'),
-	(4670, 'pulsar_courthouse_rear_1', '{"coords":{"x":-568.02001953125,"y":-235.34500122070313,"z":34.36000061035156},"maxDistance":2.5,"state":1,"doors":[{"model":297112647,"coords":{"x":-567.489990234375,"y":-236.27000427246095,"z":34.36000061035156},"heading":0},{"model":830788581,"coords":{"x":-568.5499877929688,"y":-234.4199981689453,"z":34.36000061035156},"heading":0}],"auto":true,"lockSound":"button-remote","groups":{"police":0,"government":0},"doorRate":6.0,"_originalId":"courthouse_rear_1"}'),
-	(4671, 'pulsar_door_366', '{"coords":{"x":-562.6900024414063,"y":-231.69000244140626,"z":34.36999893188476},"maxDistance":2.5,"state":1,"model":1762042010,"auto":true,"heading":0,"groups":{"police":0,"government":0},"lockSound":"button-remote","doorRate":6.0}'),
-	(4672, 'pulsar_door_367', '{"coords":{"x":-557.9400024414063,"y":-233.11000061035157,"z":34.47999954223633},"maxDistance":2.5,"state":1,"model":918828907,"auto":true,"heading":0,"groups":{"police":0,"government":0},"lockSound":"button-remote","doorRate":6.0}'),
-	(4673, 'pulsar_door_368', '{"coords":{"x":-560.5399780273438,"y":-234.61000061035157,"z":34.47999954223633},"maxDistance":2.5,"state":1,"model":918828907,"auto":true,"heading":0,"groups":{"police":0,"government":0},"lockSound":"button-remote","doorRate":6.0}'),
-	(4674, 'pulsar_door_369', '{"coords":{"x":1219.22998046875,"y":-483.2200012207031,"z":67.31999969482422},"maxDistance":2.5,"state":1,"model":-1843369135,"auto":true,"heading":0,"lockSound":"button-remote","doorRate":6.0}'),
-	(4675, 'pulsar_door_370', '{"coords":{"x":1126.489990234375,"y":-1242.1400146484376,"z":21.43000030517578},"maxDistance":2.5,"state":1,"model":-1920147247,"auto":true,"heading":0,"lockSound":"button-remote","doorRate":6.0}'),
-	(4676, 'pulsar_door_371', '{"coords":{"x":-51.77000045776367,"y":6395.3701171875,"z":32.59999847412109},"maxDistance":2.5,"state":1,"model":-1515131612,"auto":true,"heading":0,"lockSound":"button-remote","doorRate":6.0}'),
-	(4677, 'pulsar_door_372', '{"coords":{"x":347.3900146484375,"y":-199.3300018310547,"z":54.36999893188476},"maxDistance":2.5,"state":1,"model":-1156992775,"auto":true,"heading":0,"lockSound":"button-remote","doorRate":6.0}'),
-	(4678, 'pulsar_door_373', '{"coords":{"x":978.4755859375,"y":-716.1016235351563,"z":58.43925857543945},"maxDistance":2.5,"state":1,"model":-232187956,"auto":true,"heading":0,"lockSound":"button-remote","doorRate":6.0}'),
-	(4679, 'pulsar_door_374', '{"coords":{"x":982.3516235351563,"y":-726.18359375,"z":58.14799880981445},"maxDistance":2.5,"state":1,"model":-2080370239,"auto":true,"heading":0,"lockSound":"button-remote","doorRate":6.0}'),
-	(4680, 'pulsar_door_375', '{"coords":{"x":971.6005859375,"y":-726.4807739257813,"z":58.34379959106445},"maxDistance":2.5,"state":1,"model":12662004,"auto":true,"heading":0,"lockSound":"button-remote","doorRate":6.0}'),
-	(4681, 'pulsar_door_376', '{"coords":{"x":1098.833984375,"y":-438.9997863769531,"z":68.00890350341797},"maxDistance":2.5,"state":1,"model":-232187956,"auto":true,"heading":0,"lockSound":"button-remote","doorRate":6.0}'),
-	(4682, 'pulsar_door_377', '{"coords":{"x":1108.343994140625,"y":-444.12078857421877,"z":67.71765899658203},"maxDistance":2.5,"state":1,"model":-2080370239,"auto":true,"heading":0,"lockSound":"button-remote","doorRate":6.0}'),
-	(4683, 'pulsar_door_378', '{"coords":{"x":1100.384033203125,"y":-451.35260009765627,"z":67.91343688964844},"maxDistance":2.5,"state":1,"model":12662004,"auto":true,"heading":0,"lockSound":"button-remote","doorRate":6.0}'),
-	(4684, 'pulsar_door_379', '{"coords":{"x":1251.2340087890626,"y":-493.4761962890625,"z":70.1250991821289},"maxDistance":2.5,"state":1,"model":-232187956,"auto":true,"heading":0,"lockSound":"button-remote","doorRate":6.0}'),
-	(4685, 'pulsar_door_380', '{"coords":{"x":1245.199951171875,"y":-502.4338073730469,"z":69.8338394165039},"maxDistance":2.5,"state":1,"model":-2080370239,"auto":true,"heading":0,"lockSound":"button-remote","doorRate":6.0}'),
-	(4686, 'pulsar_door_381', '{"coords":{"x":1238.7900390625,"y":-493.7973937988281,"z":70.0296401977539},"maxDistance":2.5,"state":1,"model":12662004,"auto":true,"heading":0,"lockSound":"button-remote","doorRate":6.0}'),
-	(4687, 'pulsar_door_382', '{"coords":{"x":943.4299926757813,"y":-652.609619140625,"z":58.72103881835937},"maxDistance":2.5,"state":1,"model":-1422530141,"auto":true,"heading":0,"lockSound":"button-remote","doorRate":6.0}'),
-	(4688, 'pulsar_door_383', '{"coords":{"x":934.580810546875,"y":-651.85400390625,"z":58.52228164672851},"maxDistance":2.5,"state":1,"model":-672840959,"auto":true,"heading":0,"lockSound":"button-remote","doorRate":6.0}'),
-	(4689, 'pulsar_door_384', '{"coords":{"x":945.1005859375,"y":-518.7495727539063,"z":60.91783905029297},"maxDistance":2.5,"state":1,"model":-1422530141,"auto":true,"heading":0,"lockSound":"button-remote","doorRate":6.0}'),
-	(4690, 'pulsar_door_385', '{"coords":{"x":942.7999877929688,"y":-527.3278198242188,"z":60.71908187866211},"maxDistance":2.5,"state":1,"model":-672840959,"auto":true,"heading":0,"lockSound":"button-remote","doorRate":6.0}'),
-	(4691, 'pulsar_door_386', '{"coords":{"x":1221.0579833984376,"y":-669.8225708007813,"z":63.7854995727539},"maxDistance":2.5,"state":1,"model":-1422530141,"auto":true,"heading":0,"lockSound":"button-remote","doorRate":6.0}'),
-	(4692, 'pulsar_door_387', '{"coords":{"x":1228.5579833984376,"y":-674.5797729492188,"z":63.58673858642578},"maxDistance":2.5,"state":1,"model":-672840959,"auto":true,"heading":0,"lockSound":"button-remote","doorRate":6.0}'),
-	(4693, 'pulsar_door_388', '{"coords":{"x":-816.1099853515625,"y":177.50999450683595,"z":72.83000183105469},"maxDistance":2.5,"state":1,"model":-1686014385,"auto":true,"heading":0,"lockSound":"button-remote","doorRate":6.0}'),
-	(4694, 'pulsar_door_389', '{"coords":{"x":-816.719970703125,"y":179.10000610351563,"z":72.83000183105469},"maxDistance":2.5,"state":1,"model":159994461,"auto":true,"heading":0,"lockSound":"button-remote","doorRate":6.0}'),
-	(4695, 'pulsar_door_390', '{"coords":{"x":-814.469970703125,"y":186.27999877929688,"z":74.51000213623047},"maxDistance":2.5,"state":1,"model":30769481,"auto":true,"heading":0,"lockSound":"button-remote","doorRate":6.0}'),
-	(4696, 'pulsar_door_391', '{"coords":{"x":-793.3900146484375,"y":180.50999450683595,"z":73.04000091552735},"maxDistance":2.5,"state":1,"model":-1454760130,"auto":true,"heading":0,"lockSound":"button-remote","doorRate":6.0}'),
-	(4697, 'pulsar_door_392', '{"coords":{"x":-794.1900024414063,"y":182.57000732421876,"z":73.04000091552735},"maxDistance":2.5,"state":1,"model":1245831483,"auto":true,"heading":0,"lockSound":"button-remote","doorRate":6.0}'),
-	(4698, 'pulsar_door_393', '{"coords":{"x":-794.510009765625,"y":178.00999450683595,"z":73.04000091552735},"maxDistance":2.5,"state":1,"model":1245831483,"auto":true,"heading":0,"lockSound":"button-remote","doorRate":6.0}'),
-	(4699, 'pulsar_door_394', '{"coords":{"x":-796.5700073242188,"y":177.22000122070313,"z":73.04000091552735},"maxDistance":2.5,"state":1,"model":-1454760130,"auto":true,"heading":0,"lockSound":"button-remote","doorRate":6.0}'),
-	(4700, 'pulsar_door_395', '{"coords":{"x":-806.77001953125,"y":174.02000427246095,"z":76.88999938964844},"maxDistance":2.5,"state":1,"model":-794543736,"auto":true,"heading":0,"lockSound":"button-remote","doorRate":6.0}'),
-	(4701, 'pulsar_door_396', '{"coords":{"x":-782.4500122070313,"y":317.5199890136719,"z":217.7899932861328},"maxDistance":2.5,"state":1,"model":-658026477,"auto":true,"heading":0,"lockSound":"button-remote","doorRate":6.0}'),
-	(4702, 'pulsar_door_397', '{"coords":{"x":7.51999998092651,"y":539.530029296875,"z":176.17999267578126},"maxDistance":2.5,"state":1,"model":308207762,"auto":true,"heading":0,"lockSound":"button-remote","doorRate":6.0}'),
-	(4703, 'pulsar_door_398', '{"coords":{"x":-820.5700073242188,"y":-436.80999755859377,"z":37.45000076293945},"maxDistance":2.5,"state":1,"model":815741875,"auto":true,"heading":0,"lockSound":"button-remote","doorRate":6.0}'),
-	(4704, 'pulsar_door_399', '{"coords":{"x":1972.77001953125,"y":3815.3701171875,"z":33.65999984741211},"maxDistance":2.5,"state":1,"model":132154435,"auto":true,"heading":0,"lockSound":"button-remote","doorRate":6.0}'),
-	(4705, 'pulsar_door_400', '{"coords":{"x":952.6099853515625,"y":4.09000015258789,"z":111.4000015258789},"maxDistance":2.5,"state":1,"model":1799691805,"auto":true,"heading":0,"lockSound":"button-remote","doorRate":6.0}'),
-	(4706, 'pulsar_door_401', '{"coords":{"x":-213.8300018310547,"y":6231.16015625,"z":30.77000045776367},"maxDistance":2.5,"state":1,"model":-1602781750,"auto":true,"heading":0,"lockSound":"button-remote","doorRate":6.0}'),
-	(4707, 'pulsar_aztecas_main_back', '{"coords":{"x":486.010009765625,"y":-1530.3900146484376,"z":29.45000076293945},"maxDistance":2.5,"state":1,"model":2103001488,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"aztecas":0},"doorRate":6.0,"_originalId":"aztecas_main_back"}'),
-	(4708, 'pulsar_aztecas_office_door', '{"coords":{"x":488.5799865722656,"y":-1534.0999755859376,"z":29.45000076293945},"maxDistance":2.5,"state":1,"model":-1168990172,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"aztecas":0},"doorRate":6.0,"_originalId":"aztecas_office_door"}'),
-	(4709, 'pulsar_aztecas_meeting_room', '{"coords":{"x":490.94000244140627,"y":-1531.2900390625,"z":29.45000076293945},"maxDistance":2.5,"state":1,"model":-1168990172,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"aztecas":0},"doorRate":6.0,"_originalId":"aztecas_meeting_room"}'),
-	(4710, 'pulsar_aztecas_door_bar', '{"coords":{"x":491.20001220703127,"y":-1533.06005859375,"z":29.45000076293945},"maxDistance":2.5,"state":1,"model":-1168990172,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"aztecas":0},"doorRate":6.0,"_originalId":"aztecas_door_bar"}'),
-	(4711, 'pulsar_aztecas_front_main', '{"coords":{"x":493.0799865722656,"y":-1541.8299560546876,"z":29.45000076293945},"maxDistance":2.5,"state":1,"model":903896222,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"aztecas":0},"doorRate":6.0,"_originalId":"aztecas_front_main"}'),
-	(4712, 'pulsar_ballers_main_outside_1', '{"coords":{"x":0.20999999344348,"y":-1823.300048828125,"z":29.73999977111816},"maxDistance":2.5,"state":1,"model":-1052955611,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"ballers":0},"doorRate":6.0,"_originalId":"ballers_main_outside_1"}'),
-	(4713, 'pulsar_ballers_main_outside_2', '{"coords":{"x":-1.87000000476837,"y":-1808.8299560546876,"z":25.54000091552734},"maxDistance":2.5,"state":1,"model":-1351120742,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"ballers":0},"doorRate":6.0,"_originalId":"ballers_main_outside_2"}'),
-	(4714, 'pulsar_ballers_doorway_downstairs', '{"coords":{"x":-6.94999980926513,"y":-1819.72998046875,"z":29.34000015258789},"maxDistance":2.5,"state":1,"model":373216819,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"ballers":0},"doorRate":6.0,"_originalId":"ballers_doorway_downstairs"}'),
-	(4715, 'pulsar_ballers_door_plan_room', '{"coords":{"x":0.03999999910593,"y":-1816.760009765625,"z":29.34000015258789},"maxDistance":2.5,"state":1,"model":373216819,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"ballers":0},"doorRate":6.0,"_originalId":"ballers_door_plan_room"}'),
-	(4716, 'pulsar_ballers_door_office', '{"coords":{"x":0.69999998807907,"y":-1814.72998046875,"z":29.34000015258789},"maxDistance":2.5,"state":1,"model":373216819,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"ballers":0},"doorRate":6.0,"_originalId":"ballers_door_office"}'),
-	(4717, 'pulsar_deathrow_gate', '{"coords":{"x":-1555.06005859375,"y":-295.69000244140627,"z":47.25},"maxDistance":2.5,"state":1,"model":-1603817716,"heading":0,"groups":{"deathrow":0},"_originalId":"deathrow_gate"}'),
-	(4718, 'pulsar_deathrow_northgate_1', '{"coords":{"x":-1591.594970703125,"y":-249.83499145507813,"z":54.47999954223633},"maxDistance":2.5,"state":1,"doors":[{"model":-1156020871,"coords":{"x":-1592.030029296875,"y":-251.5,"z":54.47999954223633},"heading":0},{"model":-1156020871,"coords":{"x":-1591.1600341796876,"y":-248.1699981689453,"z":54.47999954223633},"heading":0}],"auto":true,"lockSound":"button-remote","groups":{"deathrow":0},"doorRate":6.0,"_originalId":"deathrow_northgate_1"}'),
-	(4719, 'pulsar_deathrow_eastgate_1', '{"coords":{"x":-1537.56005859375,"y":-233.489990234375,"z":53.32500076293945},"maxDistance":2.5,"state":1,"doors":[{"model":-1156020871,"coords":{"x":-1538.699951171875,"y":-232.1999969482422,"z":53.33000183105469},"heading":0},{"model":-1156020871,"coords":{"x":-1536.4200439453126,"y":-234.77999877929688,"z":53.31999969482422},"heading":0}],"auto":true,"lockSound":"button-remote","groups":{"deathrow":0},"doorRate":6.0,"_originalId":"deathrow_eastgate_1"}'),
-	(4720, 'pulsar_lostmc_front_door', '{"coords":{"x":99.62999725341797,"y":3615.909912109375,"z":40.63999938964844},"maxDistance":2.5,"state":1,"model":190770132,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"lostmc":0},"doorRate":6.0,"_originalId":"lostmc_front_door"}'),
-	(4721, 'pulsar_lostmc_lockers_door', '{"coords":{"x":102.55999755859375,"y":3607.14990234375,"z":40.63999938964844},"maxDistance":2.5,"state":1,"model":747286790,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"lostmc":0},"doorRate":6.0,"_originalId":"lostmc_lockers_door"}'),
-	(4722, 'pulsar_nines_gate', '{"coords":{"x":-667.22998046875,"y":-889.6599731445313,"z":23.48999977111816},"maxDistance":2.5,"state":1,"model":-1603817716,"heading":0,"groups":{"nines":0},"_originalId":"nines_gate"}'),
-	(4723, 'pulsar_door_420', '{"coords":{"x":-71.7699966430664,"y":-1331.22998046875,"z":29.45999908447265},"maxDistance":2.5,"state":1,"model":1373774648,"auto":true,"heading":0,"groups":{"odmc":0},"lockSound":"button-remote","doorRate":6.0}'),
-	(4724, 'pulsar_odmc_garage_1', '{"coords":{"x":963.1699829101563,"y":-117.33000183105469,"z":75.29000091552735},"maxDistance":2.5,"state":1,"model":-822900180,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"odmc":0},"doorRate":1.0,"_originalId":"odmc_garage_1"}'),
-	(4725, 'pulsar_odmc_garage_2', '{"coords":{"x":968.760009765625,"y":-112.11000061035156,"z":75.29000091552735},"maxDistance":2.5,"state":1,"model":-822900180,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"odmc":0},"doorRate":1.0,"_originalId":"odmc_garage_2"}'),
-	(4726, 'pulsar_odmc_garage_other', '{"coords":{"x":982.3800048828125,"y":-125.37000274658203,"z":75.04000091552735},"maxDistance":2.5,"state":1,"model":-197537718,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"odmc":0},"doorRate":1.0,"_originalId":"odmc_garage_other"}'),
-	(4727, 'pulsar_door_424', '{"coords":{"x":981.1500244140625,"y":-103.26000213623047,"z":74.98999786376953},"maxDistance":2.5,"state":1,"model":190770132,"auto":true,"heading":0,"lockSound":"button-remote","doorRate":6.0}'),
-	(4728, 'pulsar_door_425', '{"coords":{"x":985.6099853515625,"y":-95.16000366210938,"z":75.0},"maxDistance":2.5,"state":1,"model":747286790,"auto":true,"heading":0,"groups":{"odmc":0},"lockSound":"button-remote","doorRate":6.0}'),
-	(4729, 'pulsar_door_426', '{"coords":{"x":994.52001953125,"y":-119.9000015258789,"z":74.20999908447266},"maxDistance":2.5,"state":1,"model":-710818483,"auto":true,"heading":0,"groups":{"odmc":0},"lockSound":"button-remote","doorRate":6.0}'),
-	(4730, 'pulsar_door_427', '{"coords":{"x":990.8699951171875,"y":-132.88999938964845,"z":74.20999908447266},"maxDistance":2.5,"state":0,"model":-710818483,"auto":true,"heading":0,"groups":{"odmc":0},"lockSound":"button-remote","doorRate":6.0}'),
-	(4731, 'pulsar_door_428', '{"coords":{"x":959.3823852539063,"y":-120.45120239257813,"z":75.16158294677735},"maxDistance":2.5,"state":1,"model":1335311341,"auto":true,"heading":0,"groups":{"odmc":0},"lockSound":"button-remote","doorRate":6.0}'),
-	(4732, 'pulsar_doors_parsons_gate', '{"coords":{"x":-1477.7449951171876,"y":884.9450073242188,"z":183.07000732421876},"maxDistance":2.5,"state":1,"doors":[{"model":-349730013,"coords":{"x":-1478.260009765625,"y":882.239990234375,"z":183.07000732421876},"heading":0},{"model":-1918480350,"coords":{"x":-1477.22998046875,"y":887.6500244140625,"z":183.07000732421876},"heading":0}],"auto":true,"lockSound":"button-remote","groups":{"blackdragons":0},"doorRate":6.0,"_originalId":"doors_parsons_gate"}'),
-	(4733, 'pulsar_door_431', '{"coords":{"x":-14.86999988555908,"y":-1441.1800537109376,"z":31.19000053405761},"maxDistance":2.5,"state":1,"model":520341586,"auto":true,"heading":0,"groups":{"saints":0},"lockSound":"button-remote","doorRate":6.0}'),
-	(4734, 'pulsar_vagos_main_front', '{"coords":{"x":324.7200012207031,"y":-1991.0899658203126,"z":24.36000061035156},"maxDistance":2.5,"state":1,"model":2118614536,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"vagos":0},"doorRate":6.0,"_originalId":"vagos_main_front"}'),
-	(4735, 'pulsar_vagos_office_door', '{"coords":{"x":335.8999938964844,"y":-1984.5400390625,"z":24.36000061035156},"maxDistance":2.5,"state":1,"model":1763005348,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"vagos":0},"doorRate":6.0,"_originalId":"vagos_office_door"}'),
-	(4736, 'pulsar_mtg', '{"coords":{"x":325.7200012207031,"y":-1992.8199462890626,"z":24.36000061035156},"maxDistance":2.5,"state":1,"model":1763005348,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"vagos":0},"doorRate":6.0,"_originalId":"mtg"}'),
-	(4737, 'pulsar_vagos_back_main', '{"coords":{"x":336.739990234375,"y":-1991.8399658203126,"z":24.36000061035156},"maxDistance":2.5,"state":1,"model":2118614536,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"vagos":0},"doorRate":6.0,"_originalId":"vagos_back_main"}'),
-	(4738, 'pulsar_lakevinewood2_gate_1', '{"coords":{"x":-135.2949981689453,"y":972.60498046875,"z":236.11000061035157},"maxDistance":2.5,"state":0,"auto":true,"doors":[{"model":546378757,"coords":{"x":-137.8000030517578,"y":973.7100219726563,"z":236.11000061035157},"heading":0},{"model":-1249591818,"coords":{"x":-132.7899932861328,"y":971.5,"z":236.11000061035157},"heading":0}],"lockSound":"button-remote","doorRate":3.0,"_originalId":"lakevinewood2_gate_1"}'),
-	(4739, 'pulsar_lakevinewood3_gate_1', '{"coords":{"x":-104.69000244140625,"y":850.1400146484375,"z":235.8300018310547},"maxDistance":2.5,"state":0,"auto":true,"doors":[{"model":546378757,"coords":{"x":-102.19000244140625,"y":849.0,"z":235.8300018310547},"heading":0},{"model":-1249591818,"coords":{"x":-107.19000244140625,"y":851.280029296875,"z":235.8300018310547},"heading":0}],"lockSound":"button-remote","doorRate":3.0,"_originalId":"lakevinewood3_gate_1"}'),
-	(4740, 'pulsar_lakevinewood4_gate_1', '{"coords":{"x":-124.30000305175781,"y":900.77001953125,"z":235.97999572753907},"maxDistance":2.5,"state":0,"auto":true,"doors":[{"model":-1918480350,"coords":{"x":-124.69999694824219,"y":903.489990234375,"z":235.97999572753907},"heading":0},{"model":-349730013,"coords":{"x":-123.9000015258789,"y":898.0499877929688,"z":235.97999572753907},"heading":0}],"lockSound":"button-remote","doorRate":3.0,"_originalId":"lakevinewood4_gate_1"}'),
-	(4741, 'pulsar_mall_kitchen', '{"coords":{"x":-534.280029296875,"y":-600.6500244140625,"z":34.84000015258789},"maxDistance":2.5,"state":1,"model":901693952,"auto":true,"heading":0,"lockSound":"button-remote","doorRate":6.0,"_originalId":"mall_kitchen"}'),
-	(4742, 'pulsar_mba_garage_door_left', '{"coords":{"x":-375.44000244140627,"y":-1880.22998046875,"z":24.11000061035156},"maxDistance":2.5,"state":1,"model":-1098702270,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"mba":0},"doorRate":6.0,"_originalId":"mba_garage_door_left"}'),
-	(4743, 'pulsar_mba_garage_door_right', '{"coords":{"x":-386.1600036621094,"y":-1885.449951171875,"z":24.1200008392334},"maxDistance":2.5,"state":1,"model":-1098702270,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"mba":0},"doorRate":6.0,"_originalId":"mba_garage_door_right"}'),
-	(4744, 'pulsar_mtz_emergency_lobby_door1_1', '{"coords":{"x":-444.12371826171877,"y":-357.7562255859375,"z":33.49734115600586},"maxDistance":2.5,"state":0,"doors":[{"model":1624860328,"coords":{"x":-442.8782958984375,"y":-357.9211120605469,"z":33.49734115600586},"heading":0},{"model":1624860328,"coords":{"x":-445.3691101074219,"y":-357.59130859375,"z":33.49734115600586},"heading":0}],"auto":true,"lockSound":"button-remote","groups":{"ems":0},"doorRate":6.0,"_originalId":"mtz_emergency_lobby_door1_1"}'),
-	(4745, 'pulsar_mtz_emergency_lobby_door2_1', '{"coords":{"x":-447.98101806640627,"y":-348.09881591796877,"z":33.49734115600586},"maxDistance":2.5,"state":0,"doors":[{"model":1624860328,"coords":{"x":-448.1448974609375,"y":-349.3434143066406,"z":33.49734115600586},"heading":0},{"model":1624860328,"coords":{"x":-447.8171081542969,"y":-346.85418701171877,"z":33.49734115600586},"heading":0}],"auto":true,"lockSound":"button-remote","groups":{"ems":0},"doorRate":6.0,"_originalId":"mtz_emergency_lobby_door2_1"}'),
-	(4746, 'pulsar_mtz_emergency_lobby_door3_1', '{"coords":{"x":-447.0462646484375,"y":-341.00634765625,"z":33.49734115600586},"maxDistance":2.5,"state":0,"doors":[{"model":1624860328,"coords":{"x":-447.2123107910156,"y":-342.2507019042969,"z":33.49734115600586},"heading":0},{"model":1624860328,"coords":{"x":-446.88018798828127,"y":-339.7619934082031,"z":33.49734115600586},"heading":0}],"auto":true,"lockSound":"button-remote","groups":{"ems":0},"doorRate":6.0,"_originalId":"mtz_emergency_lobby_door3_1"}'),
-	(4747, 'pulsar_mtz_emergency_lobby_door4_1', '{"coords":{"x":-446.09930419921877,"y":-333.90924072265627,"z":33.49734115600586},"maxDistance":2.5,"state":0,"doors":[{"model":1624860328,"coords":{"x":-446.2654113769531,"y":-335.15411376953127,"z":33.49734115600586},"heading":0},{"model":1624860328,"coords":{"x":-445.9331970214844,"y":-332.6643981933594,"z":33.49734115600586},"heading":0}],"auto":true,"lockSound":"button-remote","groups":{"ems":0},"doorRate":6.0,"_originalId":"mtz_emergency_lobby_door4_1"}'),
-	(4748, 'pulsar_mtz_emergency_lobby_reception', '{"coords":{"x":-440.6438903808594,"y":-321.79541015625,"z":35.06682968139648},"maxDistance":2.5,"state":1,"model":493136920,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"ems":0},"doorRate":6.0,"_originalId":"mtz_emergency_lobby_reception"}'),
-	(4749, 'pulsar_mtz_emergency_corridor1', '{"coords":{"x":-444.2193908691406,"y":-320.15704345703127,"z":35.06686019897461},"maxDistance":2.5,"state":0,"doors":[{"model":665455406,"coords":{"x":-445.4263916015625,"y":-320.64471435546877,"z":35.06686019897461},"heading":0},{"model":665455406,"coords":{"x":-443.01239013671877,"y":-319.6694030761719,"z":35.06686019897461},"heading":0}],"auto":true,"lockSound":"button-remote","groups":{"ems":0},"doorRate":6.0,"_originalId":"mtz_emergency_corridor1"}'),
-	(4750, 'pulsar_mtz_emergency_cloakroom', '{"coords":{"x":-442.5889892578125,"y":-317.056396484375,"z":35.06618881225586},"maxDistance":2.5,"state":1,"model":493136920,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"ems":0},"doorRate":6.0,"_originalId":"mtz_emergency_cloakroom"}'),
-	(4751, 'pulsar_mtz_emergency_xray', '{"coords":{"x":-447.341796875,"y":-305.4991149902344,"z":35.07070922851562},"onduty":true,"state":1,"model":493136920,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"ems":0},"_originalId":"mtz_emergency_xray","maxDistance":2.5}'),
-	(4752, 'pulsar_mtz_emergency_diag', '{"coords":{"x":-449.6571960449219,"y":-299.8382873535156,"z":35.07070922851562},"onduty":true,"state":1,"model":493136920,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"ems":0},"_originalId":"mtz_emergency_diag","maxDistance":2.5}'),
-	(4753, 'pulsar_mtz_emergency_mri', '{"coords":{"x":-453.0472106933594,"y":-291.5856018066406,"z":35.0654411315918},"onduty":true,"state":1,"model":493136920,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"ems":0},"_originalId":"mtz_emergency_mri","maxDistance":2.5}'),
-	(4754, 'pulsar_mtz_emergency_room1', '{"coords":{"x":-448.64581298828127,"y":-316.0325927734375,"z":35.06631851196289},"onduty":true,"state":0,"model":493136920,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"ems":0},"_originalId":"mtz_emergency_room1","maxDistance":2.5}'),
-	(4755, 'pulsar_mtz_emergency_room2', '{"coords":{"x":-449.22491455078127,"y":-314.6340026855469,"z":35.06631851196289},"onduty":true,"state":0,"model":493136920,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"ems":0},"_originalId":"mtz_emergency_room2","maxDistance":2.5}'),
-	(4756, 'pulsar_mtz_emergency_closet', '{"coords":{"x":-451.474609375,"y":-309.0657958984375,"z":35.06631851196289},"onduty":true,"state":1,"model":493136920,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"ems":0},"_originalId":"mtz_emergency_closet","maxDistance":2.5}'),
-	(4757, 'pulsar_mtz_emergency_room3', '{"coords":{"x":-452.7051086425781,"y":-306.0628967285156,"z":35.06631851196289},"onduty":true,"state":0,"model":493136920,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"ems":0},"_originalId":"mtz_emergency_room3","maxDistance":2.5}'),
-	(4758, 'pulsar_mtz_emergency_room4', '{"coords":{"x":-454.9653015136719,"y":-300.551513671875,"z":35.06631851196289},"onduty":true,"state":0,"model":493136920,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"ems":0},"_originalId":"mtz_emergency_room4","maxDistance":2.5}'),
-	(4759, 'pulsar_mtz_emergency_room5', '{"coords":{"x":-457.12200927734377,"y":-295.3081970214844,"z":35.06631851196289},"onduty":true,"state":0,"model":493136920,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"ems":0},"_originalId":"mtz_emergency_room5","maxDistance":2.5}'),
-	(4760, 'pulsar_mtz_emergency_rest1', '{"coords":{"x":-457.0151062011719,"y":-288.7811584472656,"z":35.06948852539062},"maxDistance":2.5,"state":0,"doors":[{"model":665455406,"coords":{"x":-458.2174072265625,"y":-289.26690673828127,"z":35.06948852539062},"heading":0},{"model":665455406,"coords":{"x":-455.81280517578127,"y":-288.29541015625,"z":35.06948852539062},"heading":0}],"auto":true,"lockSound":"button-remote","groups":{"ems":0},"doorRate":6.0,"_originalId":"mtz_emergency_rest1"}'),
-	(4761, 'pulsar_mtz_level1_lobby_door1_1', '{"coords":{"x":-438.11865234375,"y":-341.4226989746094,"z":41.32680892944336},"maxDistance":2.5,"state":0,"doors":[{"model":1624860328,"coords":{"x":-437.9523010253906,"y":-340.17608642578127,"z":41.32680892944336},"heading":0},{"model":1624860328,"coords":{"x":-438.2850036621094,"y":-342.6693115234375,"z":41.32680892944336},"heading":0}],"auto":true,"lockSound":"button-remote","groups":{"ems":0},"doorRate":6.0,"_originalId":"mtz_level1_lobby_door1_1"}'),
-	(4762, 'pulsar_mtz_level1_lobby_door2_1', '{"coords":{"x":-473.4403076171875,"y":-341.03997802734377,"z":41.32181167602539},"maxDistance":2.5,"state":0,"doors":[{"model":1624860328,"coords":{"x":-472.1933898925781,"y":-341.2044982910156,"z":41.32181167602539},"heading":0},{"model":1624860328,"coords":{"x":-474.68719482421877,"y":-340.87548828125,"z":41.32181167602539},"heading":0}],"auto":true,"lockSound":"button-remote","groups":{"ems":0},"doorRate":6.0,"_originalId":"mtz_level1_lobby_door2_1"}'),
-	(4763, 'pulsar_mtz_level1_lobby_door3_1', '{"coords":{"x":-472.33538818359377,"y":-332.6492004394531,"z":41.32181167602539},"maxDistance":2.5,"state":0,"doors":[{"model":1624860328,"coords":{"x":-473.581787109375,"y":-332.485107421875,"z":41.32181167602539},"heading":0},{"model":1624860328,"coords":{"x":-471.0889892578125,"y":-332.81329345703127,"z":41.32181167602539},"heading":0}],"auto":true,"lockSound":"button-remote","groups":{"ems":0},"doorRate":6.0,"_originalId":"mtz_level1_lobby_door3_1"}'),
-	(4764, 'pulsar_mtz_level1_lobby_door4_1', '{"coords":{"x":-507.6595458984375,"y":-332.26763916015627,"z":41.32181167602539},"maxDistance":2.5,"state":0,"doors":[{"model":1624860328,"coords":{"x":-507.8236083984375,"y":-333.5137939453125,"z":41.32181167602539},"heading":0},{"model":1624860328,"coords":{"x":-507.4955139160156,"y":-331.0215148925781,"z":41.32181167602539},"heading":0}],"auto":true,"lockSound":"button-remote","groups":{"ems":0},"doorRate":6.0,"_originalId":"mtz_level1_lobby_door4_1"}'),
-	(4765, 'pulsar_mtz_level1_lobby_office_1', '{"coords":{"x":-500.5935974121094,"y":-325.24713134765627,"z":42.46982955932617},"onduty":true,"state":1,"doors":[{"model":873979204,"coords":{"x":-501.8894958496094,"y":-325.35369873046877,"z":42.46982955932617},"heading":0},{"model":873979204,"coords":{"x":-499.2976989746094,"y":-325.1405944824219,"z":42.46982955932617},"heading":0}],"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"ems":0},"_originalId":"mtz_level1_lobby_office_1","maxDistance":2.5}'),
-	(4766, 'pulsar_mtz_level1_lobby_officeexit_1', '{"coords":{"x":-510.0733947753906,"y":-298.76275634765627,"z":42.63515090942383},"onduty":true,"state":1,"doors":[{"model":2145611391,"coords":{"x":-511.27679443359377,"y":-299.26971435546877,"z":42.63515090942383},"heading":0},{"model":2145611391,"coords":{"x":-508.8699951171875,"y":-298.25579833984377,"z":42.63515090942383},"heading":0}],"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"ems":0},"_originalId":"mtz_level1_lobby_officeexit_1","maxDistance":2.5}'),
-	(4767, 'pulsar_mtz_icu_office_1', '{"coords":{"x":-495.83758544921877,"y":-333.49407958984377,"z":69.67925262451172},"maxDistance":2.5,"state":1,"doors":[{"model":665455406,"coords":{"x":-496.0180969238281,"y":-334.7782897949219,"z":69.67925262451172},"heading":0},{"model":665455406,"coords":{"x":-495.6571044921875,"y":-332.20989990234377,"z":69.67925262451172},"heading":0}],"auto":true,"lockSound":"button-remote","groups":{"ems":0},"doorRate":6.0,"_originalId":"mtz_icu_office_1"}'),
-	(4768, 'pulsar_door_482', '{"coords":{"x":-482.7204895019531,"y":-333.84600830078127,"z":69.67925262451172},"onduty":true,"state":0,"model":493136920,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"ems":0},"doorRate":6.0,"maxDistance":2.5}'),
-	(4769, 'pulsar_door_483', '{"coords":{"x":-485.42999267578127,"y":-336.8599853515625,"z":69.68000030517578},"onduty":true,"state":0,"model":493136920,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"ems":0},"doorRate":6.0,"maxDistance":2.5}'),
-	(4770, 'pulsar_door_484', '{"coords":{"x":-475.2886047363281,"y":-334.83331298828127,"z":69.67925262451172},"onduty":true,"state":0,"model":493136920,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"ems":0},"doorRate":6.0,"maxDistance":2.5}'),
-	(4771, 'pulsar_door_485', '{"coords":{"x":-478.01220703125,"y":-337.8299865722656,"z":69.67925262451172},"onduty":true,"state":0,"model":493136920,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"ems":0},"doorRate":6.0,"maxDistance":2.5}'),
-	(4772, 'pulsar_door_486', '{"coords":{"x":-467.86468505859377,"y":-335.8116149902344,"z":69.67925262451172},"onduty":true,"state":0,"model":493136920,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"ems":0},"doorRate":6.0,"maxDistance":2.5}'),
-	(4773, 'pulsar_door_487', '{"coords":{"x":-470.5856018066406,"y":-338.80560302734377,"z":69.67925262451172},"onduty":true,"state":0,"model":493136920,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"ems":0},"doorRate":6.0,"maxDistance":2.5}'),
-	(4774, 'pulsar_door_488', '{"coords":{"x":-460.4161071777344,"y":-336.7872009277344,"z":69.67925262451172},"onduty":true,"state":0,"model":493136920,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"ems":0},"doorRate":6.0,"maxDistance":2.5}'),
-	(4775, 'pulsar_door_489', '{"coords":{"x":-463.1520080566406,"y":-339.7936096191406,"z":69.67925262451172},"onduty":true,"state":0,"model":493136920,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"ems":0},"doorRate":6.0,"maxDistance":2.5}'),
-	(4776, 'pulsar_door_490', '{"coords":{"x":-445.98419189453127,"y":-342.1603088378906,"z":69.67925262451172},"onduty":true,"state":0,"model":493136920,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"ems":0},"doorRate":6.0,"maxDistance":2.5}'),
-	(4777, 'pulsar_door_491', '{"coords":{"x":-440.2983093261719,"y":-338.74591064453127,"z":69.67925262451172},"onduty":true,"state":0,"model":493136920,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"ems":0},"doorRate":6.0,"maxDistance":2.5}'),
-	(4778, 'pulsar_mtz_helipad_1', '{"coords":{"x":-444.041259765625,"y":-333.143798828125,"z":77.3009033203125},"maxDistance":2.5,"state":1,"doors":[{"model":1624860328,"coords":{"x":-445.2872009277344,"y":-332.9809875488281,"z":77.3009033203125},"heading":0},{"model":1624860328,"coords":{"x":-442.7952880859375,"y":-333.3066101074219,"z":77.3009033203125},"heading":0}],"auto":true,"lockSound":"button-remote","groups":{"ems":0,"police":0},"doorRate":6.0,"_originalId":"mtz_helipad_1"}'),
-	(4779, 'pulsar_mtz_op_lab_1', '{"coords":{"x":-457.01580810546877,"y":-288.77874755859377,"z":-130.71380615234376},"onduty":true,"state":1,"doors":[{"model":665455406,"coords":{"x":-458.2203063964844,"y":-289.2583923339844,"z":-130.71380615234376},"heading":0},{"model":665455406,"coords":{"x":-455.8113098144531,"y":-288.2991027832031,"z":-130.71380615234376},"heading":0}],"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"ems":0},"_originalId":"mtz_op_lab_1","maxDistance":2.5}'),
-	(4780, 'pulsar_mtz_op_surgery_1', '{"coords":{"x":-447.3456115722656,"y":-305.5006103515625,"z":-130.71929931640626},"onduty":true,"state":1,"model":493136920,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"ems":0},"_originalId":"mtz_op_surgery_1","maxDistance":2.5}'),
-	(4781, 'pulsar_mtz_op_surgery_2', '{"coords":{"x":-451.4877014160156,"y":-309.0755920410156,"z":-130.72369384765626},"onduty":true,"state":1,"model":493136920,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"ems":0},"_originalId":"mtz_op_surgery_2","maxDistance":2.5}'),
-	(4782, 'pulsar_mtz_op_surgery_3', '{"coords":{"x":-453.052001953125,"y":-291.58758544921877,"z":-130.72459411621095},"onduty":true,"state":1,"model":493136920,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"ems":0},"_originalId":"mtz_op_surgery_3","maxDistance":2.5}'),
-	(4783, 'pulsar_mtz_op_diag', '{"coords":{"x":-449.17449951171877,"y":-301.03619384765627,"z":-130.71929931640626},"onduty":true,"state":1,"model":493136920,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"ems":0},"_originalId":"mtz_op_diag","maxDistance":2.5}'),
-	(4784, 'pulsar_mtz_op_closet', '{"coords":{"x":-454.972412109375,"y":-300.5544128417969,"z":-130.72369384765626},"onduty":true,"state":1,"model":493136920,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"ems":0},"_originalId":"mtz_op_closet","maxDistance":2.5}'),
-	(4785, 'pulsar_mt_zonah_garage_lobby_1', '{"coords":{"x":-496.2900085449219,"y":-340.1499938964844,"z":35.43000030517578},"onduty":true,"state":1,"model":734304936,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":1.0,"groups":{"ems":0},"_originalId":"mt_zonah_garage_lobby_1","maxDistance":2.5}'),
-	(4786, 'pulsar_mt_zonah_garage_lobby_2', '{"coords":{"x":-495.760009765625,"y":-336.1099853515625,"z":35.43000030517578},"onduty":true,"state":1,"model":734304936,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":1.0,"groups":{"ems":0},"_originalId":"mt_zonah_garage_lobby_2","maxDistance":2.5}'),
-	(4787, 'pulsar_mt_zonah_garage_lobby_3', '{"coords":{"x":-495.2200012207031,"y":-332.05999755859377,"z":35.43000030517578},"onduty":true,"state":1,"model":734304936,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":1.0,"groups":{"ems":0},"_originalId":"mt_zonah_garage_lobby_3","maxDistance":2.5}'),
-	(4788, 'pulsar_pillbox_elev1_1', '{"coords":{"x":340.44500732421877,"y":-584.8299560546875,"z":27.79000091552734},"maxDistance":2.5,"state":1,"doors":[{"model":-1048421071,"coords":{"x":340.1199951171875,"y":-585.719970703125,"z":27.79000091552734},"heading":0},{"model":1674289593,"coords":{"x":340.7699890136719,"y":-583.9400024414063,"z":27.79000091552734},"heading":0}],"auto":true,"lockSound":"button-remote","groups":{"ems":0,"police":0},"doorRate":6.0,"_originalId":"pillbox_elev1_1"}'),
-	(4789, 'pulsar_pillbox_elev2_1', '{"coords":{"x":341.79498291015627,"y":-581.1199951171875,"z":27.79999923706054},"maxDistance":2.5,"state":1,"doors":[{"model":-1048421071,"coords":{"x":341.4700012207031,"y":-582.010009765625,"z":27.79999923706054},"heading":0},{"model":1674289593,"coords":{"x":342.1199951171875,"y":-580.22998046875,"z":27.79999923706054},"heading":0}],"auto":true,"lockSound":"button-remote","groups":{"ems":0,"police":0},"doorRate":6.0,"_originalId":"pillbox_elev2_1"}'),
-	(4790, 'pulsar_pillbox_garagedoor_near', '{"coords":{"x":337.2799987792969,"y":-564.4199829101563,"z":29.81999969482422},"maxDistance":2.5,"state":1,"model":-820650556,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"ems":0,"police":0},"doorRate":1.0,"_originalId":"pillbox_garagedoor_near"}'),
-	(4791, 'pulsar_pillbox_garagedoor_far', '{"coords":{"x":330.1300048828125,"y":-561.8300170898438,"z":29.7800006866455},"maxDistance":2.5,"state":1,"model":-820650556,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"ems":0,"police":0},"doorRate":1.0,"_originalId":"pillbox_garagedoor_far"}'),
-	(4792, 'pulsar_pillbox_garage_outerdoor_1', '{"coords":{"x":319.84002685546877,"y":-560.4599609375,"z":28.95000076293945},"maxDistance":2.5,"state":1,"doors":[{"model":-1421582160,"coords":{"x":321.010009765625,"y":-559.9099731445313,"z":28.95000076293945},"heading":0},{"model":1248599813,"coords":{"x":318.6700134277344,"y":-561.010009765625,"z":28.95000076293945},"heading":0}],"auto":true,"lockSound":"button-remote","groups":{"ems":0,"police":0},"doorRate":6.0,"_originalId":"pillbox_garage_outerdoor_1"}'),
-	(4793, 'pulsar_pillbox_garage_innerdoor_1', '{"coords":{"x":338.8900146484375,"y":-588.8399658203125,"z":28.95000076293945},"maxDistance":2.5,"state":1,"doors":[{"model":-1700911976,"coords":{"x":339.3299865722656,"y":-587.6300048828125,"z":28.95000076293945},"heading":0},{"model":-434783486,"coords":{"x":338.45001220703127,"y":-590.0499877929688,"z":28.95000076293945},"heading":0}],"auto":true,"lockSound":"button-remote","groups":{"ems":0,"police":0},"doorRate":6.0,"_originalId":"pillbox_garage_innerdoor_1"}'),
-	(4794, 'pulsar_pillbox_lower_rec_left_1', '{"coords":{"x":346.2300109863281,"y":-591.510009765625,"z":28.95000076293945},"maxDistance":2.5,"state":0,"doors":[{"model":-1700911976,"coords":{"x":346.6700134277344,"y":-590.2999877929688,"z":28.95000076293945},"heading":0},{"model":-434783486,"coords":{"x":345.7900085449219,"y":-592.719970703125,"z":28.95000076293945},"heading":0}],"auto":true,"lockSound":"button-remote","groups":{"ems":0,"police":0},"doorRate":6.0,"_originalId":"pillbox_lower_rec_left_1"}'),
-	(4795, 'pulsar_pillbox_lower_rec_right_1', '{"coords":{"x":349.41998291015627,"y":-582.739990234375,"z":28.95000076293945},"maxDistance":2.5,"state":0,"doors":[{"model":-1700911976,"coords":{"x":349.8599853515625,"y":-581.530029296875,"z":28.95000076293945},"heading":0},{"model":-434783486,"coords":{"x":348.9800109863281,"y":-583.9500122070313,"z":28.95000076293945},"heading":0}],"auto":true,"lockSound":"button-remote","groups":{"ems":0,"police":0},"doorRate":6.0,"_originalId":"pillbox_lower_rec_right_1"}'),
-	(4796, 'pulsar_pillbox_lower_reception', '{"coords":{"x":348.54998779296877,"y":-585.1599731445313,"z":28.95000076293945},"maxDistance":2.5,"state":1,"doors":[{"model":854291622,"coords":{"x":348.54998779296877,"y":-585.1599731445313,"z":28.95000076293945},"heading":0},{"model":854291622,"coords":{"x":348.54998779296877,"y":-585.1599731445313,"z":28.95000076293945},"heading":0}],"auto":true,"lockSound":"button-remote","groups":{"ems":0,"police":0},"doorRate":6.0,"_originalId":"pillbox_lower_reception"}'),
-	(4797, 'pulsar_pillbox_upper_main_1', '{"coords":{"x":299.57501220703127,"y":-584.97998046875,"z":42.27999877929687},"maxDistance":2.5,"state":0,"doors":[{"model":661758796,"coords":{"x":300.0299987792969,"y":-583.72998046875,"z":42.27999877929687},"heading":0},{"model":-487908756,"coords":{"x":299.1199951171875,"y":-586.22998046875,"z":42.27999877929687},"heading":0}],"auto":true,"lockSound":"button-remote","groups":{"ems":0,"police":0},"doorRate":6.0,"_originalId":"pillbox_upper_main_1"}'),
-	(4798, 'pulsar_pillbox_upper_reception', '{"coords":{"x":313.4800109863281,"y":-595.4600219726563,"z":43.43000030517578},"maxDistance":2.5,"state":1,"model":854291622,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"ems":0,"police":0},"doorRate":6.0,"_originalId":"pillbox_upper_reception"}'),
-	(4799, 'pulsar_pillbox_upper_staff_lockers', '{"coords":{"x":309.1300048828125,"y":-597.75,"z":43.43000030517578},"maxDistance":2.5,"state":1,"model":854291622,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"ems":0},"doorRate":6.0,"_originalId":"pillbox_upper_staff_lockers"}'),
-	(4800, 'pulsar_pillbox_hallway_ward_a_1', '{"coords":{"x":304.010009765625,"y":-581.864990234375,"z":43.43000030517578},"maxDistance":2.5,"state":0,"doors":[{"model":-1700911976,"coords":{"x":305.2200012207031,"y":-582.3099975585938,"z":43.43000030517578},"heading":0},{"model":-434783486,"coords":{"x":302.79998779296877,"y":-581.4199829101563,"z":43.43000030517578},"heading":0}],"auto":true,"lockSound":"button-remote","groups":{"ems":0,"police":0},"doorRate":6.0,"_originalId":"pillbox_hallway_ward_a_1"}'),
-	(4801, 'pulsar_pillbox_hallway_ward_ab_1', '{"coords":{"x":326.1099853515625,"y":-579.25,"z":43.43000030517578},"maxDistance":2.5,"state":0,"doors":[{"model":-1700911976,"coords":{"x":325.6700134277344,"y":-580.4600219726563,"z":43.43000030517578},"heading":0},{"model":-434783486,"coords":{"x":326.54998779296877,"y":-578.0399780273438,"z":43.43000030517578},"heading":0}],"auto":true,"lockSound":"button-remote","groups":{"ems":0,"police":0},"doorRate":6.0,"_originalId":"pillbox_hallway_ward_ab_1"}'),
-	(4802, 'pulsar_pillbox_hallway_ward_b_1', '{"coords":{"x":325.44500732421877,"y":-589.6699829101563,"z":43.43000030517578},"maxDistance":2.5,"state":0,"doors":[{"model":-1700911976,"coords":{"x":326.6499938964844,"y":-590.1099853515625,"z":43.43000030517578},"heading":0},{"model":-434783486,"coords":{"x":324.239990234375,"y":-589.22998046875,"z":43.43000030517578},"heading":0}],"auto":true,"lockSound":"button-remote","groups":{"ems":0,"police":0},"doorRate":6.0,"_originalId":"pillbox_hallway_ward_b_1"}'),
-	(4803, 'pulsar_pillbox_hallway_ward_c_1', '{"coords":{"x":348.8699951171875,"y":-587.5350341796875,"z":43.43000030517578},"onduty":true,"state":0,"doors":[{"model":-1700911976,"coords":{"x":348.42999267578127,"y":-588.739990234375,"z":43.43000030517578},"heading":0},{"model":-434783486,"coords":{"x":349.30999755859377,"y":-586.3300170898438,"z":43.43000030517578},"heading":0}],"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"ems":0},"_originalId":"pillbox_hallway_ward_c_1","maxDistance":2.5}'),
-	(4804, 'pulsar_pillbox_intensive_care_1', '{"coords":{"x":317.2750244140625,"y":-578.7899780273438,"z":43.43000030517578},"onduty":true,"state":0,"doors":[{"model":-1700911976,"coords":{"x":318.4800109863281,"y":-579.22998046875,"z":43.43000030517578},"heading":0},{"model":-434783486,"coords":{"x":316.07000732421877,"y":-578.3499755859375,"z":43.43000030517578},"heading":0}],"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"ems":0},"_originalId":"pillbox_intensive_care_1","maxDistance":2.5}'),
-	(4805, 'pulsar_pillbox_surgery1_1', '{"coords":{"x":313.21502685546877,"y":-571.780029296875,"z":43.43000030517578},"onduty":true,"state":1,"doors":[{"model":-1700911976,"coords":{"x":314.4200134277344,"y":-572.219970703125,"z":43.43000030517578},"heading":0},{"model":-434783486,"coords":{"x":312.010009765625,"y":-571.3400268554688,"z":43.43000030517578},"heading":0}],"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"ems":0},"_originalId":"pillbox_surgery1_1","maxDistance":2.5}'),
-	(4806, 'pulsar_pillbox_surgery2_1', '{"coords":{"x":319.04998779296877,"y":-573.9099731445313,"z":43.43000030517578},"onduty":true,"state":1,"doors":[{"model":-1700911976,"coords":{"x":320.260009765625,"y":-574.3499755859375,"z":43.43000030517578},"heading":0},{"model":-434783486,"coords":{"x":317.8399963378906,"y":-573.469970703125,"z":43.43000030517578},"heading":0}],"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"ems":0},"_originalId":"pillbox_surgery2_1","maxDistance":2.5}'),
-	(4807, 'pulsar_pillbox_surgery3_1', '{"coords":{"x":324.45001220703127,"y":-575.8699951171875,"z":43.43000030517578},"onduty":true,"state":1,"doors":[{"model":-1700911976,"coords":{"x":325.6600036621094,"y":-576.3099975585938,"z":43.43000030517578},"heading":0},{"model":-434783486,"coords":{"x":323.239990234375,"y":-575.4299926757813,"z":43.43000030517578},"heading":0}],"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"ems":0},"_originalId":"pillbox_surgery3_1","maxDistance":2.5}'),
-	(4808, 'pulsar_door_539', '{"coords":{"x":307.1199951171875,"y":-569.5700073242188,"z":43.43000030517578},"onduty":true,"state":1,"model":854291622,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"ems":0},"doorRate":6.0,"maxDistance":2.5}'),
-	(4809, 'pulsar_door_540', '{"coords":{"x":336.1600036621094,"y":-580.1400146484375,"z":43.43000030517578},"onduty":true,"state":1,"model":854291622,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"ems":0},"doorRate":6.0,"maxDistance":2.5}'),
-	(4810, 'pulsar_door_541', '{"coords":{"x":340.7799987792969,"y":-581.8200073242188,"z":43.43000030517578},"onduty":true,"state":1,"model":854291622,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"ems":0},"doorRate":6.0,"maxDistance":2.5}'),
-	(4811, 'pulsar_door_542', '{"coords":{"x":346.7699890136719,"y":-584.0,"z":43.43000030517578},"onduty":true,"state":1,"model":854291622,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"ems":0},"doorRate":6.0,"maxDistance":2.5}'),
-	(4812, 'pulsar_door_543', '{"coords":{"x":336.8699951171875,"y":-592.5800170898438,"z":43.43000030517578},"onduty":true,"state":1,"model":854291622,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"ems":0},"doorRate":6.0,"maxDistance":2.5}'),
-	(4813, 'pulsar_door_544', '{"coords":{"x":360.5,"y":-589.0,"z":43.43000030517578},"onduty":true,"state":0,"model":854291622,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"ems":0},"doorRate":6.0,"maxDistance":2.5}'),
-	(4814, 'pulsar_door_545', '{"coords":{"x":358.7300109863281,"y":-593.8800048828125,"z":43.43000030517578},"onduty":true,"state":1,"model":854291622,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"ems":0},"doorRate":6.0,"maxDistance":2.5}'),
-	(4815, 'pulsar_door_546', '{"coords":{"x":352.20001220703127,"y":-594.1500244140625,"z":43.43000030517578},"onduty":true,"state":1,"model":854291622,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"ems":0},"doorRate":6.0,"maxDistance":2.5}'),
-	(4816, 'pulsar_door_547', '{"coords":{"x":346.8900146484375,"y":-593.5999755859375,"z":43.43000030517578},"onduty":true,"state":1,"model":854291622,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"ems":0},"doorRate":6.0,"maxDistance":2.5}'),
-	(4817, 'pulsar_door_548', '{"coords":{"x":350.8299865722656,"y":-597.9000244140625,"z":43.43000030517578},"onduty":true,"state":0,"model":854291622,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"ems":0},"doorRate":6.0,"maxDistance":2.5}'),
-	(4818, 'pulsar_door_549', '{"coords":{"x":357.489990234375,"y":-579.6099853515625,"z":43.43000030517578},"onduty":true,"state":0,"model":854291622,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"ems":0},"doorRate":6.0,"maxDistance":2.5}'),
-	(4819, 'pulsar_door_550', '{"coords":{"x":356.1300048828125,"y":-583.3599853515625,"z":43.43000030517578},"onduty":true,"state":0,"model":854291622,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"ems":0},"doorRate":6.0,"maxDistance":2.5}'),
-	(4820, 'pulsar_dpd_front_1', '{"coords":{"x":380.7799987792969,"y":-1593.445068359375,"z":30.20000076293945},"maxDistance":2.5,"state":1,"doors":[{"model":1670919150,"coords":{"x":379.7799987792969,"y":-1592.6099853515626,"z":30.20000076293945},"heading":0},{"model":618295057,"coords":{"x":381.7799987792969,"y":-1594.280029296875,"z":30.20000076293945},"heading":0}],"auto":true,"lockSound":"button-remote","groups":{"prison":2,"police":0,"government":10},"doorRate":6.0,"_originalId":"dpd_front_1"}'),
-	(4821, 'pulsar_dpd_rear_1', '{"coords":{"x":370.5150146484375,"y":-1615.034912109375,"z":30.20000076293945},"maxDistance":2.5,"state":1,"doors":[{"model":618295057,"coords":{"x":369.5199890136719,"y":-1614.199951171875,"z":30.20000076293945},"heading":0},{"model":1670919150,"coords":{"x":371.510009765625,"y":-1615.8699951171876,"z":30.20000076293945},"heading":0}],"auto":true,"lockSound":"button-remote","groups":{"prison":2,"police":0,"government":10},"doorRate":6.0,"_originalId":"dpd_rear_1"}'),
-	(4822, 'pulsar_dpd_command_1', '{"coords":{"x":362.3800048828125,"y":-1593.4150390625,"z":31.13999938964843},"maxDistance":2.5,"workplace":"corrections","state":1,"doors":[{"model":-425870000,"coords":{"x":361.6099853515625,"y":-1594.3299560546876,"z":31.13999938964843},"heading":0},{"model":-425870000,"coords":{"x":363.1499938964844,"y":-1592.5,"z":31.13999938964843},"heading":0}],"auto":true,"lockSound":"button-remote","groups":{"prison":2,"police":60},"doorRate":6.0,"_originalId":"dpd_command_1"}'),
-	(4823, 'pulsar_dpd_office_2', '{"coords":{"x":363.239990234375,"y":-1589.2099609375,"z":31.13999938964843},"maxDistance":2.5,"state":1,"model":-425870000,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"police":0},"doorRate":6.0,"_originalId":"dpd_office_2"}'),
-	(4824, 'pulsar_dpd_office_1', '{"coords":{"x":358.3800048828125,"y":-1595.0,"z":31.13999938964843},"maxDistance":2.5,"state":1,"model":-425870000,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"police":0},"doorRate":6.0,"_originalId":"dpd_office_1"}'),
-	(4825, 'pulsar_dpd_reception', '{"coords":{"x":382.82000732421877,"y":-1599.030029296875,"z":30.13999938964843},"maxDistance":2.5,"state":1,"model":-425870000,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"police":0},"doorRate":6.0,"_originalId":"dpd_reception"}'),
-	(4826, 'pulsar_dpd_stairs_1', '{"coords":{"x":384.42999267578127,"y":-1601.9599609375,"z":30.13999938964843},"maxDistance":2.5,"state":1,"model":-1335406364,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"police":0},"doorRate":6.0,"_originalId":"dpd_stairs_1"}'),
-	(4827, 'pulsar_dpd_stairs_2', '{"coords":{"x":374.6400146484375,"y":-1613.6300048828126,"z":30.13999938964843},"maxDistance":2.5,"state":1,"model":-1335406364,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"police":0},"doorRate":6.0,"_originalId":"dpd_stairs_2"}'),
-	(4828, 'pulsar_dpd_observation', '{"coords":{"x":375.5400085449219,"y":-1608.1500244140626,"z":25.54000091552734},"onduty":true,"state":1,"model":-1335406364,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"prison":2,"police":0,"government":10},"_originalId":"dpd_observation","maxDistance":2.5}'),
-	(4829, 'pulsar_dpd_interrogation', '{"coords":{"x":371.9599914550781,"y":-1605.1400146484376,"z":25.54999923706054},"onduty":true,"state":1,"model":-728950481,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"prison":2,"police":0,"government":10},"_originalId":"dpd_interrogation","maxDistance":2.5}'),
-	(4830, 'pulsar_dpd_mugshot', '{"coords":{"x":379.1700134277344,"y":-1603.8299560546876,"z":25.54000091552734},"onduty":true,"state":1,"model":-1335406364,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"prison":2,"police":0,"government":10},"_originalId":"dpd_mugshot","maxDistance":2.5}'),
-	(4831, 'pulsar_dpd_lockers', '{"coords":{"x":363.8900146484375,"y":-1595.469970703125,"z":25.54999923706054},"maxDistance":2.5,"state":1,"model":-1335406364,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"police":0},"doorRate":6.0,"_originalId":"dpd_lockers"}'),
-	(4832, 'pulsar_pbpd_armoury', '{"coords":{"x":367.1199951171875,"y":-1601.0799560546876,"z":25.54000091552734},"onduty":true,"state":1,"model":-1335406364,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"police":0},"_originalId":"pbpd_armoury","maxDistance":2.5}'),
-	(4833, 'pulsar_dpd_cdouble_1', '{"coords":{"x":369.635009765625,"y":-1599.510009765625,"z":25.54999923706054},"maxDistance":2.5,"state":1,"doors":[{"model":-1335406364,"coords":{"x":370.4100036621094,"y":-1598.5899658203126,"z":25.54999923706054},"heading":0},{"model":-1335406364,"coords":{"x":368.8599853515625,"y":-1600.4300537109376,"z":25.54999923706054},"heading":0}],"auto":true,"lockSound":"button-remote","groups":{"prison":2,"police":0,"government":10},"doorRate":6.0,"_originalId":"dpd_cdouble_1"}'),
-	(4834, 'pulsar_dpd_cell_1', '{"coords":{"x":369.07000732421877,"y":-1605.68994140625,"z":29.94000053405761},"onduty":true,"state":1,"model":-674638964,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"police":0},"_originalId":"dpd_cell_1","maxDistance":2.5}'),
-	(4835, 'pulsar_dpd_cell_2', '{"coords":{"x":368.2699890136719,"y":-1605.02001953125,"z":29.94000053405761},"onduty":true,"state":1,"model":-674638964,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"police":0},"_originalId":"dpd_cell_2","maxDistance":2.5}'),
-	(4836, 'pulsar_dpd_cell_3', '{"coords":{"x":375.8800048828125,"y":-1599.1099853515626,"z":25.34000015258789},"onduty":true,"state":1,"model":-674638964,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"police":0},"_originalId":"dpd_cell_3","maxDistance":2.5}'),
-	(4837, 'pulsar_dpd_cell_4', '{"coords":{"x":375.0799865722656,"y":-1598.4300537109376,"z":25.34000015258789},"onduty":true,"state":1,"model":-674638964,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"police":0},"_originalId":"dpd_cell_4","maxDistance":2.5}'),
-	(4838, 'pulsar_dpd_gate', '{"coords":{"x":397.8800048828125,"y":-1607.3800048828126,"z":28.34000015258789},"maxDistance":2.5,"state":1,"model":1286535678,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"prison":2,"police":0,"government":10},"doorRate":1.0,"_originalId":"dpd_gate"}'),
-	(4839, 'pulsar_dpd_gate2', '{"coords":{"x":413.3599853515625,"y":-1620.0400390625,"z":28.34000015258789},"maxDistance":2.5,"state":1,"model":-1483471451,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"police":0},"doorRate":1.0,"_originalId":"dpd_gate2"}'),
-	(4840, 'pulsar_dpd_gate3', '{"coords":{"x":418.2900085449219,"y":-1651.3900146484376,"z":28.29000091552734},"maxDistance":2.5,"state":1,"model":-1483471451,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"police":0},"doorRate":1.0,"_originalId":"dpd_gate3"}'),
-	(4841, 'pulsar_gpd_front_1', '{"coords":{"x":-1082.294921875,"y":-259.7200012207031,"z":38.18999862670898},"maxDistance":2.5,"state":1,"doors":[{"model":-1045015371,"coords":{"x":-1080.969970703125,"y":-259.0199890136719,"z":38.18999862670898},"heading":0},{"model":-1679881977,"coords":{"x":-1083.6199951171876,"y":-260.4200134277344,"z":38.18999862670898},"heading":0}],"auto":true,"lockSound":"button-remote","groups":{"prison":2,"police":0,"government":10},"doorRate":6.0,"_originalId":"gpd_front_1"}'),
-	(4842, 'pulsar_gpd_door', '{"coords":{"x":-1063.800048828125,"y":-240.8300018310547,"z":39.88000106811523},"maxDistance":2.5,"state":1,"model":-1821777087,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"prison":2,"police":0,"government":10},"doorRate":6.0,"_originalId":"gpd_door"}'),
-	(4843, 'pulsar_gpd_rear_1', '{"coords":{"x":-1045.804931640625,"y":-230.67999267578126,"z":39.43999862670898},"maxDistance":2.5,"state":1,"doors":[{"model":-1425071302,"coords":{"x":-1045.0999755859376,"y":-232.0,"z":39.43999862670898},"heading":0},{"model":-1425071302,"coords":{"x":-1046.510009765625,"y":-229.36000061035157,"z":39.43999862670898},"heading":0}],"auto":true,"lockSound":"button-remote","groups":{"prison":2,"police":0,"government":10},"doorRate":6.0,"_originalId":"gpd_rear_1"}'),
-	(4844, 'pulsar_gpd_observation_1', '{"coords":{"x":-1069.199951171875,"y":-241.6699981689453,"z":39.88000106811523},"onduty":true,"state":1,"model":-2051651622,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"prison":2,"police":0,"government":10},"_originalId":"gpd_observation_1","maxDistance":2.5}'),
-	(4845, 'pulsar_gpd_interrogation_1', '{"coords":{"x":-1061.5799560546876,"y":-238.75,"z":39.88000106811523},"onduty":true,"state":1,"model":-2051651622,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"prison":2,"police":0,"government":10},"_originalId":"gpd_interrogation_1","maxDistance":2.5}'),
-	(4846, 'pulsar_gpd_cells', '{"coords":{"x":-1051.0,"y":-236.5800018310547,"z":39.88000106811523},"onduty":true,"state":1,"model":-2051651622,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"prison":2,"police":0,"government":10},"_originalId":"gpd_cells","maxDistance":2.5}'),
-	(4847, 'pulsar_gpd_lockers', '{"coords":{"x":-1065.030029296875,"y":-246.8699951171875,"z":39.88000106811523},"maxDistance":2.5,"state":1,"model":-2051651622,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"police":0},"doorRate":6.0,"_originalId":"gpd_lockers"}'),
-	(4848, 'pulsar_gpd_director', '{"coords":{"x":-1047.3900146484376,"y":-238.64999389648438,"z":50.0099983215332},"maxDistance":2.5,"workplace":"doj","state":1,"model":-2051651622,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"government":10,"police":60},"doorRate":6.0,"_originalId":"gpd_director"}'),
-	(4849, 'pulsar_gpd_armoury', '{"coords":{"x":-1046.5799560546876,"y":-228.17999267578126,"z":32.45000076293945},"onduty":true,"state":1,"model":555050468,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"police":0},"_originalId":"gpd_armoury","maxDistance":2.5}'),
-	(4850, 'pulsar_gpd_evidence', '{"coords":{"x":-1053.510009765625,"y":-234.57000732421876,"z":39.88000106811523},"onduty":true,"state":1,"model":-2051651622,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"prison":2,"police":0,"government":10},"_originalId":"gpd_evidence","maxDistance":2.5}'),
-	(4851, 'pulsar_gpd_cyber1', '{"coords":{"x":-1063.8499755859376,"y":-240.64999389648438,"z":43.0},"onduty":true,"state":1,"model":319164964,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"prison":2,"police":0,"government":10},"_originalId":"gpd_cyber1","maxDistance":2.5}'),
-	(4852, 'pulsar_gpd_cyber2', '{"coords":{"x":-1057.77001953125,"y":-237.49000549316407,"z":43.0},"onduty":true,"state":1,"model":319164964,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"prison":2,"police":0,"government":10},"_originalId":"gpd_cyber2","maxDistance":2.5}'),
-	(4853, 'pulsar_gpd_server', '{"coords":{"x":-1055.949951171875,"y":-236.44000244140626,"z":44.16999816894531},"onduty":true,"state":1,"model":-2051651622,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"prison":2,"police":0,"government":10},"_originalId":"gpd_server","maxDistance":2.5}'),
-	(4854, 'pulsar_gpd_lab', '{"coords":{"x":-1066.1600341796876,"y":-246.05999755859376,"z":50.0},"onduty":true,"state":1,"model":-2051651622,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"prison":2,"police":0,"government":10},"_originalId":"gpd_lab","maxDistance":2.5}'),
-	(4855, 'pulsar_gpd_roof', '{"coords":{"x":-1073.43994140625,"y":-246.22999572753907,"z":54.43999862670898},"onduty":true,"state":1,"model":736454490,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"prison":2,"police":0,"government":10},"_originalId":"gpd_roof","maxDistance":2.5}'),
-	(4856, 'pulsar_gpd_cells_outer', '{"coords":{"x":-1046.239990234375,"y":-235.3699951171875,"z":38.09999847412109},"onduty":true,"state":1,"model":1608297082,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"police":0},"_originalId":"gpd_cells_outer","maxDistance":2.5}'),
-	(4857, 'pulsar_gpd_cell_1', '{"coords":{"x":-1059.6700439453126,"y":-246.02999877929688,"z":38.09999847412109},"onduty":true,"state":1,"model":1608297082,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"police":0},"_originalId":"gpd_cell_1","maxDistance":2.5}'),
-	(4858, 'pulsar_gpd_cell_2', '{"coords":{"x":-1056.1600341796876,"y":-244.1999969482422,"z":38.09999847412109},"onduty":true,"state":1,"model":1608297082,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"police":0},"_originalId":"gpd_cell_2","maxDistance":2.5}'),
-	(4859, 'pulsar_gpd_cell_3', '{"coords":{"x":-1052.6800537109376,"y":-242.38999938964845,"z":38.09999847412109},"onduty":true,"state":1,"model":1608297082,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"police":0},"_originalId":"gpd_cell_3","maxDistance":2.5}'),
-	(4860, 'pulsar_gpd_cell_in', '{"coords":{"x":-1049.3900146484376,"y":-243.47000122070313,"z":38.09999847412109},"onduty":true,"state":1,"model":1608297082,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"police":0},"_originalId":"gpd_cell_in","maxDistance":2.5}'),
-	(4861, 'pulsar_gpd_training', '{"coords":{"x":-1056.9000244140626,"y":-241.24000549316407,"z":50.0099983215332},"onduty":true,"state":1,"model":-2051651622,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"police":0},"_originalId":"gpd_training","maxDistance":2.5}'),
-	(4862, 'pulsar_gpd_garage_in', '{"coords":{"x":-1041.0400390625,"y":-239.0,"z":32.43000030517578},"onduty":true,"state":1,"model":555050468,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"police":0},"_originalId":"gpd_garage_in","maxDistance":2.5}'),
-	(4863, 'pulsar_gpd_garage', '{"coords":{"x":-1093.97998046875,"y":-253.8000030517578,"z":38.16999816894531},"maxDistance":7.0,"state":1,"model":2078629652,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"prison":2,"police":0,"government":10},"doorRate":1.0,"_originalId":"gpd_garage"}'),
-	(4864, 'pulsar_la_mesa_reception_1', '{"coords":{"x":827.9520874023438,"y":-1290.08642578125,"z":28.37117004394531},"maxDistance":2.5,"workplace":"doj","state":0,"doors":[{"model":277920071,"coords":{"x":827.9520874023438,"y":-1288.7860107421876,"z":28.37117004394531},"heading":0},{"model":-34368499,"coords":{"x":827.9520874023438,"y":-1291.386962890625,"z":28.37117004394531},"heading":0}],"auto":true,"lockSound":"button-remote","groups":{"government":10,"police":0},"doorRate":6.0,"_originalId":"la_mesa_reception_1"}'),
-	(4865, 'pulsar_la_mesa_observe', '{"coords":{"x":840.08837890625,"y":-1280.9990234375,"z":28.37117004394531},"onduty":true,"workplace":"doj","state":1,"model":-1011300766,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"government":10,"police":0},"_originalId":"la_mesa_observe","maxDistance":2.5}'),
-	(4866, 'pulsar_la_mesa_interrogation', '{"coords":{"x":840.0861206054688,"y":-1281.823974609375,"z":28.37117004394531},"onduty":true,"workplace":"doj","state":1,"model":-1189294593,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"government":10,"police":0},"_originalId":"la_mesa_interrogation","maxDistance":2.5}'),
-	(4867, 'pulsar_la_mesa_meeting_left_1', '{"coords":{"x":851.2327880859375,"y":-1287.345947265625,"z":28.37117004394531},"maxDistance":2.5,"workplace":"doj","state":1,"doors":[{"model":-1983352576,"coords":{"x":849.9324951171875,"y":-1287.345947265625,"z":28.37117004394531},"heading":0},{"model":2076628221,"coords":{"x":852.5330810546875,"y":-1287.345947265625,"z":28.37117004394531},"heading":0}],"auto":true,"lockSound":"button-remote","groups":{"government":10,"police":0},"doorRate":6.0,"_originalId":"la_mesa_meeting_left_1"}'),
-	(4868, 'pulsar_la_mesa_meeting_right_1', '{"coords":{"x":857.8078002929688,"y":-1287.345947265625,"z":28.37117004394531},"maxDistance":2.5,"workplace":"doj","state":1,"doors":[{"model":-1983352576,"coords":{"x":856.5073852539063,"y":-1287.345947265625,"z":28.37117004394531},"heading":0},{"model":2076628221,"coords":{"x":859.1082153320313,"y":-1287.345947265625,"z":28.37117004394531},"heading":0}],"auto":true,"lockSound":"button-remote","groups":{"government":10,"police":0},"doorRate":6.0,"_originalId":"la_mesa_meeting_right_1"}'),
-	(4869, 'pulsar_la_mesa_archive', '{"coords":{"x":858.864990234375,"y":-1291.385009765625,"z":28.37111091613769},"maxDistance":2.5,"workplace":"doj","state":1,"model":539497004,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"government":10,"police":0},"doorRate":6.0,"_originalId":"la_mesa_archive"}'),
-	(4870, 'pulsar_la_mesa_cpt', '{"coords":{"x":851.94970703125,"y":-1298.3890380859376,"z":28.37117004394531},"maxDistance":2.5,"workplace":"doj","state":1,"model":1861900850,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"government":10,"police":60},"doorRate":6.0,"_originalId":"la_mesa_cpt"}'),
-	(4871, 'pulsar_la_mesa_cell', '{"coords":{"x":834.2813720703125,"y":-1295.9859619140626,"z":28.37117004394531},"onduty":true,"state":1,"model":1162089799,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"police":0},"_originalId":"la_mesa_cell","maxDistance":2.5}'),
-	(4872, 'pulsar_la_mesa_lobby', '{"coords":{"x":835.9445190429688,"y":-1292.1929931640626,"z":27.78268051147461},"maxDistance":2.5,"workplace":"doj","state":1,"model":-147896569,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"government":10,"police":0},"doorRate":6.0,"_originalId":"la_mesa_lobby"}'),
-	(4873, 'pulsar_la_mesa_breakroom', '{"coords":{"x":837.2611083984375,"y":-1309.5140380859376,"z":28.37111091613769},"maxDistance":2.5,"workplace":"doj","state":1,"model":1491736897,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"government":10,"police":0},"doorRate":6.0,"_originalId":"la_mesa_breakroom"}'),
-	(4874, 'pulsar_la_mesa_evidence', '{"coords":{"x":846.36962890625,"y":-1310.0400390625,"z":28.37111091613769},"maxDistance":2.5,"workplace":"doj","state":1,"model":272264766,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"government":10,"police":0},"doorRate":6.0,"_originalId":"la_mesa_evidence"}'),
-	(4875, 'pulsar_la_mesa_locker1', '{"coords":{"x":854.7811279296875,"y":-1310.0400390625,"z":28.37111091613769},"maxDistance":2.5,"workplace":"doj","state":1,"model":-1213101062,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"government":10,"police":0},"doorRate":6.0,"_originalId":"la_mesa_locker1"}'),
-	(4876, 'pulsar_la_mesa_locker2', '{"coords":{"x":855.7421875,"y":-1314.6080322265626,"z":28.37111091613769},"maxDistance":2.5,"workplace":"doj","state":1,"model":-1213101062,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"government":10,"police":0},"doorRate":6.0,"_originalId":"la_mesa_locker2"}'),
-	(4877, 'pulsar_la_mesa_hallway_1', '{"coords":{"x":857.8078002929688,"y":-1310.0379638671876,"z":28.37117004394531},"maxDistance":2.5,"workplace":"doj","state":1,"doors":[{"model":-375301406,"coords":{"x":856.5073852539063,"y":-1310.0379638671876,"z":28.37117004394531},"heading":0},{"model":-375301406,"coords":{"x":859.1082153320313,"y":-1310.0379638671876,"z":28.37117004394531},"heading":0}],"auto":true,"lockSound":"button-remote","groups":{"government":10,"police":0},"doorRate":6.0,"_originalId":"la_mesa_hallway_1"}'),
-	(4878, 'pulsar_la_mesa_bd_1', '{"coords":{"x":859.0076293945313,"y":-1320.125,"z":28.37111091613769},"maxDistance":2.5,"workplace":"doj","state":1,"model":-1339729155,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"government":10,"police":0},"doorRate":6.0,"_originalId":"la_mesa_bd_1"}'),
-	(4879, 'pulsar_la_mesa_parking_gate', '{"coords":{"x":816.9862060546875,"y":-1325.258056640625,"z":25.09328079223632},"maxDistance":2.5,"workplace":"doj","state":1,"model":-1372582968,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"government":10,"police":0},"doorRate":1.0,"_originalId":"la_mesa_parking_gate"}'),
-	(4880, 'pulsar_mrpd_reception_1', '{"coords":{"x":434.744384765625,"y":-981.9168701171875,"z":30.81529998779297},"maxDistance":2.5,"state":0,"doors":[{"model":-1547307588,"coords":{"x":434.744384765625,"y":-980.755615234375,"z":30.81529998779297},"heading":0},{"model":-1547307588,"coords":{"x":434.744384765625,"y":-983.078125,"z":30.81529998779297},"heading":0}],"auto":true,"lockSound":"button-remote","groups":{"prison":2,"police":0,"government":10},"doorRate":6.0,"_originalId":"mrpd_reception_1"}'),
-	(4881, 'pulsar_mrpd_reception_3', '{"coords":{"x":440.5201110839844,"y":-977.60107421875,"z":30.82319068908691},"onduty":true,"state":1,"model":-1406685646,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"prison":2,"police":0,"government":10},"_originalId":"mrpd_reception_3","maxDistance":2.5}'),
-	(4882, 'pulsar_mrpd_reception_4', '{"coords":{"x":440.5201110839844,"y":-986.2335205078125,"z":30.82319068908691},"onduty":true,"state":1,"model":-96679321,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"prison":2,"police":0,"government":10},"_originalId":"mrpd_reception_4","maxDistance":2.5}'),
-	(4883, 'pulsar_door_626', '{"coords":{"x":458.0893859863281,"y":-995.5247192382813,"z":30.82319068908691},"onduty":true,"state":1,"model":149284793,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"prison":2,"police":0,"government":10},"doorRate":6.0,"maxDistance":2.5}'),
-	(4884, 'pulsar_mrpd_side_1', '{"coords":{"x":457.0474548339844,"y":-972.2542724609375,"z":30.81530952453613},"maxDistance":2.5,"state":1,"doors":[{"model":-1547307588,"coords":{"x":455.8861999511719,"y":-972.2542724609375,"z":30.81530952453613},"heading":0},{"model":-1547307588,"coords":{"x":458.2087097167969,"y":-972.2542724609375,"z":30.81530952453613},"heading":0}],"auto":true,"lockSound":"button-remote","groups":{"prison":2,"police":0,"government":10},"doorRate":6.0,"_originalId":"mrpd_side_1"}'),
-	(4885, 'pulsar_mrpd_cside_1', '{"coords":{"x":441.9005126953125,"y":-998.7462158203125,"z":30.81529998779297},"maxDistance":2.5,"state":1,"doors":[{"model":-1547307588,"coords":{"x":440.73919677734377,"y":-998.7462158203125,"z":30.81529998779297},"heading":0},{"model":-1547307588,"coords":{"x":443.0617980957031,"y":-998.7462158203125,"z":30.81529998779297},"heading":0}],"auto":true,"lockSound":"button-remote","groups":{"prison":2,"police":0,"government":10},"doorRate":6.0,"_originalId":"mrpd_cside_1"}'),
-	(4886, 'pulsar_door_631', '{"coords":{"x":452.26629638671877,"y":-995.525390625,"z":30.82319068908691},"onduty":true,"state":1,"model":-96679321,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"prison":2,"police":0,"government":10},"doorRate":6.0,"maxDistance":2.5}'),
-	(4887, 'pulsar_door_632', '{"coords":{"x":458.654296875,"y":-990.6497802734375,"z":30.82319068908691},"onduty":true,"state":1,"model":-96679321,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"prison":2,"police":60,"government":10},"doorRate":6.0,"maxDistance":2.5}'),
-	(4888, 'pulsar_door_633', '{"coords":{"x":458.6499938964844,"y":-976.8900146484375,"z":30.81999969482422},"onduty":true,"state":1,"model":-96679321,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"prison":2,"police":0,"government":10},"doorRate":6.0,"maxDistance":2.5}'),
-	(4889, 'pulsar_door_634', '{"coords":{"x":479.7507019042969,"y":-999.6290283203125,"z":30.78916931152343},"onduty":true,"state":1,"model":-692649124,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"prison":2,"police":0,"government":10},"doorRate":6.0,"maxDistance":2.5}'),
-	(4890, 'pulsar_door_635', '{"coords":{"x":487.43780517578127,"y":-1000.1890258789063,"z":30.7869701385498},"onduty":true,"state":1,"model":-692649124,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"prison":2,"police":0,"government":10},"doorRate":6.0,"maxDistance":2.5}'),
-	(4891, 'pulsar_mrpd_tac_1', '{"coords":{"x":474.1806945800781,"y":-989.82470703125,"z":30.82319068908691},"onduty":true,"state":1,"doors":[{"model":-1406685646,"coords":{"x":475.3836975097656,"y":-989.82470703125,"z":30.82319068908691},"heading":0},{"model":-96679321,"coords":{"x":472.9776916503906,"y":-989.82470703125,"z":30.82319068908691},"heading":0}],"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"prison":2,"police":0,"government":10},"_originalId":"mrpd_tac_1","maxDistance":2.5}'),
-	(4892, 'pulsar_door_638', '{"coords":{"x":476.75,"y":-999.6300048828125,"z":30.81999969482422},"onduty":true,"state":1,"model":-1406685646,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"prison":2,"police":0,"government":10},"doorRate":6.0,"maxDistance":2.5}'),
-	(4893, 'pulsar_mrpd_range_1', '{"coords":{"x":486.81585693359377,"y":-1002.9019775390625,"z":30.7869701385498},"onduty":true,"state":1,"doors":[{"model":-692649124,"coords":{"x":488.0184020996094,"y":-1002.9019775390625,"z":30.7869701385498},"heading":0},{"model":-692649124,"coords":{"x":485.6133117675781,"y":-1002.9019775390625,"z":30.7869701385498},"heading":0}],"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"prison":2,"police":0,"government":10},"_originalId":"mrpd_range_1","maxDistance":2.5}'),
-	(4894, 'pulsar_mrpd_lab_1', '{"coords":{"x":479.7533874511719,"y":-987.417724609375,"z":30.82319068908691},"onduty":true,"state":1,"doors":[{"model":-1406685646,"coords":{"x":479.7533874511719,"y":-986.215087890625,"z":30.82319068908691},"heading":0},{"model":-96679321,"coords":{"x":479.7533874511719,"y":-988.6204223632813,"z":30.82319068908691},"heading":0}],"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"prison":2,"police":0,"government":10},"_originalId":"mrpd_lab_1","maxDistance":2.5}'),
-	(4895, 'pulsar_door_643', '{"coords":{"x":449.6759948730469,"y":-981.5289916992188,"z":34.97200012207031},"onduty":true,"state":1,"model":-96679321,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"prison":2,"police":0,"government":10},"doorRate":6.0,"maxDistance":2.5}'),
-	(4896, 'pulsar_door_644', '{"coords":{"x":449.6390075683594,"y":-989.85400390625,"z":35.06900024414062},"onduty":true,"state":1,"model":-1406685646,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"prison":2,"police":0,"government":10},"doorRate":6.0,"maxDistance":2.5}'),
-	(4897, 'pulsar_door_645', '{"coords":{"x":459.1600036621094,"y":-981.0189819335938,"z":35.07099914550781},"onduty":true,"state":1,"model":-1406685646,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"prison":2,"police":0,"government":10},"doorRate":6.0,"maxDistance":2.5}'),
-	(4898, 'pulsar_door_646', '{"coords":{"x":459.20599365234377,"y":-991.22900390625,"z":34.97200012207031},"onduty":true,"state":1,"model":-96679321,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"prison":2,"police":0,"government":10},"doorRate":6.0,"maxDistance":2.5}'),
-	(4899, 'pulsar_door_647', '{"coords":{"x":449.5719909667969,"y":-996.1480102539063,"z":35.07099914550781},"onduty":true,"state":1,"model":-96679321,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"prison":2,"police":0,"government":10},"doorRate":6.0,"maxDistance":2.5}'),
-	(4900, 'pulsar_door_648', '{"coords":{"x":464.89599609375,"y":-983.8330078125,"z":43.67300033569336},"maxDistance":2.5,"state":1,"model":-692649124,"auto":true,"heading":0,"groups":{"prison":2,"police":0,"government":10},"lockSound":"button-remote","doorRate":6.0}'),
-	(4901, 'pulsar_door_649', '{"coords":{"x":464.1565856933594,"y":-997.50927734375,"z":26.37070083618164},"onduty":true,"state":1,"model":1830360419,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"prison":2,"police":0,"government":10},"doorRate":6.0,"maxDistance":2.5}'),
-	(4902, 'pulsar_door_650', '{"coords":{"x":464.1590881347656,"y":-974.6655883789063,"z":26.37070083618164},"onduty":true,"state":1,"model":1830360419,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"prison":2,"police":0,"government":10},"doorRate":6.0,"maxDistance":2.5}'),
-	(4903, 'pulsar_mrpd_down_double_1', '{"coords":{"x":471.37530517578127,"y":-986.234619140625,"z":26.40547943115234},"onduty":true,"state":1,"doors":[{"model":-1406685646,"coords":{"x":471.37530517578127,"y":-985.0319213867188,"z":26.40547943115234},"heading":0},{"model":-96679321,"coords":{"x":471.37530517578127,"y":-987.4373779296875,"z":26.40547943115234},"heading":0}],"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"prison":2,"police":0,"government":10},"_originalId":"mrpd_down_double_1","maxDistance":2.5}'),
-	(4904, 'pulsar_mrpd_down_double_3', '{"coords":{"x":468.72479248046877,"y":-1000.5440063476563,"z":26.40547943115234},"onduty":true,"state":1,"doors":[{"model":-288803980,"coords":{"x":469.9273986816406,"y":-1000.5440063476563,"z":26.40547943115234},"heading":0},{"model":-288803980,"coords":{"x":467.5221862792969,"y":-1000.5440063476563,"z":26.40547943115234},"heading":0}],"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"prison":2,"police":0,"government":10},"_originalId":"mrpd_down_double_3","maxDistance":2.5}'),
-	(4905, 'pulsar_door_655', '{"coords":{"x":475.6730041503906,"y":-989.6640014648438,"z":26.27300071716308},"onduty":true,"state":1,"model":-692649124,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"prison":2,"police":0,"government":10},"doorRate":6.0,"maxDistance":2.5}'),
-	(4906, 'pulsar_door_656', '{"coords":{"x":475.61138916015627,"y":-992.0482177734375,"z":26.51181030273437},"onduty":true,"state":1,"model":-1258679973,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"prison":2,"police":0,"government":10},"doorRate":6.0,"maxDistance":2.5}'),
-	(4907, 'pulsar_mrpd_rear_exit_1', '{"coords":{"x":468.5714416503906,"y":-1014.406005859375,"z":26.48381996154785},"onduty":true,"state":1,"doors":[{"model":-692649124,"coords":{"x":469.7742919921875,"y":-1014.406005859375,"z":26.48381996154785},"heading":0},{"model":-692649124,"coords":{"x":467.36859130859377,"y":-1014.406005859375,"z":26.48381996154785},"heading":0}],"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"prison":2,"police":0,"government":10},"_originalId":"mrpd_rear_exit_1","maxDistance":2.5}'),
-	(4908, 'pulsar_mrpd_down_double_5', '{"coords":{"x":479.5719909667969,"y":-986.1384887695313,"z":26.27300071716308},"onduty":true,"state":1,"doors":[{"model":149284793,"coords":{"x":479.57598876953127,"y":-985.5819702148438,"z":26.27300071716308},"heading":0},{"model":149284793,"coords":{"x":479.5679931640625,"y":-986.6950073242188,"z":26.27300071716308},"heading":0}],"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"prison":2,"police":0,"government":10},"_originalId":"mrpd_down_double_5","maxDistance":2.5}'),
-	(4909, 'pulsar_door_661', '{"coords":{"x":482.1600036621094,"y":-988.3070068359375,"z":26.27300071716308},"onduty":true,"state":1,"model":-1406685646,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"prison":2,"police":0,"government":10},"doorRate":6.0,"maxDistance":2.5}'),
-	(4910, 'pulsar_door_662', '{"coords":{"x":482.72100830078127,"y":-984.614013671875,"z":26.3740005493164},"onduty":true,"state":1,"model":-1406685646,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"prison":2,"police":0,"government":10},"doorRate":6.0,"maxDistance":2.5}'),
-	(4911, 'pulsar_door_663', '{"coords":{"x":482.32501220703127,"y":-992.9520263671875,"z":26.27499961853027},"onduty":true,"state":1,"model":-1406685646,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"prison":2,"police":0,"government":10},"doorRate":6.0,"maxDistance":2.5}'),
-	(4912, 'pulsar_door_664', '{"coords":{"x":482.1400146484375,"y":-995.9660034179688,"z":26.27300071716308},"onduty":true,"state":1,"model":-1406685646,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"prison":2,"police":0,"government":10},"doorRate":6.0,"maxDistance":2.5}'),
-	(4913, 'pulsar_door_665', '{"coords":{"x":475.29400634765627,"y":-1007.4329833984375,"z":26.27400016784668},"onduty":true,"state":1,"model":-288803980,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"prison":2,"police":0,"government":10},"doorRate":6.0,"maxDistance":2.5}'),
-	(4914, 'pulsar_mrpd_cell_mugshot', '{"coords":{"x":475.0069885253906,"y":-1010.8189697265625,"z":26.31299972534179},"onduty":true,"state":1,"model":-1406685646,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"prison":2,"police":0,"government":10},"_originalId":"mrpd_cell_mugshot","maxDistance":2.5}'),
-	(4915, 'pulsar_mrpd_cell_1', '{"coords":{"x":477.14300537109377,"y":-1011.9089965820313,"z":26.27300071716308},"onduty":true,"state":1,"model":-53345114,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"prison":2,"police":0,"government":10},"_originalId":"mrpd_cell_1","maxDistance":2.5}'),
-	(4916, 'pulsar_mrpd_cell_2', '{"coords":{"x":480.0509948730469,"y":-1011.9949951171875,"z":26.27300071716308},"onduty":true,"state":1,"model":-53345114,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"prison":2,"police":0,"government":10},"_originalId":"mrpd_cell_2","maxDistance":2.5}'),
-	(4917, 'pulsar_mrpd_cell_3', '{"coords":{"x":483.5660095214844,"y":-1011.75,"z":26.27300071716308},"onduty":true,"state":1,"model":-53345114,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"prison":2,"police":0,"government":10},"_originalId":"mrpd_cell_3","maxDistance":2.5}'),
-	(4918, 'pulsar_mrpd_cell_4', '{"coords":{"x":486.58099365234377,"y":-1011.7630004882813,"z":26.27300071716308},"onduty":true,"state":1,"model":-53345114,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"prison":2,"police":0,"government":10},"_originalId":"mrpd_cell_4","maxDistance":2.5}'),
-	(4919, 'pulsar_mrpd_cell_5', '{"coords":{"x":484.9309997558594,"y":-1007.864013671875,"z":26.32200050354004},"onduty":true,"state":1,"model":-53345114,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"prison":2,"police":0,"government":10},"_originalId":"mrpd_cell_5","maxDistance":2.5}'),
-	(4920, 'pulsar_mrpd_cell_outer_1', '{"coords":{"x":477.302001953125,"y":-1008.2570190429688,"z":26.27300071716308},"onduty":true,"state":1,"model":-53345114,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"prison":2,"police":0,"government":10},"_originalId":"mrpd_cell_outer_1","maxDistance":2.5}'),
-	(4921, 'pulsar_mrpd_cell_outer_2', '{"coords":{"x":481.6969909667969,"y":-1003.5180053710938,"z":26.27400016784668},"onduty":true,"state":1,"model":-53345114,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"prison":2,"police":0,"government":10},"_originalId":"mrpd_cell_outer_2","maxDistance":2.5}'),
-	(4922, 'pulsar_door_674', '{"coords":{"x":479.5710144042969,"y":-1002.39599609375,"z":26.27300071716308},"onduty":true,"state":1,"model":-288803980,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"prison":2,"police":0,"government":10},"doorRate":6.0,"maxDistance":2.5}'),
-	(4923, 'pulsar_mrpd_garage_enter', '{"coords":{"x":452.29998779296877,"y":-1000.780029296875,"z":26.73999977111816},"onduty":true,"state":1,"model":2130672747,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":1.0,"groups":{"prison":2,"police":0,"government":10},"_originalId":"mrpd_garage_enter","maxDistance":2.5}'),
-	(4924, 'pulsar_mrpd_garage_exit', '{"coords":{"x":431.4100036621094,"y":-1000.77001953125,"z":26.70000076293945},"onduty":true,"state":1,"model":2130672747,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":1.0,"groups":{"prison":2,"police":0,"government":10},"_originalId":"mrpd_garage_exit","maxDistance":2.5}'),
-	(4925, 'pulsar_mrpd_bollards_exit', '{"coords":{"x":410.0257873535156,"y":-1024.2259521484376,"z":29.2202205657959},"maxDistance":7.0,"state":1,"model":-1868050792,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"prison":2,"police":0,"government":10},"doorRate":1.0,"_originalId":"mrpd_bollards_exit"}'),
-	(4926, 'pulsar_mrpd_bollards_enter', '{"coords":{"x":410.0257873535156,"y":-1024.2259521484376,"z":29.2202205657959},"maxDistance":7.0,"state":1,"model":-1635161509,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"prison":2,"police":0,"government":10},"doorRate":1.0,"_originalId":"mrpd_bollards_enter"}'),
-	(4927, 'pulsar_mrpd_reargate', '{"coords":{"x":488.8948059082031,"y":-1017.2100219726563,"z":27.14583969116211},"onduty":true,"state":1,"model":-1603817716,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":1.0,"groups":{"prison":2,"police":0,"government":10},"_originalId":"mrpd_reargate","maxDistance":2.5}'),
-	(4928, 'pulsar_pbpd_front_1', '{"coords":{"x":-437.8800048828125,"y":6013.6552734375,"z":32.29000091552734},"maxDistance":2.5,"state":0,"doors":[{"model":733214349,"coords":{"x":-437.1700134277344,"y":6012.9501953125,"z":32.29000091552734},"heading":0},{"model":965382714,"coords":{"x":-438.5899963378906,"y":6014.35986328125,"z":32.29000091552734},"heading":0}],"auto":true,"lockSound":"button-remote","groups":{"prison":2,"police":0,"government":10},"doorRate":6.0,"_originalId":"pbpd_front_1"}'),
-	(4929, 'pulsar_pbpd_lobby_1', '{"coords":{"x":-447.364990234375,"y":6004.16015625,"z":32.29000091552734},"maxDistance":2.5,"state":1,"doors":[{"model":1857649811,"coords":{"x":-448.07000732421877,"y":6004.8701171875,"z":32.29000091552734},"heading":0},{"model":1362051455,"coords":{"x":-446.6600036621094,"y":6003.4501953125,"z":32.29000091552734},"heading":0}],"auto":true,"lockSound":"button-remote","groups":{"prison":2,"police":0,"government":10},"doorRate":6.0,"_originalId":"pbpd_lobby_1"}'),
-	(4930, 'pulsar_pbpd_rear_1', '{"coords":{"x":-454.19500732421877,"y":5997.3447265625,"z":32.29000091552734},"maxDistance":2.5,"state":1,"doors":[{"model":965382714,"coords":{"x":-453.489990234375,"y":5996.64013671875,"z":32.29000091552734},"heading":0},{"model":733214349,"coords":{"x":-454.8999938964844,"y":5998.0498046875,"z":32.29000091552734},"heading":0}],"auto":true,"lockSound":"button-remote","groups":{"prison":2,"police":0,"government":10},"doorRate":6.0,"_originalId":"pbpd_rear_1"}'),
-	(4931, 'pulsar_pbpd_reception', '{"coords":{"x":-443.9599914550781,"y":6017.16015625,"z":32.29000091552734},"maxDistance":2.5,"state":1,"model":1362051455,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"prison":2,"police":0,"government":10},"doorRate":6.0,"_originalId":"pbpd_reception"}'),
-	(4932, 'pulsar_pbpd_observation_1', '{"coords":{"x":-443.05999755859377,"y":5999.8701171875,"z":27.57999992370605},"onduty":true,"state":1,"model":1362051455,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"prison":2,"police":0,"government":10},"_originalId":"pbpd_observation_1","maxDistance":2.5}'),
-	(4933, 'pulsar_pbpd_interrogation_1', '{"coords":{"x":-441.94000244140627,"y":5998.75,"z":27.57999992370605},"onduty":true,"state":1,"model":1362051455,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"prison":2,"police":0,"government":10},"_originalId":"pbpd_interrogation_1","maxDistance":2.5}'),
-	(4934, 'pulsar_pbpd_observation_2', '{"coords":{"x":-445.3500061035156,"y":5995.33984375,"z":27.57999992370605},"onduty":true,"state":1,"model":1362051455,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"prison":2,"police":0,"government":10},"_originalId":"pbpd_observation_2","maxDistance":2.5}'),
-	(4935, 'pulsar_pbpd_interrogation_2', '{"coords":{"x":-446.4800109863281,"y":5996.47021484375,"z":27.57999992370605},"onduty":true,"state":1,"model":1362051455,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"prison":2,"police":0,"government":10},"_originalId":"pbpd_interrogation_2","maxDistance":2.5}'),
-	(4936, 'pulsar_pbpd_observation_c_1', '{"coords":{"x":-447.28997802734377,"y":6000.68994140625,"z":27.57999992370605},"onduty":true,"state":1,"doors":[{"model":1857649811,"coords":{"x":-448.0,"y":5999.97998046875,"z":27.57999992370605},"heading":0},{"model":1362051455,"coords":{"x":-446.5799865722656,"y":6001.39990234375,"z":27.57999992370605},"heading":0}],"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"prison":2,"police":0,"government":10},"_originalId":"pbpd_observation_c_1","maxDistance":2.5}'),
-	(4937, 'pulsar_pbpd_mugshot', '{"coords":{"x":-449.510009765625,"y":5999.47021484375,"z":27.57999992370605},"onduty":true,"state":1,"model":1362051455,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"prison":2,"police":0,"government":10},"_originalId":"pbpd_mugshot","maxDistance":2.5}'),
-	(4938, 'pulsar_pbpd_lockers', '{"coords":{"x":-441.6700134277344,"y":6009.14013671875,"z":37.0},"maxDistance":2.5,"state":1,"model":1362051455,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"police":0},"doorRate":6.0,"_originalId":"pbpd_lockers"}'),
-	(4939, 'pulsar_pbpd_office_command', '{"coords":{"x":-437.1300048828125,"y":6004.66015625,"z":37.0},"maxDistance":2.5,"state":1,"model":1362051455,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"prison":2,"police":60,"government":10},"doorRate":6.0,"_originalId":"pbpd_office_command"}'),
-	(4940, 'pulsar_pbpd_evidence', '{"coords":{"x":-449.67999267578127,"y":5999.33984375,"z":37.0},"onduty":true,"state":1,"model":1362051455,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"prison":2,"police":0,"government":10},"_originalId":"pbpd_evidence","maxDistance":2.5}'),
-	(4941, 'pulsar_pbpd_cells_outer', '{"coords":{"x":-442.239990234375,"y":6012.6201171875,"z":27.72999954223632},"onduty":true,"state":1,"model":-594854737,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"police":0},"_originalId":"pbpd_cells_outer","maxDistance":2.5}'),
-	(4942, 'pulsar_pbpd_cell_1', '{"coords":{"x":-443.3900146484375,"y":6015.43994140625,"z":27.72999954223632},"onduty":true,"state":1,"model":-594854737,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"police":0},"_originalId":"pbpd_cell_1","maxDistance":2.5}'),
-	(4943, 'pulsar_pbpd_cell_2', '{"coords":{"x":-446.3599853515625,"y":6018.41015625,"z":27.72999954223632},"onduty":true,"state":1,"model":-594854737,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"police":0},"_originalId":"pbpd_cell_2","maxDistance":2.5}'),
-	(4944, 'pulsar_pbpd_cell_3', '{"coords":{"x":-448.9200134277344,"y":6015.85009765625,"z":27.72999954223632},"onduty":true,"state":1,"model":-594854737,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"police":0},"_originalId":"pbpd_cell_3","maxDistance":2.5}'),
-	(4945, 'pulsar_pbpd_cell_4', '{"coords":{"x":-445.95001220703127,"y":6012.8798828125,"z":27.72999954223632},"onduty":true,"state":1,"model":-594854737,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"police":0},"_originalId":"pbpd_cell_4","maxDistance":2.5}'),
-	(4946, 'pulsar_pbpd_gate', '{"coords":{"x":-456.4800109863281,"y":6031.1298828125,"z":31.13999938964843},"maxDistance":7.0,"state":1,"model":-470936668,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"prison":2,"police":0,"government":10},"doorRate":1.0,"_originalId":"pbpd_gate"}'),
-	(4947, 'pulsar_sspd_front_1', '{"coords":{"x":1836.2550048828126,"y":3674.06982421875,"z":34.34000015258789},"maxDistance":2.5,"state":0,"doors":[{"model":-1501157055,"coords":{"x":1837.3800048828126,"y":3674.719970703125,"z":34.34000015258789},"heading":0},{"model":-1501157055,"coords":{"x":1835.1300048828126,"y":3673.419921875,"z":34.34000015258789},"heading":0}],"auto":true,"lockSound":"button-remote","groups":{"prison":2,"police":0,"government":10},"doorRate":6.0,"_originalId":"sspd_front_1"}'),
-	(4948, 'pulsar_sspd_stairwell', '{"coords":{"x":1838.010009765625,"y":3677.10009765625,"z":34.27999877929687},"maxDistance":2.5,"state":1,"model":1364638935,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"prison":2,"police":0,"government":10},"doorRate":6.0,"_originalId":"sspd_stairwell"}'),
-	(4949, 'pulsar_sspd_backarea', '{"coords":{"x":1830.6500244140626,"y":3676.56005859375,"z":34.27999877929687},"maxDistance":2.5,"state":1,"model":-1264811159,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"prison":2,"police":0,"government":10},"doorRate":6.0,"_originalId":"sspd_backarea"}'),
-	(4950, 'pulsar_sspd_mugshot_enter', '{"coords":{"x":1818.3199462890626,"y":3669.280029296875,"z":34.27999877929687},"onduty":true,"state":1,"model":1364638935,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"prison":2,"police":0,"government":10},"_originalId":"sspd_mugshot_enter","maxDistance":2.5}'),
-	(4951, 'pulsar_sspd_cell_1', '{"coords":{"x":1810.1300048828126,"y":3676.4599609375,"z":34.4000015258789},"onduty":true,"state":1,"model":2010487154,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"police":0},"_originalId":"sspd_cell_1","maxDistance":2.5}'),
-	(4952, 'pulsar_sspd_cell_2', '{"coords":{"x":1808.6300048828126,"y":3679.070068359375,"z":34.4000015258789},"onduty":true,"state":1,"model":2010487154,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"police":0},"_originalId":"sspd_cell_2","maxDistance":2.5}'),
-	(4953, 'pulsar_sspd_cell_3', '{"coords":{"x":1807.1300048828126,"y":3681.659912109375,"z":34.4000015258789},"onduty":true,"state":1,"model":2010487154,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"police":0},"_originalId":"sspd_cell_3","maxDistance":2.5}'),
-	(4954, 'pulsar_sspd_cells_rear', '{"coords":{"x":1813.550048828125,"y":3675.06005859375,"z":34.4000015258789},"onduty":true,"state":1,"model":2010487154,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"prison":2,"police":0,"government":10},"_originalId":"sspd_cells_rear","maxDistance":2.5}'),
-	(4955, 'pulsar_sspd_interrogation', '{"coords":{"x":1814.199951171875,"y":3669.449951171875,"z":34.27999877929687},"onduty":true,"state":1,"model":-1264811159,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"prison":2,"police":0,"government":10},"_originalId":"sspd_interrogation","maxDistance":2.5}'),
-	(4956, 'pulsar_sspd_obervation', '{"coords":{"x":1812.31005859375,"y":3672.719970703125,"z":34.27999877929687},"onduty":true,"state":1,"model":1364638935,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"prison":2,"police":0,"government":10},"_originalId":"sspd_obervation","maxDistance":2.5}'),
-	(4957, 'pulsar_sspd_armoury', '{"coords":{"x":1838.969970703125,"y":3682.860107421875,"z":34.27999877929687},"onduty":true,"state":1,"model":-1264811159,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"prison":2,"police":0,"government":10},"_originalId":"sspd_armoury","maxDistance":2.5}'),
-	(4958, 'pulsar_sspd_back', '{"coords":{"x":1823.8599853515626,"y":3681.1201171875,"z":34.34000015258789},"maxDistance":2.5,"state":1,"model":-1501157055,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"prison":2,"police":0,"government":10},"doorRate":6.0,"_originalId":"sspd_back"}'),
-	(4959, 'pulsar_sspd_evidence', '{"coords":{"x":1829.8499755859376,"y":3673.7900390625,"z":34.27999877929687},"onduty":true,"state":1,"model":-1264811159,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"prison":2,"police":0,"government":10},"_originalId":"sspd_evidence","maxDistance":2.5}'),
-	(4960, 'pulsar_sspd_lockers', '{"coords":{"x":1827.0699462890626,"y":3674.5,"z":34.27999877929687},"maxDistance":2.5,"state":1,"model":-1264811159,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"prison":2,"police":0,"government":10},"doorRate":6.0,"_originalId":"sspd_lockers"}'),
-	(4961, 'pulsar_sspd_sheriff', '{"coords":{"x":1831.22998046875,"y":3675.429931640625,"z":38.95000076293945},"maxDistance":2.5,"state":1,"model":-1626613696,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"prison":2,"police":70,"government":10},"doorRate":6.0,"_originalId":"sspd_sheriff"}'),
-	(4962, 'pulsar_sspd_sheriff2', '{"coords":{"x":1828.4300537109376,"y":3673.81005859375,"z":38.95000076293945},"maxDistance":2.5,"state":1,"model":-1626613696,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"prison":2,"police":70,"government":10},"doorRate":6.0,"_originalId":"sspd_sheriff2"}'),
-	(4963, 'pulsar_sspd_archive', '{"coords":{"x":1828.530029296875,"y":3680.22998046875,"z":38.95000076293945},"maxDistance":2.5,"state":0,"model":-1264811159,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"prison":2,"police":0,"government":10},"doorRate":6.0,"_originalId":"sspd_archive"}'),
-	(4964, 'pulsar_sspd_gate', '{"coords":{"x":1862.0,"y":3687.52001953125,"z":33.0099983215332},"maxDistance":2.5,"state":1,"model":1286535678,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"prison":2,"police":0,"government":10},"doorRate":1.0,"_originalId":"sspd_gate"}'),
-	(4965, 'pulsar_sspd_garage_rear', '{"coords":{"x":1845.4100341796876,"y":3677.489990234375,"z":34.61000061035156},"maxDistance":2.5,"state":1,"model":-1156020871,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"prison":2,"police":0,"government":10},"doorRate":6.0,"_originalId":"sspd_garage_rear"}'),
-	(4967, 'pulsar_prison_gate_2', '{"coords":{"x":1818.5400390625,"y":2604.81005859375,"z":44.61000061035156},"onduty":true,"state":1,"model":741314661,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"prison":0,"police":0,"ems":0},"_originalId":"prison_gate_2","maxDistance":2.5}'),
-	(4968, 'pulsar_prison_gate_3', '{"coords":{"x":1797.760009765625,"y":2596.56005859375,"z":46.38999938964844},"onduty":true,"state":1,"model":-1156020871,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"prison":0,"police":0,"ems":0},"_originalId":"prison_gate_3","maxDistance":2.5}'),
-	(4969, 'pulsar_prison_gate_4', '{"coords":{"x":1798.0899658203126,"y":2591.68994140625,"z":46.41999816894531},"onduty":true,"state":0,"model":-1156020871,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"prison":0,"police":0,"ems":0},"_originalId":"prison_gate_4","maxDistance":2.5}'),
-	(4970, 'pulsar_prison_gate_5', '{"coords":{"x":1797.8299560546876,"y":2546.77001953125,"z":46.25},"onduty":true,"state":1,"model":-1156020871,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"prison":0,"police":0,"ems":0},"_originalId":"prison_gate_5","maxDistance":2.5}'),
-	(4971, 'pulsar_prison_gate_ground_1', '{"coords":{"x":1764.47998046875,"y":2528.580078125,"z":46.27999877929687},"maxDistance":2.5,"state":1,"model":-1156020871,"auto":true,"heading":0,"lockSound":"button-remote","doorRate":6.0,"_originalId":"prison_gate_ground_1"}'),
-	(4972, 'pulsar_prison_gate_ground_2', '{"coords":{"x":1761.2099609375,"y":2529.449951171875,"z":46.27999877929687},"onduty":true,"state":1,"model":-1156020871,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"prison":0,"police":0,"ems":0},"_originalId":"prison_gate_ground_2","maxDistance":2.5}'),
-	(4973, 'pulsar_prison_gate_ground_3', '{"coords":{"x":1725.9300537109376,"y":2506.409912109375,"z":46.31000137329101},"maxDistance":2.5,"state":1,"model":-1156020871,"auto":true,"heading":0,"lockSound":"button-remote","doorRate":6.0,"_originalId":"prison_gate_ground_3"}'),
-	(4974, 'pulsar_prison_gate_ground_4', '{"coords":{"x":1726.800048828125,"y":2509.68994140625,"z":46.31000137329101},"onduty":true,"state":1,"model":-1156020871,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"prison":0,"police":0,"ems":0},"_originalId":"prison_gate_ground_4","maxDistance":2.5}'),
-	(4975, 'pulsar_prison_gate_ground_5', '{"coords":{"x":1715.0999755859376,"y":2487.449951171875,"z":46.27999877929687},"maxDistance":2.5,"state":1,"model":-1156020871,"auto":true,"heading":0,"lockSound":"button-remote","doorRate":6.0,"_originalId":"prison_gate_ground_5"}'),
-	(4976, 'pulsar_prison_gate_ground_6', '{"coords":{"x":1712.699951171875,"y":2489.85009765625,"z":46.27999877929687},"onduty":true,"state":1,"model":-1156020871,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"prison":0,"police":0,"ems":0},"_originalId":"prison_gate_ground_6","maxDistance":2.5}'),
-	(4977, 'pulsar_prison_gate_ground_7', '{"coords":{"x":1670.6500244140626,"y":2487.47998046875,"z":46.31000137329101},"maxDistance":2.5,"state":1,"model":-1156020871,"auto":true,"heading":0,"lockSound":"button-remote","doorRate":6.0,"_originalId":"prison_gate_ground_7"}'),
-	(4978, 'pulsar_prison_gate_ground_8', '{"coords":{"x":1673.050048828125,"y":2489.889892578125,"z":46.31000137329101},"onduty":true,"state":1,"model":-1156020871,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"prison":0,"police":0,"ems":0},"_originalId":"prison_gate_ground_8","maxDistance":2.5}'),
-	(4979, 'pulsar_prison_gate_ground_9', '{"coords":{"x":1654.1300048828126,"y":2490.389892578125,"z":46.27999877929687},"maxDistance":2.5,"state":1,"model":-1156020871,"auto":true,"heading":0,"lockSound":"button-remote","doorRate":6.0,"_originalId":"prison_gate_ground_9"}'),
-	(4980, 'pulsar_prison_gate_ground_10', '{"coords":{"x":1653.8199462890626,"y":2493.760009765625,"z":46.27999877929687},"onduty":true,"state":1,"model":-1156020871,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"prison":0,"police":0,"ems":0},"_originalId":"prison_gate_ground_10","maxDistance":2.5}'),
-	(4981, 'pulsar_prison_gate_ground_11', '{"coords":{"x":1623.449951171875,"y":2519.27001953125,"z":46.31000137329101},"maxDistance":2.5,"state":1,"model":-1156020871,"auto":true,"heading":0,"lockSound":"button-remote","doorRate":6.0,"_originalId":"prison_gate_ground_11"}'),
-	(4982, 'pulsar_prison_gate_ground_12', '{"coords":{"x":1620.0799560546876,"y":2518.9599609375,"z":46.31000137329101},"onduty":true,"state":1,"model":-1156020871,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"prison":0,"police":0,"ems":0},"_originalId":"prison_gate_ground_12","maxDistance":2.5}'),
-	(4983, 'pulsar_prison_gate_ground_13', '{"coords":{"x":1616.239990234375,"y":2531.52001953125,"z":46.27999877929687},"maxDistance":2.5,"state":1,"model":-1156020871,"auto":true,"heading":0,"lockSound":"button-remote","doorRate":6.0,"_originalId":"prison_gate_ground_13"}'),
-	(4984, 'pulsar_prison_gate_ground_14', '{"coords":{"x":1618.6300048828126,"y":2533.929931640625,"z":46.27999877929687},"onduty":true,"state":1,"model":-1156020871,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"prison":0,"police":0,"ems":0},"_originalId":"prison_gate_ground_14","maxDistance":2.5}'),
-	(4985, 'pulsar_prison_gate_ground_15', '{"coords":{"x":1616.0699462890626,"y":2575.97998046875,"z":46.27999877929687},"maxDistance":2.5,"state":1,"model":-1156020871,"auto":true,"heading":0,"lockSound":"button-remote","doorRate":6.0,"_originalId":"prison_gate_ground_15"}'),
-	(4986, 'pulsar_prison_gate_ground_16', '{"coords":{"x":1618.469970703125,"y":2573.590087890625,"z":46.27999877929687},"onduty":true,"state":1,"model":-1156020871,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"prison":0,"police":0,"ems":0},"_originalId":"prison_gate_ground_16","maxDistance":2.5}'),
-	(4987, 'pulsar_prison_gate_ground_17', '{"coords":{"x":1681.800048828125,"y":2562.989990234375,"z":46.27999877929687},"maxDistance":2.5,"state":1,"model":-1156020871,"auto":true,"heading":0,"lockSound":"button-remote","doorRate":6.0,"_originalId":"prison_gate_ground_17"}'),
-	(4988, 'pulsar_prison_gate_ground_18', '{"coords":{"x":1681.800048828125,"y":2566.3798828125,"z":46.27999877929687},"onduty":true,"state":1,"model":-1156020871,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"prison":0,"police":0,"ems":0},"_originalId":"prison_gate_ground_18","maxDistance":2.5}'),
-	(4989, 'pulsar_prison_gate_ground_19', '{"coords":{"x":1708.6099853515626,"y":2562.989990234375,"z":46.27999877929687},"maxDistance":2.5,"state":1,"model":-1156020871,"auto":true,"heading":0,"lockSound":"button-remote","doorRate":6.0,"_originalId":"prison_gate_ground_19"}'),
-	(4990, 'pulsar_prison_gate_ground_20', '{"coords":{"x":1708.5999755859376,"y":2566.3798828125,"z":46.27999877929687},"onduty":true,"state":1,"model":-1156020871,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"prison":0,"police":0,"ems":0},"_originalId":"prison_gate_ground_20","maxDistance":2.5}'),
-	(4991, 'pulsar_prison_gate_ground_21', '{"coords":{"x":1744.6199951171876,"y":2560.64990234375,"z":46.27999877929687},"maxDistance":2.5,"state":1,"model":-1156020871,"auto":true,"heading":0,"lockSound":"button-remote","doorRate":6.0,"_originalId":"prison_gate_ground_21"}'),
-	(4992, 'pulsar_prison_gate_ground_22', '{"coords":{"x":1744.6099853515626,"y":2564.0400390625,"z":46.27999877929687},"onduty":true,"state":1,"model":-1156020871,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"prison":0,"police":0,"ems":0},"_originalId":"prison_gate_ground_22","maxDistance":2.5}'),
-	(4993, 'pulsar_prison_gate_ground_23', '{"coords":{"x":1697.4000244140626,"y":2544.239990234375,"z":46.27000045776367},"onduty":true,"state":1,"model":-1156020871,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"prison":0,"police":0,"ems":0},"_originalId":"prison_gate_ground_23","maxDistance":2.5}'),
-	(4994, 'pulsar_prison_gate_ground_24', '{"coords":{"x":1697.4000244140626,"y":2547.6201171875,"z":46.27000045776367},"onduty":true,"state":1,"model":-1156020871,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"prison":0,"police":0,"ems":0},"_originalId":"prison_gate_ground_24","maxDistance":2.5}'),
-	(4995, 'pulsar_prison_gate_ground_25', '{"coords":{"x":1744.1800537109376,"y":2562.530029296875,"z":46.25},"onduty":true,"state":1,"model":-1156020871,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"prison":0,"police":0,"ems":0},"_originalId":"prison_gate_ground_25","maxDistance":2.5}'),
-	(4996, 'pulsar_prison_gate_ground_26', '{"coords":{"x":1708.47998046875,"y":2564.780029296875,"z":46.25},"onduty":true,"state":1,"model":-1156020871,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"prison":0,"police":0,"ems":0},"_originalId":"prison_gate_ground_26","maxDistance":2.5}'),
-	(4997, 'pulsar_prison_gate_ground_27', '{"coords":{"x":1681.2099609375,"y":2564.780029296875,"z":46.25},"onduty":true,"state":1,"model":-1156020871,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"prison":0,"police":0,"ems":0},"_originalId":"prison_gate_ground_27","maxDistance":2.5}'),
-	(4998, 'pulsar_prison_gate_internal_slide_right', '{"coords":{"x":1799.6099853515626,"y":2616.97998046875,"z":44.59999847412109},"onduty":true,"state":1,"model":741314661,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"prison":0,"police":0,"ems":0},"_originalId":"prison_gate_internal_slide_right","maxDistance":2.5}'),
-	(4999, 'pulsar_prison_gate_double_right_01', '{"coords":{"x":1832.705078125,"y":2696.300048828125,"z":44.45000076293945},"onduty":true,"state":1,"doors":[{"model":741314661,"coords":{"x":1835.280029296875,"y":2689.10009765625,"z":44.45000076293945},"heading":0},{"model":741314661,"coords":{"x":1830.1300048828126,"y":2703.5,"z":44.45000076293945},"heading":0}],"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"prison":0,"police":0,"ems":0},"_originalId":"prison_gate_double_right_01","maxDistance":2.5}'),
-	(5000, 'pulsar_prison_gate_double_right_02', '{"coords":{"x":1769.449951171875,"y":2749.81982421875,"z":44.45000076293945},"onduty":true,"state":1,"doors":[{"model":741314661,"coords":{"x":1762.199951171875,"y":2752.489990234375,"z":44.45000076293945},"heading":0},{"model":741314661,"coords":{"x":1776.699951171875,"y":2747.14990234375,"z":44.45000076293945},"heading":0}],"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"prison":0,"police":0,"ems":0},"_originalId":"prison_gate_double_right_02","maxDistance":2.5}'),
-	(5001, 'pulsar_prison_gate_double_right_03', '{"coords":{"x":1655.2099609375,"y":2745.18505859375,"z":44.45000076293945},"onduty":true,"state":1,"doors":[{"model":741314661,"coords":{"x":1662.010009765625,"y":2748.699951171875,"z":44.45000076293945},"heading":0},{"model":741314661,"coords":{"x":1648.4100341796876,"y":2741.669921875,"z":44.45000076293945},"heading":0}],"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"prison":0,"police":0,"ems":0},"_originalId":"prison_gate_double_right_03","maxDistance":2.5}'),
-	(5002, 'pulsar_prison_gate_double_right_04', '{"coords":{"x":1580.18505859375,"y":2673.449951171875,"z":44.5099983215332},"onduty":true,"state":1,"doors":[{"model":741314661,"coords":{"x":1584.6500244140626,"y":2679.75,"z":44.5099983215332},"heading":0},{"model":741314661,"coords":{"x":1575.719970703125,"y":2667.14990234375,"z":44.5099983215332},"heading":0}],"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"prison":0,"police":0,"ems":0},"_originalId":"prison_gate_double_right_04","maxDistance":2.5}'),
-	(5003, 'pulsar_prison_gate_double_right_05', '{"coords":{"x":1547.344970703125,"y":2583.705078125,"z":44.44999694824219},"onduty":true,"state":1,"doors":[{"model":741314661,"coords":{"x":1547.7099609375,"y":2591.280029296875,"z":44.5099983215332},"heading":0},{"model":741314661,"coords":{"x":1546.97998046875,"y":2576.1298828125,"z":44.38999938964844},"heading":0}],"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"prison":0,"police":0,"ems":0},"_originalId":"prison_gate_double_right_05","maxDistance":2.5}'),
-	(5004, 'pulsar_prison_gate_double_right_06', '{"coords":{"x":1554.574951171875,"y":2476.044921875,"z":44.4000015258789},"onduty":true,"state":1,"doors":[{"model":741314661,"coords":{"x":1550.9300537109376,"y":2482.739990234375,"z":44.4000015258789},"heading":0},{"model":741314661,"coords":{"x":1558.219970703125,"y":2469.35009765625,"z":44.4000015258789},"heading":0}],"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"prison":0,"police":0,"ems":0},"_originalId":"prison_gate_double_right_06","maxDistance":2.5}'),
-	(5005, 'pulsar_prison_gate_double_right_07', '{"coords":{"x":1660.324951171875,"y":2408.60986328125,"z":44.43499755859375},"onduty":true,"state":1,"doors":[{"model":741314661,"coords":{"x":1652.97998046875,"y":2409.570068359375,"z":44.43999862670898},"heading":0},{"model":741314661,"coords":{"x":1667.6700439453126,"y":2407.64990234375,"z":44.43000030517578},"heading":0}],"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"prison":0,"police":0,"ems":0},"_originalId":"prison_gate_double_right_07","maxDistance":2.5}'),
-	(5006, 'pulsar_prison_gate_double_right_08', '{"coords":{"x":1755.840087890625,"y":2423.16015625,"z":44.43499755859375},"onduty":true,"state":1,"doors":[{"model":741314661,"coords":{"x":1749.1400146484376,"y":2419.81005859375,"z":44.43000030517578},"heading":0},{"model":741314661,"coords":{"x":1762.5400390625,"y":2426.510009765625,"z":44.43999862670898},"heading":0}],"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"prison":0,"police":0,"ems":0},"_originalId":"prison_gate_double_right_08","maxDistance":2.5}'),
-	(5007, 'pulsar_prison_gate_double_right_09', '{"coords":{"x":1811.3699951171876,"y":2481.72509765625,"z":44.47000122070312},"onduty":true,"state":1,"doors":[{"model":741314661,"coords":{"x":1808.989990234375,"y":2474.5400390625,"z":44.47999954223633},"heading":0},{"model":741314661,"coords":{"x":1813.75,"y":2488.909912109375,"z":44.45999908447265},"heading":0}],"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"prison":0,"police":0,"ems":0},"_originalId":"prison_gate_double_right_09","maxDistance":2.5}'),
-	(5008, 'pulsar_prison_door_tower_01', '{"coords":{"x":1820.77001953125,"y":2620.77001953125,"z":45.95000076293945},"onduty":true,"state":1,"model":-1033001619,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"prison":0,"police":0,"ems":0},"_originalId":"prison_door_tower_01","maxDistance":2.5}'),
-	(5009, 'pulsar_prison_door_tower_02', '{"coords":{"x":1845.7900390625,"y":2698.6201171875,"z":45.95999908447265},"onduty":true,"state":1,"model":-1033001619,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"prison":0,"police":0,"ems":0},"_originalId":"prison_door_tower_02","maxDistance":2.5}'),
-	(5010, 'pulsar_prison_door_tower_03', '{"coords":{"x":1773.1099853515626,"y":2759.699951171875,"z":45.88999938964844},"onduty":true,"state":1,"model":-1033001619,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"prison":0,"police":0,"ems":0},"_originalId":"prison_door_tower_03","maxDistance":2.5}'),
-	(5011, 'pulsar_prison_door_tower_04', '{"coords":{"x":1651.1600341796876,"y":2755.43994140625,"z":45.88000106811523},"onduty":true,"state":1,"model":-1033001619,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"prison":0,"police":0,"ems":0},"_originalId":"prison_door_tower_04","maxDistance":2.5}'),
-	(5012, 'pulsar_prison_door_tower_05', '{"coords":{"x":1572.6600341796876,"y":2679.18994140625,"z":45.72999954223633},"onduty":true,"state":1,"model":-1033001619,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"prison":0,"police":0,"ems":0},"_originalId":"prison_door_tower_05","maxDistance":2.5}'),
-	(5013, 'pulsar_prison_door_tower_06', '{"coords":{"x":1537.81005859375,"y":2586.0,"z":45.68999862670898},"onduty":true,"state":1,"model":-1033001619,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"prison":0,"police":0,"ems":0},"_originalId":"prison_door_tower_06","maxDistance":2.5}'),
-	(5014, 'pulsar_prison_door_tower_07', '{"coords":{"x":1543.239990234375,"y":2471.2900390625,"z":45.70999908447265},"onduty":true,"state":1,"model":-1033001619,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"prison":0,"police":0,"ems":0},"_originalId":"prison_door_tower_07","maxDistance":2.5}'),
-	(5015, 'pulsar_prison_door_tower_08', '{"coords":{"x":1658.5799560546876,"y":2397.719970703125,"z":45.72000122070312},"onduty":true,"state":1,"model":-1033001619,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"prison":0,"police":0,"ems":0},"_originalId":"prison_door_tower_08","maxDistance":2.5}'),
-	(5016, 'pulsar_prison_door_tower_09', '{"coords":{"x":1759.6199951171876,"y":2412.840087890625,"z":45.70999908447265},"onduty":true,"state":1,"model":-1033001619,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"prison":0,"police":0,"ems":0},"_originalId":"prison_door_tower_09","maxDistance":2.5}'),
-	(5017, 'pulsar_prison_door_tower_10', '{"coords":{"x":1821.1700439453126,"y":2476.260009765625,"z":45.68999862670898},"onduty":true,"state":1,"model":-1033001619,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"prison":0,"police":0,"ems":0},"_originalId":"prison_door_tower_10","maxDistance":2.5}'),
-	(5018, 'pulsar_prison_reception', '{"coords":{"x":1844.4000244140626,"y":2577.0,"z":46.04000091552734},"onduty":true,"state":1,"model":2024969025,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"prison":0,"police":0,"ems":0},"_originalId":"prison_reception","maxDistance":2.5}'),
-	(5019, 'pulsar_prison_reception_cloakroom', '{"coords":{"x":1837.6300048828126,"y":2576.989990234375,"z":46.04000091552734},"onduty":true,"state":1,"model":2024969025,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"prison":0,"police":0,"ems":0},"_originalId":"prison_reception_cloakroom","maxDistance":2.5}'),
-	(5020, 'pulsar_prison_reception_visitors', '{"coords":{"x":1835.530029296875,"y":2587.43994140625,"z":46.04000091552734},"onduty":true,"state":0,"model":-684929024,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"prison":0,"police":0,"ems":0},"_originalId":"prison_reception_visitors","maxDistance":2.5}'),
-	(5021, 'pulsar_prison_reception_cage', '{"coords":{"x":1837.9100341796876,"y":2590.25,"z":46.20000076293945},"onduty":true,"state":1,"model":539686410,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"prison":0,"police":0,"ems":0},"_originalId":"prison_reception_cage","maxDistance":2.5}'),
-	(5022, 'pulsar_prison_reception_mugshot', '{"coords":{"x":1838.6199951171876,"y":2593.7099609375,"z":46.04000091552734},"onduty":true,"state":1,"model":-684929024,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"prison":0,"police":0,"ems":0},"_originalId":"prison_reception_mugshot","maxDistance":2.5}'),
-	(5023, 'pulsar_prison_reception_door', '{"coords":{"x":1831.3399658203126,"y":2594.989990234375,"z":46.04000091552734},"onduty":true,"state":1,"model":-684929024,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"prison":0,"police":0,"ems":0},"_originalId":"prison_reception_door","maxDistance":2.5}'),
-	(5024, 'pulsar_prison_reception_exit', '{"coords":{"x":1819.0699462890626,"y":2594.8701171875,"z":46.09000015258789},"onduty":true,"state":0,"model":1373390714,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"prison":0,"police":0,"ems":0},"_originalId":"prison_reception_exit","maxDistance":2.5}'),
-	(5025, 'pulsar_prison_cell_control_1', '{"coords":{"x":1775.4100341796876,"y":2491.030029296875,"z":49.84000015258789},"onduty":true,"state":1,"model":241550507,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"prison":0,"police":0,"ems":0},"_originalId":"prison_cell_control_1","maxDistance":2.5}'),
-	(5026, 'pulsar_prison_cell_control_2', '{"coords":{"x":1772.93994140625,"y":2495.31005859375,"z":49.84000015258789},"onduty":true,"state":1,"model":241550507,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"prison":0,"police":0,"ems":0},"_originalId":"prison_cell_control_2","maxDistance":2.5}'),
-	(5027, 'pulsar_prison_cell_1', '{"coords":{"x":1768.550048828125,"y":2498.409912109375,"z":45.88999938964844},"onduty":true,"state":0,"model":913760512,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"prison":0,"police":0,"ems":0},"_originalId":"prison_cell_1","maxDistance":2.5}'),
-	(5028, 'pulsar_prison_cell_2', '{"coords":{"x":1765.4000244140626,"y":2496.590087890625,"z":45.88999938964844},"onduty":true,"state":0,"model":913760512,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"prison":0,"police":0,"ems":0},"_originalId":"prison_cell_2","maxDistance":2.5}'),
-	(5029, 'pulsar_prison_cell_3', '{"coords":{"x":1762.25,"y":2494.780029296875,"z":45.88999938964844},"onduty":true,"state":0,"model":913760512,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"prison":0,"police":0,"ems":0},"_originalId":"prison_cell_3","maxDistance":2.5}'),
-	(5030, 'pulsar_prison_cell_4', '{"coords":{"x":1755.9599609375,"y":2491.14990234375,"z":45.88999938964844},"onduty":true,"state":0,"model":913760512,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"prison":0,"police":0,"ems":0},"_originalId":"prison_cell_4","maxDistance":2.5}'),
-	(5031, 'pulsar_prison_cell_6', '{"coords":{"x":1752.8199462890626,"y":2489.330078125,"z":45.88999938964844},"onduty":true,"state":0,"model":913760512,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"prison":0,"police":0,"ems":0},"_originalId":"prison_cell_6","maxDistance":2.5}'),
-	(5032, 'pulsar_prison_cell_7', '{"coords":{"x":1768.550048828125,"y":2498.409912109375,"z":49.84999847412109},"onduty":true,"state":0,"model":913760512,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"prison":0,"police":0,"ems":0},"_originalId":"prison_cell_7","maxDistance":2.5}'),
-	(5033, 'pulsar_prison_cell_8', '{"coords":{"x":1765.4000244140626,"y":2496.60009765625,"z":49.84999847412109},"onduty":true,"state":0,"model":913760512,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"prison":0,"police":0,"ems":0},"_originalId":"prison_cell_8","maxDistance":2.5}'),
-	(5034, 'pulsar_prison_cell_9', '{"coords":{"x":1762.25,"y":2494.780029296875,"z":49.84999847412109},"onduty":true,"state":0,"model":913760512,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"prison":0,"police":0,"ems":0},"_originalId":"prison_cell_9","maxDistance":2.5}'),
-	(5035, 'pulsar_prison_cell_10', '{"coords":{"x":1759.1099853515626,"y":2492.9599609375,"z":49.84999847412109},"onduty":true,"state":0,"model":913760512,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"prison":0,"police":0,"ems":0},"_originalId":"prison_cell_10","maxDistance":2.5}'),
-	(5036, 'pulsar_prison_cell_11', '{"coords":{"x":1755.9599609375,"y":2491.14990234375,"z":49.84999847412109},"onduty":true,"state":0,"model":913760512,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"prison":0,"police":0,"ems":0},"_originalId":"prison_cell_11","maxDistance":2.5}'),
-	(5037, 'pulsar_prison_cell_12', '{"coords":{"x":1752.8199462890626,"y":2489.330078125,"z":49.84999847412109},"onduty":true,"state":0,"model":913760512,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"prison":0,"police":0,"ems":0},"_originalId":"prison_cell_12","maxDistance":2.5}'),
-	(5038, 'pulsar_prison_cell_13', '{"coords":{"x":1749.6700439453126,"y":2487.510009765625,"z":49.84999847412109},"onduty":true,"state":0,"model":913760512,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"prison":0,"police":0,"ems":0},"_originalId":"prison_cell_13","maxDistance":2.5}'),
-	(5039, 'pulsar_prison_cell_14', '{"coords":{"x":1758.0799560546876,"y":2475.389892578125,"z":45.88999938964844},"onduty":true,"state":0,"model":913760512,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"prison":0,"police":0,"ems":0},"_originalId":"prison_cell_14","maxDistance":2.5}'),
-	(5040, 'pulsar_prison_cell_15', '{"coords":{"x":1761.219970703125,"y":2477.2099609375,"z":45.88999938964844},"onduty":true,"state":0,"model":913760512,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"prison":0,"police":0,"ems":0},"_originalId":"prison_cell_15","maxDistance":2.5}'),
-	(5041, 'pulsar_prison_cell_16', '{"coords":{"x":1764.3699951171876,"y":2479.030029296875,"z":45.88999938964844},"onduty":true,"state":0,"model":913760512,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"prison":0,"police":0,"ems":0},"_originalId":"prison_cell_16","maxDistance":2.5}'),
-	(5042, 'pulsar_prison_cell_17', '{"coords":{"x":1767.52001953125,"y":2480.840087890625,"z":45.88999938964844},"onduty":true,"state":0,"model":913760512,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"prison":0,"police":0,"ems":0},"_originalId":"prison_cell_17","maxDistance":2.5}'),
-	(5043, 'pulsar_prison_cell_18', '{"coords":{"x":1770.6600341796876,"y":2482.659912109375,"z":45.88999938964844},"onduty":true,"state":0,"model":913760512,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"prison":0,"police":0,"ems":0},"_originalId":"prison_cell_18","maxDistance":2.5}'),
-	(5044, 'pulsar_prison_cell_19', '{"coords":{"x":1773.81005859375,"y":2484.47998046875,"z":45.88999938964844},"onduty":true,"state":0,"model":913760512,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"prison":0,"police":0,"ems":0},"_originalId":"prison_cell_19","maxDistance":2.5}'),
-	(5045, 'pulsar_prison_cell_20', '{"coords":{"x":1776.949951171875,"y":2486.2900390625,"z":45.88999938964844},"onduty":true,"state":0,"model":913760512,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"prison":0,"police":0,"ems":0},"_originalId":"prison_cell_20","maxDistance":2.5}'),
-	(5046, 'pulsar_prison_cell_21', '{"coords":{"x":1758.0799560546876,"y":2475.389892578125,"z":49.84999847412109},"onduty":true,"state":0,"model":913760512,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"prison":0,"police":0,"ems":0},"_originalId":"prison_cell_21","maxDistance":2.5}'),
-	(5047, 'pulsar_prison_cell_22', '{"coords":{"x":1761.219970703125,"y":2477.2099609375,"z":49.84999847412109},"onduty":true,"state":0,"model":913760512,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"prison":0,"police":0,"ems":0},"_originalId":"prison_cell_22","maxDistance":2.5}'),
-	(5048, 'pulsar_prison_cell_23', '{"coords":{"x":1764.3699951171876,"y":2479.030029296875,"z":49.84999847412109},"onduty":true,"state":0,"model":913760512,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"prison":0,"police":0,"ems":0},"_originalId":"prison_cell_23","maxDistance":2.5}'),
-	(5049, 'pulsar_prison_cell_24', '{"coords":{"x":1767.52001953125,"y":2480.840087890625,"z":49.84999847412109},"onduty":true,"state":0,"model":913760512,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"prison":0,"police":0,"ems":0},"_originalId":"prison_cell_24","maxDistance":2.5}'),
-	(5050, 'pulsar_prison_cell_25', '{"coords":{"x":1770.6600341796876,"y":2482.659912109375,"z":49.84999847412109},"onduty":true,"state":0,"model":913760512,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"prison":0,"police":0,"ems":0},"_originalId":"prison_cell_25","maxDistance":2.5}'),
-	(5051, 'pulsar_prison_cell_26', '{"coords":{"x":1773.81005859375,"y":2484.47998046875,"z":49.84999847412109},"onduty":true,"state":0,"model":913760512,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"prison":0,"police":0,"ems":0},"_originalId":"prison_cell_26","maxDistance":2.5}'),
-	(5052, 'pulsar_prison_cell_27', '{"coords":{"x":1776.949951171875,"y":2486.2900390625,"z":49.84999847412109},"onduty":true,"state":0,"model":913760512,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"prison":0,"police":0,"ems":0},"_originalId":"prison_cell_27","maxDistance":2.5}'),
-	(5053, 'pulsar_prison_cell_gym', '{"coords":{"x":1751.1500244140626,"y":2481.179931640625,"z":45.88999938964844},"onduty":true,"state":0,"model":241550507,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"prison":0,"police":0,"ems":0},"_originalId":"prison_cell_gym","maxDistance":2.5}'),
-	(5054, 'pulsar_prison_cell_games', '{"coords":{"x":1752.280029296875,"y":2479.25,"z":45.88999938964844},"onduty":true,"state":0,"model":241550507,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"prison":0,"police":0,"ems":0},"_originalId":"prison_cell_games","maxDistance":2.5}'),
-	(5055, 'pulsar_prison_cell_exit', '{"coords":{"x":1758.6500244140626,"y":2492.659912109375,"z":45.88999938964844},"onduty":true,"state":0,"model":241550507,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"prison":0,"police":0,"ems":0},"_originalId":"prison_cell_exit","maxDistance":2.5}'),
-	(5056, 'pulsar_prison_cell_block', '{"coords":{"x":1754.800048828125,"y":2501.570068359375,"z":45.81000137329101},"onduty":true,"state":0,"model":1373390714,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"prison":0,"police":0,"ems":0},"_originalId":"prison_cell_block","maxDistance":2.5}'),
-	(5057, 'pulsar_prison_food_1', '{"coords":{"x":1791.5999755859376,"y":2551.4599609375,"z":45.75},"onduty":true,"state":0,"model":1373390714,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"prison":0,"police":0,"ems":0},"_originalId":"prison_food_1","maxDistance":2.5}'),
-	(5058, 'pulsar_prison_food_2', '{"coords":{"x":1776.199951171875,"y":2552.56005859375,"z":45.75},"onduty":true,"state":0,"model":1373390714,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"prison":0,"police":0,"ems":0},"_originalId":"prison_food_2","maxDistance":2.5}'),
-	(5059, 'pulsar_prison_food_kitchen', '{"coords":{"x":1786.8299560546876,"y":2560.27001953125,"z":45.70000076293945},"onduty":true,"state":1,"model":2024969025,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"prison":0,"police":0,"ems":0},"_originalId":"prison_food_kitchen","maxDistance":2.5}'),
-	(5060, 'pulsar_prison_infirmary_block', '{"coords":{"x":1765.1199951171876,"y":2566.52001953125,"z":45.79999923706055},"onduty":true,"state":0,"model":1373390714,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"prison":0,"police":0,"ems":0},"_originalId":"prison_infirmary_block","maxDistance":2.5}'),
-	(5061, 'pulsar_prison_infirmary_security', '{"coords":{"x":1772.81005859375,"y":2570.300048828125,"z":45.7400016784668},"onduty":true,"state":1,"model":2074175368,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"prison":0,"police":0,"ems":0},"_originalId":"prison_infirmary_security","maxDistance":2.5}'),
-	(5062, 'pulsar_prison_infirmary_double_1', '{"coords":{"x":1765.179931640625,"y":2574.699951171875,"z":45.75},"onduty":true,"state":1,"doors":[{"model":-1624297821,"coords":{"x":1766.3299560546876,"y":2574.699951171875,"z":45.75},"heading":0},{"model":-1624297821,"coords":{"x":1764.030029296875,"y":2574.699951171875,"z":45.75},"heading":0}],"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"prison":0,"police":0,"ems":0},"_originalId":"prison_infirmary_double_1","maxDistance":2.5}'),
-	(5063, 'pulsar_prison_icu_1', '{"coords":{"x":1765.179931640625,"y":2589.56005859375,"z":45.75},"onduty":true,"state":1,"doors":[{"model":-1624297821,"coords":{"x":1766.3299560546876,"y":2589.56005859375,"z":45.75},"heading":0},{"model":-1624297821,"coords":{"x":1764.030029296875,"y":2589.56005859375,"z":45.75},"heading":0}],"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"prison":0,"police":0,"ems":0},"_originalId":"prison_icu_1","maxDistance":2.5}'),
-	(5064, 'pulsar_prison_surgery_1', '{"coords":{"x":1767.3199462890626,"y":2583.4599609375,"z":45.75},"onduty":true,"state":1,"doors":[{"model":-1624297821,"coords":{"x":1767.3199462890626,"y":2582.31005859375,"z":45.75},"heading":0},{"model":-1624297821,"coords":{"x":1767.3199462890626,"y":2584.610107421875,"z":45.75},"heading":0}],"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"prison":0,"police":0,"ems":0},"_originalId":"prison_surgery_1","maxDistance":2.5}'),
-	(5065, 'pulsar_prison_lab', '{"coords":{"x":1767.3199462890626,"y":2580.830078125,"z":45.75},"onduty":true,"state":1,"model":-1392981450,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"prison":0,"police":0,"ems":0},"_originalId":"prison_lab","maxDistance":2.5}'),
-	(5066, 'pulsar_bank_fleeca_mall_office', '{"coords":{"x":-567.2000122070313,"y":-583.469970703125,"z":41.58000183105469},"maxDistance":2.5,"state":1,"model":-551608542,"auto":true,"heading":0,"lockSound":"button-remote","doorRate":10.0,"_originalId":"bank_fleeca_mall_office"}'),
-	(5067, 'pulsar_bank_fleeca_vinewood_door_1', '{"coords":{"x":272.7900085449219,"y":206.47999572753907,"z":106.37999725341797},"maxDistance":2.5,"state":1,"model":267980221,"auto":true,"heading":0,"lockSound":"button-remote","doorRate":10.0,"_originalId":"bank_fleeca_vinewood_door_1"}'),
-	(5068, 'pulsar_bank_fleeca_vinewood_door_2', '{"coords":{"x":251.52000427246095,"y":215.7100067138672,"z":106.37000274658203},"maxDistance":2.5,"state":1,"model":-2121568016,"auto":true,"heading":0,"lockSound":"button-remote","doorRate":10.0,"_originalId":"bank_fleeca_vinewood_door_2"}'),
-	(5069, 'pulsar_bank_fleeca_vinewood_door_3', '{"coords":{"x":267.3699951171875,"y":213.41000366210938,"z":106.37000274658203},"maxDistance":2.5,"state":1,"model":-2121568016,"auto":true,"heading":0,"lockSound":"button-remote","doorRate":10.0,"_originalId":"bank_fleeca_vinewood_door_3"}'),
-	(5070, 'pulsar_bank_fleeca_vinewood_door_4', '{"coords":{"x":270.2300109863281,"y":221.27000427246095,"z":106.37000274658203},"maxDistance":2.5,"state":1,"model":-2121568016,"auto":true,"heading":0,"lockSound":"button-remote","doorRate":10.0,"_originalId":"bank_fleeca_vinewood_door_4"}'),
-	(5071, 'pulsar_bank_fleeca_vinewood_door_5', '{"coords":{"x":256.6099853515625,"y":229.69000244140626,"z":106.37000274658203},"maxDistance":2.5,"state":1,"model":-2121568016,"auto":true,"heading":0,"lockSound":"button-remote","doorRate":10.0,"_originalId":"bank_fleeca_vinewood_door_5"}'),
-	(5072, 'pulsar_bank_fleeca_vinewood_door_6', '{"coords":{"x":256.6099853515625,"y":229.69000244140626,"z":106.37000274658203},"maxDistance":2.5,"state":1,"model":-2121568016,"auto":true,"heading":0,"lockSound":"button-remote","doorRate":10.0,"_originalId":"bank_fleeca_vinewood_door_6"}'),
-	(5073, 'pulsar_bank_fleeca_vinewood_gate_1', '{"coords":{"x":272.6400146484375,"y":219.89999389648438,"z":97.31999969482422},"maxDistance":2.5,"state":1,"model":409280169,"auto":true,"heading":0,"lockSound":"button-remote","doorRate":10.0,"_originalId":"bank_fleeca_vinewood_gate_1"}'),
-	(5074, 'pulsar_bank_fleeca_vinewood_gate_2', '{"coords":{"x":270.1000061035156,"y":212.9199981689453,"z":97.31999969482422},"maxDistance":2.5,"state":1,"model":409280169,"auto":true,"heading":0,"lockSound":"button-remote","doorRate":10.0,"_originalId":"bank_fleeca_vinewood_gate_2"}'),
-	(5075, 'pulsar_bank_fleeca_vinewood_offices_1', '{"coords":{"x":262.17999267578127,"y":210.33999633789063,"z":106.37999725341797},"maxDistance":2.5,"state":1,"model":1721645826,"auto":true,"heading":0,"lockSound":"button-remote","doorRate":10.0,"_originalId":"bank_fleeca_vinewood_offices_1"}'),
-	(5076, 'pulsar_bank_fleeca_vinewood_offices_2', '{"coords":{"x":252.7899932861328,"y":213.75999450683595,"z":106.37999725341797},"maxDistance":2.5,"state":1,"model":1721645826,"auto":true,"heading":0,"lockSound":"button-remote","doorRate":10.0,"_originalId":"bank_fleeca_vinewood_offices_2"}'),
-	(5077, 'pulsar_bank_fleeca_vinewood_offices_3', '{"coords":{"x":258.82000732421877,"y":230.3800048828125,"z":106.37999725341797},"maxDistance":2.5,"state":1,"model":1721645826,"auto":true,"heading":0,"lockSound":"button-remote","doorRate":10.0,"_originalId":"bank_fleeca_vinewood_offices_3"}'),
-	(5078, 'pulsar_bank_fleeca_vinewood_offices_4', '{"coords":{"x":268.2099914550781,"y":226.9600067138672,"z":106.37999725341797},"maxDistance":2.5,"state":1,"model":1721645826,"auto":true,"heading":0,"lockSound":"button-remote","doorRate":10.0,"_originalId":"bank_fleeca_vinewood_offices_4"}'),
-	(5079, 'pulsar_bank_fleeca_vinewood_offices_5_1', '{"coords":{"x":273.17999267578127,"y":216.86000061035157,"z":110.27999877929688},"maxDistance":2.5,"state":1,"model":1109357065,"auto":true,"lockSound":"button-remote","doorRate":10.0,"_originalId":"bank_fleeca_vinewood_offices_5_1"}'),
-	(5080, 'pulsar_bank_fleeca_vinewood_offices_5_2', '{"coords":{"x":272.4700012207031,"y":214.91000366210938,"z":110.27999877929688},"maxDistance":2.5,"state":1,"model":1109357065,"auto":true,"lockSound":"button-remote","doorRate":10.0,"_originalId":"bank_fleeca_vinewood_offices_5_2"}'),
-	(5081, 'pulsar_bank_fleeca_vinewood_offices_6', '{"coords":{"x":262.17999267578127,"y":210.33999633789063,"z":110.27999877929688},"maxDistance":2.5,"state":1,"model":1721645826,"auto":true,"heading":0,"lockSound":"button-remote","doorRate":10.0,"_originalId":"bank_fleeca_vinewood_offices_6"}'),
-	(5082, 'pulsar_bank_fleeca_vinewood_offices_7', '{"coords":{"x":252.7899932861328,"y":213.75999450683595,"z":110.27999877929688},"maxDistance":2.5,"state":1,"model":1721645826,"auto":true,"heading":0,"lockSound":"button-remote","doorRate":10.0,"_originalId":"bank_fleeca_vinewood_offices_7"}'),
-	(5083, 'pulsar_bank_fleeca_vinewood_offices_8', '{"coords":{"x":258.82000732421877,"y":230.3800048828125,"z":110.27999877929688},"maxDistance":2.5,"state":1,"model":1721645826,"auto":true,"heading":0,"lockSound":"button-remote","doorRate":10.0,"_originalId":"bank_fleeca_vinewood_offices_8"}'),
-	(5084, 'pulsar_bank_fleeca_vinewood_offices_9', '{"coords":{"x":268.2099914550781,"y":226.9600067138672,"z":110.27999877929688},"maxDistance":2.5,"state":1,"model":1721645826,"auto":true,"heading":0,"lockSound":"button-remote","doorRate":10.0,"_originalId":"bank_fleeca_vinewood_offices_9"}'),
-	(5085, 'pulsar_bank_fleeca_vinewood_stairs_1', '{"coords":{"x":277.6000061035156,"y":223.5399932861328,"z":106.37999725341797},"maxDistance":2.5,"state":1,"model":267980221,"auto":true,"heading":0,"lockSound":"button-remote","doorRate":10.0,"_originalId":"bank_fleeca_vinewood_stairs_1"}'),
-	(5086, 'pulsar_bank_fleeca_vinewood_stairs_2', '{"coords":{"x":277.6000061035156,"y":223.5399932861328,"z":110.27999877929688},"maxDistance":2.5,"state":1,"model":267980221,"auto":true,"heading":0,"lockSound":"button-remote","doorRate":10.0,"_originalId":"bank_fleeca_vinewood_stairs_2"}'),
-	(5087, 'pulsar_bank_fleeca_vinewood_roof_1', '{"coords":{"x":272.67498779296877,"y":235.03500366210938,"z":123.97000122070313},"maxDistance":2.5,"state":1,"auto":true,"doors":[{"model":726025323,"coords":{"x":271.45001220703127,"y":235.47999572753907,"z":123.97000122070313},"heading":0},{"model":1577691629,"coords":{"x":273.8999938964844,"y":234.58999633789063,"z":123.97000122070313},"heading":0}],"lockSound":"button-remote","doorRate":10.0,"_originalId":"bank_fleeca_vinewood_roof_1"}'),
-	(5088, 'pulsar_bank_savings_paleto_office_1', '{"coords":{"x":-104.83999633789063,"y":6463.77001953125,"z":31.79000091552734},"maxDistance":2.5,"state":1,"model":2110946875,"auto":true,"heading":0,"lockSound":"button-remote","doorRate":10.0,"_originalId":"bank_savings_paleto_office_1"}'),
-	(5089, 'pulsar_bank_savings_paleto_office_2', '{"coords":{"x":-100.62000274658203,"y":6467.990234375,"z":31.79000091552734},"maxDistance":2.5,"state":1,"model":1754616769,"auto":true,"heading":0,"lockSound":"button-remote","doorRate":10.0,"_originalId":"bank_savings_paleto_office_2"}'),
-	(5090, 'pulsar_bank_savings_paleto_office_3', '{"coords":{"x":-104.70999908447266,"y":6473.919921875,"z":31.79000091552734},"maxDistance":2.5,"state":1,"model":-368548260,"auto":true,"heading":0,"lockSound":"button-remote","doorRate":10.0,"_originalId":"bank_savings_paleto_office_3"}'),
-	(5091, 'pulsar_bank_savings_paleto_corridor_1', '{"coords":{"x":-111.04000091552735,"y":6475.330078125,"z":31.79000091552734},"maxDistance":2.5,"state":1,"model":-56652918,"auto":true,"heading":0,"lockSound":"button-remote","doorRate":10.0,"_originalId":"bank_savings_paleto_corridor_1"}'),
-	(5092, 'pulsar_bank_savings_paleto_corridor_2', '{"coords":{"x":-100.11000061035156,"y":6474.39013671875,"z":31.79000091552734},"maxDistance":2.5,"state":1,"model":-147325430,"auto":true,"heading":0,"lockSound":"button-remote","doorRate":10.0,"_originalId":"bank_savings_paleto_corridor_2"}'),
-	(5093, 'pulsar_bank_savings_paleto_security', '{"coords":{"x":-92.2300033569336,"y":6468.9599609375,"z":31.79000091552734},"maxDistance":2.5,"state":1,"model":-147325430,"auto":true,"heading":0,"lockSound":"button-remote","doorRate":10.0,"_originalId":"bank_savings_paleto_security"}'),
-	(5094, 'pulsar_bank_savings_paleto_back_1', '{"coords":{"x":-96.70999908447266,"y":6474.06005859375,"z":31.79000091552734},"maxDistance":2.5,"state":1,"model":1248599813,"auto":true,"heading":0,"lockSound":"button-remote","doorRate":10.0,"_originalId":"bank_savings_paleto_back_1"}'),
-	(5095, 'pulsar_bank_savings_paleto_back_2', '{"coords":{"x":-116.51000213623047,"y":6478.9599609375,"z":31.79000091552734},"maxDistance":2.5,"state":1,"model":1248599813,"auto":true,"heading":0,"lockSound":"button-remote","doorRate":10.0,"_originalId":"bank_savings_paleto_back_2"}'),
-	(5096, 'pulsar_bank_savings_paleto_gate', '{"coords":{"x":-112.56999969482422,"y":6468.009765625,"z":31.20999908447265},"maxDistance":2.5,"state":1,"model":1784650867,"auto":true,"heading":0,"lockSound":"button-remote","doorRate":10.0,"_originalId":"bank_savings_paleto_gate"}'),
-	(5097, 'pulsar_bank_savings_paleto_vault', '{"coords":{"x":-100.23999786376953,"y":6464.5498046875,"z":31.8799991607666},"maxDistance":2.5,"state":1,"model":-2050208642,"auto":true,"heading":0,"lockSound":"button-remote","doorRate":10.0,"_originalId":"bank_savings_paleto_vault"}'),
-	(5098, 'pulsar_fleeca_hawick_east_gate', '{"coords":{"x":314.6199951171875,"y":-285.989990234375,"z":54.45999908447265},"maxDistance":2.5,"state":1,"model":-1591004109,"auto":true,"heading":0,"lockSound":"button-remote","doorRate":10.0,"_originalId":"fleeca_hawick_east_gate"}'),
-	(5099, 'pulsar_fleeca_hawick_west_gate', '{"coords":{"x":-350.4100036621094,"y":-56.79999923706055,"z":49.33000183105469},"maxDistance":2.5,"state":1,"model":-1591004109,"auto":true,"heading":0,"lockSound":"button-remote","doorRate":10.0,"_originalId":"fleeca_hawick_west_gate"}'),
-	(5100, 'pulsar_fleeca_delperro_gate', '{"coords":{"x":-1207.3299560546876,"y":-335.1300048828125,"z":38.08000183105469},"maxDistance":2.5,"state":1,"model":-1591004109,"auto":true,"heading":0,"lockSound":"button-remote","doorRate":10.0,"_originalId":"fleeca_delperro_gate"}'),
-	(5101, 'pulsar_fleeca_great_ocean_gate', '{"coords":{"x":-2956.1201171875,"y":485.4200134277344,"z":16.0},"maxDistance":2.5,"state":1,"model":-1591004109,"auto":true,"heading":0,"lockSound":"button-remote","doorRate":10.0,"_originalId":"fleeca_great_ocean_gate"}'),
-	(5102, 'pulsar_fleeca_route68_gate', '{"coords":{"x":1172.2900390625,"y":2713.14990234375,"z":38.38999938964844},"maxDistance":2.5,"state":1,"model":-1591004109,"auto":true,"heading":0,"lockSound":"button-remote","doorRate":10.0,"_originalId":"fleeca_route68_gate"}'),
-	(5103, 'pulsar_fleeca_vespucci_gate', '{"coords":{"x":150.2899932861328,"y":-1047.6300048828126,"z":29.67000007629394},"maxDistance":2.5,"state":1,"model":-1591004109,"auto":true,"heading":0,"lockSound":"button-remote","doorRate":10.0,"_originalId":"fleeca_vespucci_gate"}'),
-	(5104, 'pulsar_fleeca_hawick_east_tills', '{"coords":{"x":309.70001220703127,"y":-280.29998779296877,"z":54.31999969482422},"maxDistance":2.5,"state":1,"model":-147325430,"auto":true,"heading":0,"lockSound":"button-remote","doorRate":10.0,"_originalId":"fleeca_hawick_east_tills"}'),
-	(5105, 'pulsar_fleeca_hawick_west_tills', '{"coords":{"x":-355.44000244140627,"y":-51.18999862670898,"z":49.18999862670898},"maxDistance":2.5,"state":1,"model":-147325430,"auto":true,"heading":0,"lockSound":"button-remote","doorRate":10.0,"_originalId":"fleeca_hawick_west_tills"}'),
-	(5106, 'pulsar_fleeca_delperro_tills', '{"coords":{"x":-1214.8499755859376,"y":-334.8500061035156,"z":37.93999862670898},"maxDistance":2.5,"state":1,"model":-147325430,"auto":true,"heading":0,"lockSound":"button-remote","doorRate":10.0,"_originalId":"fleeca_delperro_tills"}'),
-	(5107, 'pulsar_fleeca_great_ocean_tills', '{"coords":{"x":-2960.0400390625,"y":479.0,"z":15.85000038146972},"maxDistance":2.5,"state":1,"model":-147325430,"auto":true,"heading":0,"lockSound":"button-remote","doorRate":10.0,"_originalId":"fleeca_great_ocean_tills"}'),
-	(5108, 'pulsar_fleeca_route68_tills', '{"coords":{"x":1178.8699951171876,"y":2709.5,"z":38.25},"maxDistance":2.5,"state":1,"model":-147325430,"auto":true,"heading":0,"lockSound":"button-remote","doorRate":10.0,"_originalId":"fleeca_route68_tills"}'),
-	(5109, 'pulsar_fleeca_vespucci_tills', '{"coords":{"x":145.3699951171875,"y":-1041.93994140625,"z":29.5300006866455},"maxDistance":2.5,"state":1,"model":-147325430,"auto":true,"heading":0,"lockSound":"button-remote","doorRate":10.0,"_originalId":"fleeca_vespucci_tills"}'),
-	(5110, 'pulsar_bobcat_extr', '{"coords":{"x":882.1900024414063,"y":-2258.419921875,"z":30.55999946594238},"maxDistance":2.5,"state":1,"auto":true,"doors":[{"model":-1563799200,"coords":{"x":880.9000244140625,"y":-2258.31005859375,"z":30.55999946594238},"heading":0},{"model":-1259801187,"coords":{"x":883.47998046875,"y":-2258.530029296875,"z":30.55999946594238},"heading":0}],"lockSound":"button-remote","doorRate":10.0,"_originalId":"bobcat_extr"}'),
-	(5111, 'pulsar_bobcat_front', '{"coords":{"x":881.6199951171875,"y":-2264.669921875,"z":30.6200008392334},"maxDistance":2.5,"state":1,"model":-551608542,"auto":true,"heading":0,"lockSound":"button-remote","doorRate":10.0,"_originalId":"bobcat_front"}'),
-	(5112, 'pulsar_bobcat_inner', '{"coords":{"x":881.3250122070313,"y":-2268.294921875,"z":30.6200008392334},"maxDistance":2.5,"state":1,"auto":true,"doors":[{"model":933053701,"coords":{"x":880.030029296875,"y":-2268.179931640625,"z":30.6200008392334},"heading":0},{"model":933053701,"coords":{"x":882.6199951171875,"y":-2268.409912109375,"z":30.6200008392334},"heading":0}],"lockSound":"button-remote","doorRate":10.0,"_originalId":"bobcat_inner"}'),
-	(5113, 'pulsar_bobcat_surveillance', '{"coords":{"x":882.3400268554688,"y":-2295.27001953125,"z":30.6200008392334},"maxDistance":2.5,"state":1,"model":-311575617,"auto":true,"heading":0,"lockSound":"button-remote","doorRate":10.0,"_originalId":"bobcat_surveillance"}'),
-	(5114, 'pulsar_bobcat_rear_left', '{"coords":{"x":864.8599853515625,"y":-2308.449951171875,"z":31.01000022888183},"maxDistance":2.5,"state":1,"auto":true,"doors":[{"model":838685283,"coords":{"x":864.989990234375,"y":-2306.949951171875,"z":31.01000022888183},"heading":0},{"model":-1020431159,"coords":{"x":864.72998046875,"y":-2309.949951171875,"z":31.01000022888183},"heading":0}],"lockSound":"button-remote","doorRate":10.0,"_originalId":"bobcat_rear_left"}'),
-	(5115, 'pulsar_coke_hidden_entrance', '{"coords":{"x":-321.489990234375,"y":-2444.47998046875,"z":7.46000003814697},"maxDistance":2.5,"state":1,"model":1013228087,"auto":true,"heading":0,"lockSound":"button-remote","doorRate":10.0,"_originalId":"coke_hidden_entrance"}'),
-	(5116, 'pulsar_coke_seadoor', '{"coords":{"x":-332.9700012207031,"y":-2471.199951171875,"z":-1.63999998569488},"maxDistance":2.5,"state":1,"auto":true,"doors":[{"model":1988553027,"coords":{"x":-335.9100036621094,"y":-2468.719970703125,"z":-1.63999998569488},"heading":0},{"model":1625505276,"coords":{"x":-330.0299987792969,"y":-2473.679931640625,"z":-1.63999998569488},"heading":0}],"lockSound":"button-remote","doorRate":10.0,"_originalId":"coke_seadoor"}'),
-	(5117, 'pulsar_coke_garage', '{"coords":{"x":-318.0899963378906,"y":-2438.39990234375,"z":9.39000034332275},"maxDistance":2.5,"state":1,"model":-1291669313,"heading":0,"_originalId":"coke_garage"}'),
-	(5118, 'pulsar_robbery_gallery_vault', '{"coords":{"x":14.76000022888183,"y":138.72000122070313,"z":93.9800033569336},"maxDistance":2.5,"state":1,"model":-660779536,"auto":true,"heading":0,"lockSound":"button-remote","doorRate":10.0,"_originalId":"robbery_gallery_vault"}'),
-	(5119, 'pulsar_robbery_gallery_cage1', '{"coords":{"x":37.47000122070312,"y":144.9600067138672,"z":93.91999816894531},"maxDistance":2.5,"state":0,"model":-1508355822,"auto":true,"heading":0,"lockSound":"button-remote","doorRate":10.0,"_originalId":"robbery_gallery_cage1"}'),
-	(5120, 'pulsar_robbery_gallery_cage2', '{"coords":{"x":33.83000183105469,"y":135.05999755859376,"z":93.94000244140625},"maxDistance":2.5,"state":0,"model":-1508355822,"auto":true,"heading":0,"lockSound":"button-remote","doorRate":10.0,"_originalId":"robbery_gallery_cage2"}'),
-	(5121, 'pulsar_robbery_gallery_office', '{"coords":{"x":20.78499984741211,"y":155.3000030517578,"z":93.91500091552735},"maxDistance":2.5,"state":1,"auto":true,"doors":[{"model":110411286,"coords":{"x":20.34000015258789,"y":154.0800018310547,"z":93.91999816894531},"heading":0},{"model":110411286,"coords":{"x":21.22999954223632,"y":156.52000427246095,"z":93.91000366210938},"heading":0}],"lockSound":"button-remote","doorRate":10.0,"_originalId":"robbery_gallery_office"}'),
-	(5122, 'pulsar_robbery_gallery_front', '{"coords":{"x":11.64500045776367,"y":148.86000061035157,"z":93.91500091552735},"maxDistance":2.5,"state":0,"auto":true,"doors":[{"model":110411286,"coords":{"x":11.19999980926513,"y":147.63999938964845,"z":93.91999816894531},"heading":0},{"model":110411286,"coords":{"x":12.09000015258789,"y":150.0800018310547,"z":93.91000366210938},"heading":0}],"lockSound":"button-remote","doorRate":10.0,"_originalId":"robbery_gallery_front"}'),
-	(5123, 'pulsar_lombank_front_gate', '{"coords":{"x":17.98999977111816,"y":-919.9500122070313,"z":30.04999923706054},"maxDistance":2.5,"state":1,"model":-222270721,"auto":true,"heading":0,"lockSound":"button-remote","doorRate":10.0,"_originalId":"lombank_front_gate"}'),
-	(5124, 'pulsar_lombank_office', '{"coords":{"x":23.83499908447265,"y":-938.1199951171875,"z":33.84000015258789},"maxDistance":2.5,"state":1,"auto":true,"doors":[{"model":964838196,"coords":{"x":25.3799991607666,"y":-933.8499755859375,"z":33.84000015258789},"heading":0},{"model":964838196,"coords":{"x":22.29000091552734,"y":-942.3900146484375,"z":33.84000015258789},"heading":0}],"lockSound":"button-remote","doorRate":10.0,"_originalId":"lombank_office"}'),
-	(5125, 'pulsar_lombank_cargo', '{"coords":{"x":28.95999908447265,"y":-917.5999755859375,"z":31.80999946594238},"maxDistance":2.5,"state":1,"model":1309269072,"auto":true,"heading":0,"lockSound":"button-remote","doorRate":10.0,"_originalId":"lombank_cargo"}'),
-	(5126, 'pulsar_lombank_cargo_2', '{"coords":{"x":27.86000061035156,"y":-920.6400146484375,"z":31.80999946594238},"maxDistance":2.5,"state":1,"model":1309269072,"auto":true,"heading":0,"lockSound":"button-remote","doorRate":10.0,"_originalId":"lombank_cargo_2"}'),
-	(5127, 'pulsar_lombank_hidden', '{"coords":{"x":37.38999938964844,"y":-922.1599731445313,"z":29.90999984741211},"maxDistance":2.5,"state":1,"model":30403864,"auto":true,"heading":0,"lockSound":"button-remote","doorRate":10.0,"_originalId":"lombank_hidden"}'),
-	(5128, 'pulsar_lombank_upper_gate', '{"coords":{"x":22.70000076293945,"y":-931.5999755859375,"z":30.21999931335449},"maxDistance":2.5,"state":1,"model":1309269072,"auto":true,"heading":0,"lockSound":"button-remote","doorRate":10.0,"_originalId":"lombank_upper_gate"}'),
-	(5129, 'pulsar_lombank_upper_vault', '{"coords":{"x":19.06999969482422,"y":-940.3800048828125,"z":30.05999946594238},"maxDistance":2.5,"state":1,"model":-1185205679,"auto":true,"heading":0,"lockSound":"button-remote","doorRate":10.0,"_originalId":"lombank_upper_vault"}'),
-	(5130, 'pulsar_lombank_upper_vault_gate', '{"coords":{"x":21.90999984741211,"y":-943.8099975585938,"z":30.21999931335449},"maxDistance":2.5,"state":1,"model":1309269072,"auto":true,"heading":0,"lockSound":"button-remote","doorRate":10.0,"_originalId":"lombank_upper_vault_gate"}'),
-	(5131, 'pulsar_lombank_lower_gate', '{"coords":{"x":25.32999992370605,"y":-930.260009765625,"z":26.05999946594238},"maxDistance":2.5,"state":1,"model":1309269072,"auto":true,"heading":0,"lockSound":"button-remote","doorRate":10.0,"_originalId":"lombank_lower_gate"}'),
-	(5132, 'pulsar_lombank_lower_vault', '{"coords":{"x":26.29999923706054,"y":-918.3499755859375,"z":26.45000076293945},"maxDistance":2.5,"state":1,"model":961976194,"auto":true,"heading":0,"lockSound":"button-remote","doorRate":10.0,"_originalId":"lombank_lower_vault"}'),
-	(5133, 'pulsar_lombank_lower_room_1', '{"coords":{"x":23.93000030517578,"y":-915.280029296875,"z":26.05999946594238},"maxDistance":2.5,"state":1,"model":1309269072,"auto":true,"heading":0,"lockSound":"button-remote","doorRate":10.0,"_originalId":"lombank_lower_room_1"}'),
-	(5134, 'pulsar_lombank_lower_room_2', '{"coords":{"x":33.0,"y":-918.5800170898438,"z":26.05999946594238},"maxDistance":2.5,"state":1,"model":1309269072,"auto":true,"heading":0,"lockSound":"button-remote","doorRate":10.0,"_originalId":"lombank_lower_room_2"}'),
-	(5135, 'pulsar_lombank_lower_room_3', '{"coords":{"x":26.5,"y":-908.2000122070313,"z":26.05999946594238},"maxDistance":2.5,"state":1,"model":1309269072,"auto":true,"heading":0,"lockSound":"button-remote","doorRate":10.0,"_originalId":"lombank_lower_room_3"}'),
-	(5136, 'pulsar_lombank_lower_room_4', '{"coords":{"x":35.56999969482422,"y":-911.5,"z":26.05999946594238},"maxDistance":2.5,"state":1,"model":1309269072,"auto":true,"heading":0,"lockSound":"button-remote","doorRate":10.0,"_originalId":"lombank_lower_room_4"}'),
-	(5137, 'pulsar_lombank_hidden_entrance', '{"coords":{"x":43.40999984741211,"y":-810.969970703125,"z":31.70999908447265},"maxDistance":2.5,"state":1,"model":-1997783829,"auto":true,"heading":0,"lockSound":"button-remote","doorRate":10.0,"_originalId":"lombank_hidden_entrance"}'),
-	(5138, 'pulsar_lombank_office_3', '{"coords":{"x":35.7400016784668,"y":-933.3300170898438,"z":30.04999923706054},"maxDistance":2.5,"state":1,"model":964838196,"auto":true,"heading":0,"lockSound":"button-remote","doorRate":10.0,"_originalId":"lombank_office_3"}'),
-	(5139, 'pulsar_lombank_supply_closet', '{"coords":{"x":38.31999969482422,"y":-926.2100219726563,"z":30.06999969482422},"maxDistance":2.5,"state":1,"model":964838196,"auto":true,"heading":0,"lockSound":"button-remote","doorRate":10.0,"_originalId":"lombank_supply_closet"}'),
-	(5140, 'pulsar_lombank_lasers', '{"coords":{"x":25.96659088134765,"y":-926.6845703125,"z":26.73406028747558},"maxDistance":2.5,"state":1,"model":-1596396219,"auto":true,"heading":0,"lockSound":"button-remote","doorRate":10.0,"_originalId":"lombank_lasers"}'),
-	(5141, 'pulsar_lombank_garage', '{"coords":{"x":36.54000091552734,"y":-908.97998046875,"z":33.40999984741211},"maxDistance":2.5,"state":1,"model":-1906310003,"auto":true,"heading":0,"lockSound":"button-remote","doorRate":10.0,"_originalId":"lombank_garage"}'),
-	(5142, 'pulsar_mazebank_tills', '{"coords":{"x":-1308.4599609375,"y":-816.6099853515625,"z":16.93000030517578},"maxDistance":2.5,"state":1,"model":-774701539,"auto":true,"heading":0,"lockSound":"button-remote","doorRate":10.0,"_originalId":"mazebank_tills"}'),
-	(5143, 'pulsar_mazebank_gate', '{"coords":{"x":-1301.280029296875,"y":-819.969970703125,"z":16.8700008392334},"maxDistance":2.5,"state":1,"model":-1269579347,"auto":true,"heading":0,"lockSound":"button-remote","doorRate":10.0,"_originalId":"mazebank_gate"}'),
-	(5144, 'pulsar_mazebank_vault_gate', '{"coords":{"x":-1294.6400146484376,"y":-816.030029296875,"z":17.11000061035156},"maxDistance":2.5,"state":1,"model":-1591004109,"auto":true,"heading":0,"lockSound":"button-remote","doorRate":10.0,"_originalId":"mazebank_vault_gate"}'),
-	(5145, 'pulsar_mazebank_offices', '{"coords":{"x":-1302.47998046875,"y":-830.3800048828125,"z":17.21999931335449},"onduty":true,"state":1,"model":-1960292781,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":10.0,"groups":{"police":0},"_originalId":"mazebank_offices","maxDistance":2.5}'),
-	(5146, 'pulsar_mazebank_office_1', '{"coords":{"x":-1300.5899658203126,"y":-830.8599853515625,"z":17.21999931335449},"onduty":true,"state":1,"model":-1960292781,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":10.0,"groups":{"police":0},"_originalId":"mazebank_office_1","maxDistance":2.5}'),
-	(5147, 'pulsar_mazebank_office_2', '{"coords":{"x":-1298.1300048828126,"y":-834.1400146484375,"z":17.21999931335449},"onduty":true,"state":1,"model":-1960292781,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":10.0,"groups":{"police":0},"_originalId":"mazebank_office_2","maxDistance":2.5}'),
-	(5148, 'pulsar_mazebank_office_3', '{"coords":{"x":-1293.06005859375,"y":-840.8900146484375,"z":17.21999931335449},"onduty":true,"state":1,"model":-1960292781,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":10.0,"groups":{"police":0},"_originalId":"mazebank_office_3","maxDistance":2.5}'),
-	(5149, 'pulsar_robbery_vangelico_office', '{"coords":{"x":-629.1300048828125,"y":-230.14999389648438,"z":38.20999908447265},"maxDistance":2.5,"state":1,"model":1335309163,"auto":true,"heading":0,"lockSound":"button-remote","doorRate":6.0,"_originalId":"robbery_vangelico_office"}'),
-	(5150, 'pulsar_robbery_xgems_office', '{"coords":{"x":225.9600067138672,"y":369.1300048828125,"z":106.30000305175781},"maxDistance":2.5,"state":1,"model":1335309163,"auto":true,"heading":0,"lockSound":"button-remote","doorRate":6.0,"_originalId":"robbery_xgems_office"}'),
-	(5151, 'pulsar_safd_eastside_main_door', '{"coords":{"x":1185.0,"y":-1464.68994140625,"z":34.08000183105469},"maxDistance":2.5,"state":1,"model":-585526495,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"ems":0},"doorRate":6.0,"_originalId":"safd_eastside_main_door"}'),
-	(5152, 'pulsar_safd_eastside_garage_1', '{"coords":{"x":1204.8199462890626,"y":-1463.52001953125,"z":35.86999893188476},"onduty":true,"state":1,"model":1934132135,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"ems":0},"_originalId":"safd_eastside_garage_1","maxDistance":2.5}'),
-	(5153, 'pulsar_safd_eastside_garage_2', '{"coords":{"x":1200.75,"y":-1463.52001953125,"z":35.86999893188476},"onduty":true,"state":1,"model":1934132135,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"ems":0},"_originalId":"safd_eastside_garage_2","maxDistance":2.5}'),
-	(5154, 'pulsar_safd_eastside_garage_3', '{"coords":{"x":1196.6700439453126,"y":-1463.52001953125,"z":35.86999893188476},"onduty":true,"state":1,"model":1934132135,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"ems":0},"_originalId":"safd_eastside_garage_3","maxDistance":2.5}'),
-	(5155, 'pulsar_safd_southside_main_door', '{"coords":{"x":199.2899932861328,"y":-1634.489990234375,"z":29.02000045776367},"maxDistance":2.5,"state":1,"model":-585526495,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"ems":0},"doorRate":6.0,"_originalId":"safd_southside_main_door"}'),
-	(5156, 'pulsar_safd_southside_garage_1', '{"coords":{"x":215.22999572753907,"y":-1646.3299560546876,"z":30.81999969482422},"onduty":true,"state":1,"model":1934132135,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"ems":0},"_originalId":"safd_southside_garage_1","maxDistance":2.5}'),
-	(5157, 'pulsar_safd_southside_garage_2', '{"coords":{"x":212.10000610351563,"y":-1643.7099609375,"z":30.81999969482422},"onduty":true,"state":1,"model":1934132135,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"ems":0},"_originalId":"safd_southside_garage_2","maxDistance":2.5}'),
-	(5158, 'pulsar_safd_southside_garage_3', '{"coords":{"x":208.97999572753907,"y":-1641.0899658203126,"z":30.81999969482422},"onduty":true,"state":1,"model":1934132135,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"ems":0},"_originalId":"safd_southside_garage_3","maxDistance":2.5}'),
-	(5159, 'pulsar_st_fiacre_main_front_right_1', '{"coords":{"x":1150.4150390625,"y":-1530.6650390625,"z":34.38000106811523},"maxDistance":2.5,"state":0,"doors":[{"model":2072340116,"coords":{"x":1149.3599853515626,"y":-1529.9300537109376,"z":34.38000106811523},"heading":0},{"model":610481702,"coords":{"x":1151.469970703125,"y":-1531.4000244140626,"z":34.38000106811523},"heading":0}],"auto":true,"lockSound":"button-remote","groups":{"ems":0,"police":0},"doorRate":6.0,"_originalId":"st_fiacre_main_front_right_1"}'),
-	(5160, 'pulsar_st_fiacre_main_front_right_2', '{"coords":{"x":1148.675048828125,"y":-1533.1500244140626,"z":34.38000106811523},"maxDistance":2.5,"state":0,"doors":[{"model":2072340116,"coords":{"x":1147.6199951171876,"y":-1532.4100341796876,"z":34.38000106811523},"heading":0},{"model":610481702,"coords":{"x":1149.72998046875,"y":-1533.8900146484376,"z":34.38000106811523},"heading":0}],"auto":true,"lockSound":"button-remote","groups":{"ems":0,"police":0},"doorRate":6.0,"_originalId":"st_fiacre_main_front_right_2"}'),
-	(5161, 'pulsar_st_fiacre_pharmacy_right', '{"coords":{"x":1138.81005859375,"y":-1533.0799560546876,"z":35.15999984741211},"maxDistance":2.5,"state":0,"doors":[{"model":-1600698396,"coords":{"x":1139.9599609375,"y":-1533.0799560546876,"z":35.15999984741211},"heading":0},{"model":-1600698396,"coords":{"x":1137.6600341796876,"y":-1533.0799560546876,"z":35.15999984741211},"heading":0}],"auto":true,"lockSound":"button-remote","groups":{"ems":0,"police":0},"doorRate":6.0,"_originalId":"st_fiacre_pharmacy_right"}'),
-	(5162, 'pulsar_st_fiacre_east_to_west_left', '{"coords":{"x":1134.1700439453126,"y":-1535.179931640625,"z":35.18999862670898},"maxDistance":2.5,"state":0,"doors":[{"model":1029158225,"coords":{"x":1134.1700439453126,"y":-1536.47998046875,"z":35.18999862670898},"heading":0},{"model":1029158225,"coords":{"x":1134.1700439453126,"y":-1533.8800048828126,"z":35.18999862670898},"heading":0}],"auto":true,"lockSound":"button-remote","groups":{"ems":0,"police":0},"doorRate":6.0,"_originalId":"st_fiacre_east_to_west_left"}'),
-	(5163, 'pulsar_st_fiacre_west_double_right', '{"coords":{"x":1122.7249755859376,"y":-1524.3499755859376,"z":34.02999877929687},"maxDistance":2.5,"state":0,"doors":[{"model":2072340116,"coords":{"x":1121.43994140625,"y":-1524.3499755859376,"z":34.02999877929687},"heading":0},{"model":610481702,"coords":{"x":1124.010009765625,"y":-1524.3499755859376,"z":34.02999877929687},"heading":0}],"auto":true,"lockSound":"button-remote","groups":{"ems":0,"police":0},"doorRate":6.0,"_originalId":"st_fiacre_west_double_right"}'),
-	(5164, 'pulsar_st_fiacre_main_east_right1', '{"coords":{"x":1153.14501953125,"y":-1546.93994140625,"z":34.02999877929687},"maxDistance":2.5,"state":0,"doors":[{"model":2072340116,"coords":{"x":1153.1400146484376,"y":-1545.6600341796876,"z":34.02999877929687},"heading":0},{"model":610481702,"coords":{"x":1153.1500244140626,"y":-1548.219970703125,"z":34.02999877929687},"heading":0}],"auto":true,"lockSound":"button-remote","groups":{"ems":0,"police":0},"doorRate":6.0,"_originalId":"st_fiacre_main_east_right1"}'),
-	(5165, 'pulsar_st_fiacre_main_east_right2', '{"coords":{"x":1151.1400146484376,"y":-1546.93994140625,"z":34.02999877929687},"maxDistance":2.5,"state":0,"doors":[{"model":2072340116,"coords":{"x":1151.1400146484376,"y":-1545.6600341796876,"z":34.02999877929687},"heading":0},{"model":610481702,"coords":{"x":1151.1400146484376,"y":-1548.219970703125,"z":34.02999877929687},"heading":0}],"auto":true,"lockSound":"button-remote","groups":{"ems":0,"police":0},"doorRate":6.0,"_originalId":"st_fiacre_main_east_right2"}'),
-	(5166, 'pulsar_st_fiacre_east_reception_hallway_left', '{"coords":{"x":1134.1700439453126,"y":-1548.52001953125,"z":35.18999862670898},"maxDistance":2.5,"state":0,"doors":[{"model":1029158225,"coords":{"x":1134.1700439453126,"y":-1547.219970703125,"z":35.18999862670898},"heading":0},{"model":1029158225,"coords":{"x":1134.1700439453126,"y":-1549.8199462890626,"z":35.18999862670898},"heading":0}],"auto":true,"lockSound":"button-remote","groups":{"ems":0,"police":0},"doorRate":6.0,"_originalId":"st_fiacre_east_reception_hallway_left"}'),
-	(5167, 'pulsar_st_fiacre_service_room_closet', '{"coords":{"x":1135.0699462890626,"y":-1537.260009765625,"z":35.15999984741211},"onduty":true,"state":1,"model":-1337230745,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"ems":0},"_originalId":"st_fiacre_service_room_closet","maxDistance":2.5}'),
-	(5168, 'pulsar_st_fiacre_service_room_lockers', '{"coords":{"x":1140.4599609375,"y":-1537.260009765625,"z":35.15999984741211},"maxDistance":2.5,"state":1,"model":-1337230745,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"ems":0},"doorRate":6.0,"_originalId":"st_fiacre_service_room_lockers"}'),
-	(5169, 'pulsar_door_956', '{"coords":{"x":1140.449951171875,"y":-1541.739990234375,"z":35.15999984741211},"maxDistance":2.5,"state":1,"model":-1337230745,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"ems":0},"doorRate":6.0,"_originalId":"st_fiacre_service_room_lockers_to_breakroom"}'),
-	(5170, 'pulsar_st_fiacre_service_room_cafe_to_breakroom', '{"coords":{"x":1140.4599609375,"y":-1546.550048828125,"z":35.15999984741211},"maxDistance":2.5,"state":1,"model":-1108204408,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"ems":0},"doorRate":6.0,"_originalId":"st_fiacre_service_room_cafe_to_breakroom"}'),
-	(5171, 'pulsar_st_fiacre_west_reception_break_room', '{"coords":{"x":1122.6400146484376,"y":-1535.6099853515626,"z":35.15999984741211},"maxDistance":2.5,"state":1,"model":-1108204408,"heading":0,"auto":true,"lockSound":"button-remote","groups":{"ems":0},"doorRate":6.0,"_originalId":"st_fiacre_west_reception_break_room"}'),
-	(5172, 'pulsar_st_fiacre_east_double_doors_elevator_left', '{"coords":{"x":1146.050048828125,"y":-1560.6199951171876,"z":34.02999877929687},"maxDistance":2.5,"state":0,"doors":[{"model":610481702,"coords":{"x":1147.969970703125,"y":-1560.6199951171876,"z":34.02999877929687},"heading":0},{"model":2072340116,"coords":{"x":1144.1300048828126,"y":-1560.6199951171876,"z":34.02999877929687},"heading":0}],"auto":true,"lockSound":"button-remote","groups":{"ems":0,"police":0},"doorRate":6.0,"_originalId":"st_fiacre_east_double_doors_elevator_left"}'),
-	(5173, 'pulsar_st_fiacre_elevator_ward_left', '{"coords":{"x":1134.1700439453126,"y":-1563.43994140625,"z":35.18999862670898},"maxDistance":2.5,"state":0,"doors":[{"model":1029158225,"coords":{"x":1134.1700439453126,"y":-1564.739990234375,"z":35.18999862670898},"heading":0},{"model":1029158225,"coords":{"x":1134.1700439453126,"y":-1562.1400146484376,"z":35.18999862670898},"heading":0}],"auto":true,"lockSound":"button-remote","groups":{"ems":0,"police":0},"doorRate":6.0,"_originalId":"st_fiacre_elevator_ward_left"}'),
-	(5174, 'pulsar_st_fiacre_west_ward_double_left', '{"coords":{"x":1131.510009765625,"y":-1550.510009765625,"z":35.18999862670898},"maxDistance":2.5,"state":0,"doors":[{"model":1029158225,"coords":{"x":1132.81005859375,"y":-1550.510009765625,"z":35.18999862670898},"heading":0},{"model":1029158225,"coords":{"x":1130.2099609375,"y":-1550.510009765625,"z":35.18999862670898},"heading":0}],"auto":true,"lockSound":"button-remote","groups":{"ems":0,"police":0},"doorRate":6.0,"_originalId":"st_fiacre_west_ward_double_left"}'),
-	(5175, 'pulsar_st_fiacre_ward_to_morgue_left', '{"coords":{"x":1131.510009765625,"y":-1567.530029296875,"z":35.18999862670898},"maxDistance":2.5,"state":1,"doors":[{"model":1029158225,"coords":{"x":1132.81005859375,"y":-1567.530029296875,"z":35.18999862670898},"heading":0},{"model":1029158225,"coords":{"x":1130.2099609375,"y":-1567.530029296875,"z":35.18999862670898},"heading":0}],"auto":true,"lockSound":"button-remote","groups":{"ems":0,"police":0},"doorRate":6.0,"_originalId":"st_fiacre_ward_to_morgue_left"}'),
-	(5176, 'pulsar_st_fiacre_exam_left1', '{"coords":{"x":1128.9000244140626,"y":-1570.3499755859376,"z":35.18999862670898},"maxDistance":2.5,"state":1,"doors":[{"model":1379556169,"coords":{"x":1128.9000244140626,"y":-1571.22998046875,"z":35.18999862670898},"heading":0},{"model":1379556169,"coords":{"x":1128.9000244140626,"y":-1569.469970703125,"z":35.18999862670898},"heading":0}],"auto":true,"lockSound":"button-remote","groups":{"ems":0,"police":0},"doorRate":6.0,"_originalId":"st_fiacre_exam_left1"}'),
-	(5177, 'pulsar_st_fiacre_exam_left2', '{"coords":{"x":1128.9000244140626,"y":-1576.1500244140626,"z":35.18999862670898},"maxDistance":2.5,"state":1,"doors":[{"model":1379556169,"coords":{"x":1128.9000244140626,"y":-1577.030029296875,"z":35.18999862670898},"heading":0},{"model":1379556169,"coords":{"x":1128.9000244140626,"y":-1575.27001953125,"z":35.18999862670898},"heading":0}],"auto":true,"lockSound":"button-remote","groups":{"ems":0,"police":0},"doorRate":6.0,"_originalId":"st_fiacre_exam_left2"}'),
-	(5178, 'pulsar_st_fiacre_morgue_outer_right', '{"coords":{"x":1134.25,"y":-1574.31005859375,"z":35.18999862670898},"maxDistance":2.5,"state":1,"doors":[{"model":1379556169,"coords":{"x":1134.25,"y":-1575.18994140625,"z":35.18999862670898},"heading":0},{"model":1379556169,"coords":{"x":1134.25,"y":-1573.4300537109376,"z":35.18999862670898},"heading":0}],"auto":true,"lockSound":"button-remote","groups":{"ems":0,"police":0},"doorRate":6.0,"_originalId":"st_fiacre_morgue_outer_right"}'),
-	(5179, 'pulsar_st_fiacre_morgue_inner_left', '{"coords":{"x":1143.4300537109376,"y":-1574.31005859375,"z":35.18999862670898},"maxDistance":2.5,"state":1,"doors":[{"model":1379556169,"coords":{"x":1143.4300537109376,"y":-1573.4300537109376,"z":35.18999862670898},"heading":0},{"model":1379556169,"coords":{"x":1143.4300537109376,"y":-1575.18994140625,"z":35.18999862670898},"heading":0}],"auto":true,"lockSound":"button-remote","groups":{"ems":0,"police":0},"doorRate":6.0,"_originalId":"st_fiacre_morgue_inner_left"}'),
-	(5180, 'pulsar_st_fiacre_morgue_garage_left', '{"coords":{"x":1131.580078125,"y":-1579.030029296875,"z":35.11999893188476},"maxDistance":2.5,"state":1,"doors":[{"model":1360224563,"coords":{"x":1130.4000244140626,"y":-1579.030029296875,"z":35.11999893188476},"heading":0},{"model":1360224563,"coords":{"x":1132.760009765625,"y":-1579.030029296875,"z":35.11999893188476},"heading":0}],"auto":true,"lockSound":"button-remote","groups":{"ems":0,"police":0},"doorRate":6.0,"_originalId":"st_fiacre_morgue_garage_left"}'),
-	(5181, 'pulsar_st_fiacre_garage_1', '{"coords":{"x":1135.9000244140626,"y":-1596.050048828125,"z":35.20000076293945},"onduty":true,"state":1,"model":720452516,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":1.0,"groups":{"ems":0},"_originalId":"st_fiacre_garage_1","maxDistance":2.5}'),
-	(5182, 'pulsar_st_fiacre_garage_2', '{"coords":{"x":1141.489990234375,"y":-1596.0799560546876,"z":35.20000076293945},"onduty":true,"state":1,"model":720452516,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":1.0,"groups":{"ems":0},"_originalId":"st_fiacre_garage_2","maxDistance":2.5}'),
-	(5183, 'pulsar_st_fiacre_2ndfloor_bridge_left', '{"coords":{"x":1151.3199462890626,"y":-1536.3699951171876,"z":39.41999816894531},"maxDistance":2.5,"state":1,"doors":[{"model":-917337152,"coords":{"x":1151.3199462890626,"y":-1537.3800048828126,"z":39.41999816894531},"heading":0},{"model":-1253186633,"coords":{"x":1151.3199462890626,"y":-1535.3599853515626,"z":39.41999816894531},"heading":0}],"auto":true,"lockSound":"button-remote","groups":{"ems":0,"police":0},"doorRate":6.0,"_originalId":"st_fiacre_2ndfloor_bridge_left"}'),
-	(5184, 'pulsar_st_fiacre_reception_to_gym_1', '{"coords":{"x":1139.1400146484376,"y":-1526.969970703125,"z":39.6500015258789},"onduty":true,"state":0,"doors":[{"model":-919537394,"coords":{"x":1137.8699951171876,"y":-1526.969970703125,"z":39.6500015258789},"heading":0},{"model":-919537394,"coords":{"x":1140.4100341796876,"y":-1526.969970703125,"z":39.6500015258789},"heading":0}],"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"ems":0},"_originalId":"st_fiacre_reception_to_gym_1","maxDistance":2.5}'),
-	(5185, 'pulsar_st_fiacre_training_room', '{"coords":{"x":1128.9200439453126,"y":-1537.199951171875,"z":39.63000106811523},"onduty":true,"state":1,"model":-1337230745,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"ems":0},"_originalId":"st_fiacre_training_room","maxDistance":2.5}'),
-	(5186, 'pulsar_st_fiacre_2nd_lobby_right_1', '{"coords":{"x":1146.25,"y":-1560.5400390625,"z":39.6500015258789},"maxDistance":2.5,"state":0,"doors":[{"model":1029158225,"coords":{"x":1147.550048828125,"y":-1560.5400390625,"z":39.6500015258789},"heading":0},{"model":1029158225,"coords":{"x":1144.949951171875,"y":-1560.5400390625,"z":39.6500015258789},"heading":0}],"auto":true,"lockSound":"button-remote","groups":{"ems":0,"police":0},"doorRate":6.0,"_originalId":"st_fiacre_2nd_lobby_right_1"}'),
-	(5187, 'pulsar_st_fiacre_2nd_lobby_right_2', '{"coords":{"x":1134.1600341796876,"y":-1563.43994140625,"z":39.65999984741211},"maxDistance":2.5,"state":0,"doors":[{"model":1029158225,"coords":{"x":1134.1600341796876,"y":-1562.1400146484376,"z":39.65999984741211},"heading":0},{"model":1029158225,"coords":{"x":1134.1600341796876,"y":-1564.739990234375,"z":39.65999984741211},"heading":0}],"auto":true,"lockSound":"button-remote","groups":{"ems":0,"police":0},"doorRate":6.0,"_originalId":"st_fiacre_2nd_lobby_right_2"}'),
-	(5188, 'pulsar_st_fiacre_2nd_reception_right_1', '{"coords":{"x":1146.2449951171876,"y":-1540.8599853515626,"z":39.65999984741211},"maxDistance":2.5,"state":0,"doors":[{"model":1029158225,"coords":{"x":1147.550048828125,"y":-1540.8599853515626,"z":39.65999984741211},"heading":0},{"model":1029158225,"coords":{"x":1144.93994140625,"y":-1540.8599853515626,"z":39.65999984741211},"heading":0}],"auto":true,"lockSound":"button-remote","groups":{"ems":0,"police":0},"doorRate":6.0,"_originalId":"st_fiacre_2nd_reception_right_1"}'),
-	(5189, 'pulsar_st_fiacre_2nd_reception_right_2', '{"coords":{"x":1132.06005859375,"y":-1540.8900146484376,"z":39.65999984741211},"maxDistance":2.5,"state":0,"doors":[{"model":1029158225,"coords":{"x":1133.3599853515626,"y":-1540.8900146484376,"z":39.65999984741211},"heading":0},{"model":1029158225,"coords":{"x":1130.760009765625,"y":-1540.8900146484376,"z":39.65999984741211},"heading":0}],"auto":true,"lockSound":"button-remote","groups":{"ems":0,"police":0},"doorRate":6.0,"_originalId":"st_fiacre_2nd_reception_right_2"}'),
-	(5190, 'pulsar_st_fiacre_chief_right', '{"coords":{"x":1129.9599609375,"y":-1563.43994140625,"z":39.65999984741211},"onduty":true,"state":1,"doors":[{"model":1029158225,"coords":{"x":1129.9599609375,"y":-1562.1400146484376,"z":39.65999984741211},"heading":0},{"model":1029158225,"coords":{"x":1129.9599609375,"y":-1564.739990234375,"z":39.65999984741211},"heading":0}],"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"ems":0},"_originalId":"st_fiacre_chief_right","maxDistance":2.5}'),
-	(5191, 'pulsar_st_fiacre_chief_doctor', '{"coords":{"x":1124.1099853515626,"y":-1564.050048828125,"z":39.63999938964844},"onduty":true,"state":1,"model":-1337230745,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"ems":0},"_originalId":"st_fiacre_chief_doctor","maxDistance":2.5}'),
-	(5192, 'pulsar_st_fiacre_dep_chief_doctor', '{"coords":{"x":1126.4300537109376,"y":-1567.6700439453126,"z":39.63000106811523},"onduty":true,"state":1,"model":-1337230745,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"ems":0},"_originalId":"st_fiacre_dep_chief_doctor","maxDistance":2.5}'),
-	(5193, 'pulsar_st_fiacre_2nd_office1', '{"coords":{"x":1129.9200439453126,"y":-1556.760009765625,"z":39.63000106811523},"onduty":true,"state":1,"model":-1337230745,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"ems":0},"_originalId":"st_fiacre_2nd_office1","maxDistance":2.5}'),
-	(5194, 'pulsar_st_fiacre_2nd_office2', '{"coords":{"x":1129.9300537109376,"y":-1544.6800537109376,"z":39.63000106811523},"onduty":true,"state":1,"model":-1337230745,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"ems":0},"_originalId":"st_fiacre_2nd_office2","maxDistance":2.5}'),
-	(5195, 'pulsar_st_fiacre_2nd_office3', '{"coords":{"x":1129.9300537109376,"y":-1553.43994140625,"z":39.63000106811523},"onduty":true,"state":1,"model":-1337230745,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"ems":0},"_originalId":"st_fiacre_2nd_office3","maxDistance":2.5}'),
-	(5196, 'pulsar_st_fiacre_2nd_xray1', '{"coords":{"x":1134.199951171875,"y":-1543.4599609375,"z":39.63000106811523},"onduty":true,"state":1,"model":-1337230745,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"ems":0},"_originalId":"st_fiacre_2nd_xray1","maxDistance":2.5}'),
-	(5197, 'pulsar_st_fiacre_2nd_xray1_view', '{"coords":{"x":1134.199951171875,"y":-1553.43994140625,"z":39.63000106811523},"onduty":true,"state":1,"model":-1337230745,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"ems":0},"_originalId":"st_fiacre_2nd_xray1_view","maxDistance":2.5}'),
-	(5198, 'pulsar_st_fiacre_2nd_xray1_view_inner', '{"coords":{"x":1134.989990234375,"y":-1549.530029296875,"z":39.63000106811523},"onduty":true,"state":1,"model":-206212846,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"ems":0},"_originalId":"st_fiacre_2nd_xray1_view_inner","maxDistance":2.5}'),
-	(5199, 'pulsar_st_fiacre_2nd_xray2', '{"coords":{"x":1134.199951171875,"y":-1556.780029296875,"z":39.63000106811523},"onduty":true,"state":1,"model":-1337230745,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"ems":0},"_originalId":"st_fiacre_2nd_xray2","maxDistance":2.5}'),
-	(5200, 'pulsar_st_fiacre_2nd_ward2', '{"coords":{"x":1148.3800048828126,"y":-1558.4200439453126,"z":39.63000106811523},"onduty":true,"state":1,"model":-1337230745,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"ems":0},"_originalId":"st_fiacre_2nd_ward2","maxDistance":2.5}'),
-	(5201, 'pulsar_st_fiacre_2nd_ward4', '{"coords":{"x":1148.3800048828126,"y":-1551.9100341796876,"z":39.63000106811523},"onduty":true,"state":1,"model":-1337230745,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"ems":0},"_originalId":"st_fiacre_2nd_ward4","maxDistance":2.5}'),
-	(5202, 'pulsar_st_fiacre_2nd_ward6', '{"coords":{"x":1148.3800048828126,"y":-1545.4000244140626,"z":39.63000106811523},"onduty":true,"state":1,"model":-1337230745,"heading":0,"lockSound":"button-remote","auto":true,"doorRate":6.0,"groups":{"ems":0},"_originalId":"st_fiacre_2nd_ward6","maxDistance":2.5}'),
-	(5203, 'prison_test', '{"coords":{"x":1844.978271484375,"y":2608.427490234375,"z":44.63977813720703},"onduty":true,"maxDistance":2.5,"groups":{"police":0,"ems":0,"prison":0},"lockSound":"button-remote","model":741314661,"state":1,"doorRate":6,"auto":true,"heading":90}');
-
-DROP TABLE IF EXISTS `peds`;
-CREATE TABLE IF NOT EXISTS `peds` (
-  `char` varchar(255) NOT NULL,
-  `ped` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL,
-  PRIMARY KEY (`char`) USING BTREE,
-  CONSTRAINT `ped` CHECK (json_valid(`ped`))
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
-
-DROP TABLE IF EXISTS `whitelisted_peds`;
-CREATE TABLE IF NOT EXISTS `whitelisted_peds` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `sid` int(11) NOT NULL,
-  `model` varchar(100) NOT NULL,
-  `label` varchar(255) NOT NULL,
-  `created` datetime NOT NULL DEFAULT current_timestamp(),
-  PRIMARY KEY (`id`),
-  KEY `sid` (`sid`),
-  KEY `model` (`model`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
-DROP TABLE IF EXISTS `placed_meth_tables`;
 CREATE TABLE IF NOT EXISTS `placed_meth_tables` (
   `table_id` int(11) NOT NULL,
   `owner` bigint(20) DEFAULT NULL,
@@ -1931,31 +726,6 @@ CREATE TABLE IF NOT EXISTS `placed_meth_tables` (
   PRIMARY KEY (`table_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
-DROP TABLE IF EXISTS `placed_moonshine_barrels`;
-CREATE TABLE IF NOT EXISTS `placed_moonshine_barrels` (
-  `barrel_id` int(11) NOT NULL,
-  `owner` varchar(50) NOT NULL,
-  `placed` int(11) NOT NULL,
-  `ready` int(11) NOT NULL,
-  `expires` int(11) NOT NULL,
-  `coords` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL CHECK (json_valid(`coords`)),
-  `heading` float NOT NULL,
-  `brew_data` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL CHECK (json_valid(`brew_data`)),
-  PRIMARY KEY (`barrel_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
-
-DROP TABLE IF EXISTS `placed_moonshine_stills`;
-CREATE TABLE IF NOT EXISTS `placed_moonshine_stills` (
-  `still_id` int(11) NOT NULL,
-  `owner` varchar(50) NOT NULL,
-  `placed` int(11) NOT NULL,
-  `expires` int(11) NOT NULL,
-  `coords` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL CHECK (json_valid(`coords`)),
-  `heading` float NOT NULL,
-  PRIMARY KEY (`still_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
-
-DROP TABLE IF EXISTS `placed_props`;
 CREATE TABLE IF NOT EXISTS `placed_props` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `model` varchar(255) NOT NULL DEFAULT '',
@@ -1971,64 +741,24 @@ CREATE TABLE IF NOT EXISTS `placed_props` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=38 DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
-DROP TABLE IF EXISTS `properties`;
-CREATE TABLE IF NOT EXISTS `properties` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `type` varchar(255) NOT NULL,
-  `label` varchar(255) NOT NULL,
-  `price` int(11) NOT NULL DEFAULT 0,
-  `sold` tinyint(1) NOT NULL DEFAULT 0,
-  `owner` varchar(255) DEFAULT NULL,
-  `location` longtext DEFAULT NULL,
-  `upgrades` longtext DEFAULT NULL,
-  `locked` tinyint(1) NOT NULL DEFAULT 1,
-  `keys` longtext DEFAULT NULL,
-  `data` longtext DEFAULT NULL,
-  `foreclosed` tinyint(1) NOT NULL DEFAULT 0,
-  `soldAt` int(11) DEFAULT NULL,
-  `created_at` timestamp DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
-  KEY `type` (`type`),
-  KEY `owner` (`owner`),
-  KEY `sold` (`sold`),
-  CONSTRAINT `location` CHECK (json_valid(`location`)),
-  CONSTRAINT `upgrades` CHECK (json_valid(`upgrades`)),
-  CONSTRAINT `keys` CHECK (json_valid(`keys`)),
-  CONSTRAINT `data` CHECK (json_valid(`data`))
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_520_ci;
+CREATE TABLE IF NOT EXISTS `player_shops` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(64) NOT NULL,
+  `ped_model` varchar(256) DEFAULT NULL,
+  `position` text NOT NULL,
+  `owner` int(10) unsigned NOT NULL,
+  `owner_bank` int(11) NOT NULL,
+  `job` varchar(64) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
-DROP TABLE IF EXISTS `properties_furniture`;
-CREATE TABLE IF NOT EXISTS `properties_furniture` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `property` varchar(255) NOT NULL,
-  `furniture` longtext DEFAULT NULL,
-  `updatedTime` int(11) DEFAULT NULL,
-  `updatedBy` longtext DEFAULT NULL,
-  `created_at` timestamp DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `property` (`property`),
-  CONSTRAINT `furniture` CHECK (json_valid(`furniture`)),
-  CONSTRAINT `updatedBy` CHECK (json_valid(`updatedBy`))
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_520_ci;
+CREATE TABLE IF NOT EXISTS `player_shops_moderators` (
+  `shop` int(10) unsigned NOT NULL,
+  `name` varchar(512) DEFAULT NULL,
+  `sid` int(10) unsigned NOT NULL,
+  PRIMARY KEY (`shop`,`sid`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
-DROP TABLE IF EXISTS `redline_racer_history`;
-CREATE TABLE IF NOT EXISTS `redline_racer_history` (
-  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-  `sid` int(11) unsigned NOT NULL,
-  `date` datetime NOT NULL DEFAULT current_timestamp(),
-  `placing` int(11) NOT NULL,
-  `winnings` text DEFAULT NULL,
-  `vehicle` varchar(128) NOT NULL,
-  `vehicle_class` varchar(4) NOT NULL,
-  `track` int(11) unsigned NOT NULL,
-  PRIMARY KEY (`id`),
-  KEY `racer_history_track` (`track`),
-  KEY `racer_history` (`sid`) USING BTREE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_520_ci;
-
-DROP TABLE IF EXISTS `redline_race_history`;
 CREATE TABLE IF NOT EXISTS `redline_race_history` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `state` int(11) NOT NULL DEFAULT 0,
@@ -2040,21 +770,25 @@ CREATE TABLE IF NOT EXISTS `redline_race_history` (
   `racers` longtext NOT NULL DEFAULT '[]',
   `date` datetime NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`id`),
-  KEY `race_history_track` (`track`)
+  KEY `race_history_track` (`track`),
+  CONSTRAINT `race_history_track` FOREIGN KEY (`track`) REFERENCES `redline_tracks` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_520_ci;
 
-DROP TABLE IF EXISTS `redline_tracks`;
-CREATE TABLE IF NOT EXISTS `redline_tracks` (
+CREATE TABLE IF NOT EXISTS `redline_racer_history` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-  `name` varchar(64) NOT NULL,
-  `distance` varchar(256) NOT NULL,
-  `type` varchar(16) NOT NULL,
-  `checkpoints` longtext NOT NULL,
-  `created_by` varchar(64) DEFAULT NULL,
-  PRIMARY KEY (`id`)
+  `sid` int(11) unsigned NOT NULL,
+  `date` datetime NOT NULL DEFAULT current_timestamp(),
+  `placing` int(11) NOT NULL,
+  `winnings` text DEFAULT NULL,
+  `vehicle` varchar(128) NOT NULL,
+  `vehicle_class` varchar(4) NOT NULL,
+  `track` int(11) unsigned NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `racer_history_track` (`track`),
+  KEY `racer_history` (`sid`) USING BTREE,
+  CONSTRAINT `racer_history_track` FOREIGN KEY (`track`) REFERENCES `redline_tracks` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_520_ci;
 
-DROP TABLE IF EXISTS `redline_track_history`;
 CREATE TABLE IF NOT EXISTS `redline_track_history` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `track` int(11) unsigned NOT NULL,
@@ -2068,124 +802,86 @@ CREATE TABLE IF NOT EXISTS `redline_track_history` (
   PRIMARY KEY (`id`),
   KEY `track_history_track` (`track`),
   KEY `track_history_race` (`race`),
-  KEY `sid` (`sid`)
+  KEY `sid` (`sid`),
+  CONSTRAINT `track_history_race` FOREIGN KEY (`race`) REFERENCES `redline_race_history` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `track_history_track` FOREIGN KEY (`track`) REFERENCES `redline_tracks` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_520_ci;
 
-DROP TABLE IF EXISTS `scenes`;
-CREATE TABLE IF NOT EXISTS `scenes` (
-  `_id` int(11) NOT NULL AUTO_INCREMENT,
-  `coords` text NOT NULL,
-  `length` int(11) DEFAULT NULL,
-  `expires` bigint(20) DEFAULT NULL,
-  `staff` tinyint(1) DEFAULT NULL,
-  `distance` float DEFAULT NULL,
-  `route` int(11) DEFAULT NULL,
-  `text` text DEFAULT NULL,
-  `background` text DEFAULT NULL,
-  PRIMARY KEY (`_id`)
+CREATE TABLE IF NOT EXISTS `redline_tracks` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(64) NOT NULL,
+  `distance` varchar(256) NOT NULL,
+  `type` varchar(16) NOT NULL,
+  `checkpoints` longtext NOT NULL,
+  `created_by` varchar(64) DEFAULT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_520_ci;
 
-DROP TABLE IF EXISTS `sequence`;
 CREATE TABLE IF NOT EXISTS `sequence` (
   `id` char(64) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
   `sequence` int(10) unsigned NOT NULL DEFAULT 1,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
-DROP TABLE IF EXISTS `shop_bank_accounts`;
+INSERT INTO `sequence` (`id`, `sequence`) VALUES
+	('Account', 1),
+	('Character', 6),
+	('WEAPON_38SNUBNOSE2', 1),
+	('WEAPON_44MAGNUM_PD', 1),
+	('WEAPON_ADVANCEDRIFLE', 1),
+	('WEAPON_AK74', 1),
+	('WEAPON_AR15_PD', 1),
+	('WEAPON_BEANBAG', 1),
+	('WEAPON_BROWNING', 1),
+	('WEAPON_BULLPUPSHOTGUN_PD', 1),
+	('WEAPON_COMBATMG_MK2', 1),
+	('WEAPON_COMBATPISTOL', 1),
+	('WEAPON_CROWBAR', 1),
+	('WEAPON_FIREWORK', 1),
+	('WEAPON_FIVESEVEN_PD', 1),
+	('WEAPON_FM1_M9A3', 1),
+	('WEAPON_FNX45', 1),
+	('WEAPON_G36', 2),
+	('WEAPON_GLOCK19', 1),
+	('WEAPON_GLOCK19_CIV', 1),
+	('WEAPON_GRENADE', 1),
+	('WEAPON_HATCHET', 1),
+	('WEAPON_HEAVYPISTOL', 2),
+	('WEAPON_HEAVYSHOTGUN', 1),
+	('WEAPON_HEAVYSNIPER_MK2', 1),
+	('WEAPON_HKUMP_PD', 1),
+	('WEAPON_KATANAS', 1),
+	('WEAPON_L5', 1),
+	('WEAPON_MACHETE', 1),
+	('WEAPON_MCXRATTLER', 1),
+	('WEAPON_MINISMG', 1),
+	('WEAPON_MK47BANSHEE2', 1),
+	('WEAPON_MK47FM', 1),
+	('WEAPON_MP9A', 1),
+	('WEAPON_NSR9', 1),
+	('WEAPON_P320A', 1),
+	('WEAPON_PETROLCAN', 1),
+	('WEAPON_PISTOL', 2),
+	('WEAPON_PISTOL50', 1),
+	('WEAPON_PISTOL_MK2', 1),
+	('WEAPON_PM4', 1),
+	('WEAPON_PROXMINE', 1),
+	('WEAPON_SAWNOFFSHOTGUN', 1),
+	('WEAPON_SLEDGE', 1),
+	('WEAPON_SMG', 1),
+	('WEAPON_STONE_HATCHET', 1),
+	('WEAPON_SWITCHBLADE', 1),
+	('WEAPON_VECTOR', 1),
+	('WEAPON_VINTAGEPISTOL', 1);
+
 CREATE TABLE IF NOT EXISTS `shop_bank_accounts` (
   `shop` int(10) unsigned NOT NULL,
   `bank` int(10) unsigned NOT NULL,
   PRIMARY KEY (`shop`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
 
-DROP TABLE IF EXISTS `storage_units`;
-CREATE TABLE `storage_units` (
-    `_id` INT(11) NOT NULL AUTO_INCREMENT,
-    `label` VARCHAR(255) NULL DEFAULT NULL COLLATE 'latin1_swedish_ci',
-    `owner` INT(11) NULL DEFAULT -1,
-    `level` VARCHAR(255) NULL DEFAULT NULL COLLATE 'latin1_swedish_ci',
-    `location` LONGTEXT NULL DEFAULT NULL COLLATE 'utf8mb4_bin',
-    `managedBy` VARCHAR(255) NULL DEFAULT NULL,
-    `lastAccessed` DATETIME NULL DEFAULT NULL,
-    `passcode` VARCHAR(255) NULL DEFAULT NULL COLLATE 'latin1_swedish_ci',
-    PRIMARY KEY (`_id`) USING BTREE,
-    CONSTRAINT `location` CHECK (json_valid(`location`))
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
-
-DROP TABLE IF EXISTS `tokens`;
-CREATE TABLE IF NOT EXISTS `tokens` (
-    `account` VARCHAR(255) NOT NULL,
-    `tokens` LONGTEXT DEFAULT NULL,
-    PRIMARY KEY (`account`),
-    CONSTRAINT `tokens` CHECK (json_valid(`tokens`))
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
-DROP TABLE IF EXISTS `vehicles`;
-CREATE TABLE IF NOT EXISTS `vehicles` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `VIN` varchar(50) NOT NULL,
-  `Type` int(11) NOT NULL DEFAULT 0,
-  `Make` varchar(100) NOT NULL,
-  `Model` varchar(100) NOT NULL,
-  `RegisteredPlate` varchar(20) NOT NULL,
-  `RegistrationDate` int(11) DEFAULT 0,
-  `OwnerType` int(11) NOT NULL DEFAULT 0,
-  `OwnerId` varchar(255) NOT NULL,
-  `OwnerWorkplace` varchar(255) DEFAULT NULL,
-  `StorageType` int(11) DEFAULT NULL,
-  `StorageId` varchar(50) DEFAULT NULL,
-  `FirstSpawn` boolean DEFAULT FALSE,
-  `Mileage` decimal(10,2) DEFAULT 0.00,
-  `Fuel` decimal(5,2) DEFAULT 100.00,
-  `DirtLevel` decimal(4,2) DEFAULT 0.00,
-  `Value` int(11) DEFAULT 0,
-  `Class` varchar(10) DEFAULT 'Unknown',
-  `Vehicle` int(11) DEFAULT 0,
-  `FakePlate` tinyint(1) NOT NULL DEFAULT 0,
-  `Damage` json DEFAULT NULL,
-  `DamagedParts` json DEFAULT NULL,
-  `Polish` json DEFAULT NULL,
-  `PurgeColor` json DEFAULT NULL,
-  `PurgeLocation` varchar(50) DEFAULT '',
-  `Harness` int(11) DEFAULT 0,
-  `Nitrous` int(11) DEFAULT 0,
-  `NeonsDisabled` boolean DEFAULT FALSE,
-  `WheelFitment` json DEFAULT NULL,
-  `Donator` boolean DEFAULT FALSE,
-  `Seized` boolean DEFAULT FALSE,
-  `SeizedTime` int(11) DEFAULT 0,
-  `Properties` longtext DEFAULT NULL,
-  `Created` datetime NOT NULL DEFAULT current_timestamp(),
-  `LastSave` bigint(20) DEFAULT NULL,
-  `ModelType` varchar(50) DEFAULT 'automobile',
-  `OwnerLevel` INT(11) DEFAULT 0,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `VIN` (`VIN`),
-  KEY `OwnerType` (`OwnerType`),
-  KEY `OwnerId` (`OwnerId`),
-  KEY `RegisteredPlate` (`RegisteredPlate`),
-  CONSTRAINT `Properties` CHECK (json_valid(`Properties`))
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
-DROP TABLE IF EXISTS `weed`;
-CREATE TABLE IF NOT EXISTS `weed` (
-  `id` INT(11) NOT NULL AUTO_INCREMENT,
-  `is_male` TINYINT(1) NOT NULL,
-  `x` DOUBLE NOT NULL,
-  `y` DOUBLE NOT NULL,
-  `z` DOUBLE NOT NULL,
-  `growth` FLOAT NOT NULL DEFAULT 0,
-  `output` FLOAT NOT NULL DEFAULT 1,
-  `material` INT(11) NOT NULL,
-  `planted` INT(11) NOT NULL,
-  `water` FLOAT NOT NULL DEFAULT 100,
-  `fertilizer_type` VARCHAR(32) DEFAULT NULL,
-  `fertilizer_value` FLOAT DEFAULT NULL,
-  `fertilizer_time` INT(11) DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
-
-SET FOREIGN_KEY_CHECKS=1;
-
-
+/*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
+/*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
+/*!40014 SET FOREIGN_KEY_CHECKS=IFNULL(@OLD_FOREIGN_KEY_CHECKS, 1) */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40111 SET SQL_NOTES=IFNULL(@OLD_SQL_NOTES, 1) */;
